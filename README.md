@@ -10,18 +10,33 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_UPDATE_STATE
 };
 ```
-Events tiggered by a *bThing*. Use `mgos_event_add_handler()` or `mgos_event_add_group_handler(MGOS_BTHING_EVENT_BASE, ...)` for handling triggered events.
+Events triggered by a*bThing* or on which it is listening to. Use `mgos_event_add_group_handler(MGOS_BTHING_EVENT_BASE, ...)` for handling all triggered events in one shot.
 
-|Event||
-|--|--|
-|MGOS_EV_BTHING_CREATED|Raised Raised when a new *bThing* is created.|
-|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the `mgos_bthing_notify_state` enum value configured for the *bThing*.|
+**MGOS_EV_BTHING_CREATED** - Triggered when a new *bThing* is created. 
+```c
+static void bthing_created_cb(int ev, void *ev_data, void *userdata) {
+  mgos_bthing_t thing = (mgos_bthing_t)ev_data;
+  // do something...
+}
+mgos_event_add_handler(MGOS_EV_BTHING_CREATED, bthing_created_cb, NULL);
+```
 
-Events a *bThing* is listening to. Use `mgos_event_trigger()` for sending an event to a *bThing*.
+**MGOS_EV_BTHING_STATE_UPDATED** - Triggered when the state of a *bThing* has been updated. This event is triggered according the `mgos_bthing_notify_state` enum value configured for the *bThing*.
+```c
+static void bthing_state_updated_cb(int ev, void *ev_data, void *userdata) {
+  mgos_bthing_state *state = (mgos_bthing_state *)ev_data;
+  // do something...
+}
+mgos_event_add_handler(MGOS_EV_BTHING_STATE_UPDATED, bthing_state_updated_cb, NULL);
+```
 
-|Event||
-|--|--|
-|MGOS_EV_BTHING_UPDATE_STATE|Send this message for requesting a *bThing* to update its state.|
+**MGOS_EV_BTHING_UPDATE_STATE** - Send this message for requesting to update the state. This message can be sent to all registered *bThings* or to a specific one.
+```c
+// Send the message to all registered bThings
+mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, NULL);
+// Send the message to a specific bThing
+mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, thing);
+```
 ### enum mgos_bthing_notify_state
 ```c
 enum mgos_bthing_notify_state {
@@ -97,18 +112,24 @@ bThing.EVENT: {
   UPDATE_STATE
 }
 ```
-Events tiggered by a *bThing*. Use `Event.addHandler()` or `Event.addGroupHandler(bThing.EVENT.BASE, ...)` for handling triggered events.
+Events triggered by a*bThing* or on which it is listening to. Use `Event.addGroupHandler(bThing.EVENT.BASE, ...)` for handling all triggered events in one shot.
 
-|Event||
-|--|--|
-|CREATED|Raised Raised when a new *bThing* is created.|
-|STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the `bThing.NOTIFY_STATE` value configured for the *bThing*.|
+**CREATED** - Triggered when a new *bThing* is created. 
+```js
+Event.addHandler(bThing.EVENT.CREATED, function(ev, thing, ud) {
+  let thing = bThing.getFromHandle(evdata);
+}, null);
+```
 
-Events a *bThing* is listening to. Use `Event.trigger()` for sending an event to a *bThing*.
+**STATE_UPDATED** - Triggered when the state of a *bThing* has been updated. This event is triggered according the `bThing.NOTIFY_STATE` [value](#bthingnotify_state) configured for the *bThing*.
 
-|Event||
-|--|--|
-|UPDATE_STATE|Send this message for requesting a *bThing* to update its state.|
+**UPDATE_STATE** - Send this message for requesting to update the state. This message can be sent to all registered *bThings* or to a specific one.
+```js
+// Send the message to all registered bThings
+Event.trigger(bThing.EVENT.UPDATE_STATE, null);
+// Send the message to a specific bThing
+Event.trigger(bThing.EVENT.UPDATE_STATE, thing);
+```
 ### bThing.NOTIFY_STATE
 ```js
 bThing.NOTIFY_STATE: {
@@ -117,7 +138,7 @@ bThing.NOTIFY_STATE: {
   ALWAYS
 }
 ```
-Ways a *bThing* can trigger the `bThing.NOTIFY_STATE.STATE_UPDATED` event.
+Ways a *bThing* can trigger the `bThing.EVENT.STATE_UPDATED` [event](#bthingevent).
 
 |Value||
 |--|--|

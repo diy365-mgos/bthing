@@ -28,11 +28,18 @@ extern "C" {
 struct mg_bthing;
 struct mg_bthing_enum;
 
+
 /* Generic and opaque bThing instance */
 typedef struct mg_bthing *mgos_bthing_t;
 
 /* bThing enumerator */
 typedef struct mg_bthing_enum *mgos_bthing_enum_t;
+
+/* bThing base state */
+typedef struct mgos_bthing_state {
+  mgos_bthing_t thing;
+  void *value;
+} mgos_bthing_state_t;
 
 
 #define MGOS_BTHING_TYPE_SENSOR 1
