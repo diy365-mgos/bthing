@@ -1,0 +1,22 @@
+author: DYI365
+type: lib
+description: Mongoose OS core library for the bThings ecosystem.
+version: 1.0
+
+sources:
+  - src
+
+includes:
+  - include
+
+filesystem:
+  - fs
+
+config_schema:
+
+libs:
+
+tags:
+  - c
+
+manifest_version: 2017-09-29
