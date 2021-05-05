@@ -128,7 +128,7 @@ Events triggered by a*bThing* or on which it is listening to. Use `Event.addGrou
 
 Example:
 ```js
-Event.addHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
+Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
   let thing = bThing.getFromHandle(evdata);
   if (ev == bThing.EVENT.CREATED) {
     // ...
