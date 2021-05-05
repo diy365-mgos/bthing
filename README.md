@@ -5,32 +5,38 @@ Mongoose OS core library for the bThings ecosystem.
 ### enum mgos_bthing_event
 ```c
 enum mgos_bthing_event {
+  MGOS_EV_BTHING_ANY,
   MGOS_EV_BTHING_CREATED, 
   MGOS_EV_BTHING_STATE_UPDATED,
   MGOS_EV_BTHING_UPDATE_STATE
 };
 ```
-Events triggered by a*bThing* or on which it is listening to. Use `mgos_event_add_group_handler(MGOS_BTHING_EVENT_BASE, ...)` for handling all triggered events in one shot.
+Events triggered by a*bThing* or on which it is listening to. Use `mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, ...)` for handling all triggered events in one shot.
 
-**MGOS_EV_BTHING_CREATED** - Triggered when a new *bThing* is created. 
+|Event||
+|--|--|
+|MGOS_EV_BTHING_CREATED|Triggered when a new *bThing* is created.|
+|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the *bThing* state notification setting (see [mgos_bthing_notify_state](#enum-mgos_bthing_notify_state) below).|
+
+Example:
 ```c
-static void bthing_created_cb(int ev, void *ev_data, void *userdata) {
+static void bthing_events_cb(int ev, void *ev_data, void *userdata) {
   mgos_bthing_t thing = (mgos_bthing_t)ev_data;
-  // do something...
+  if (ev == case MGOS_EV_BTHING_CREATED) {
+    // ...
+  } else if (ev == case MGOS_EV_BTHING_STATE_UPDATED) {
+    // ...
+  }
+  (void) userdata;
 }
-mgos_event_add_handler(MGOS_EV_BTHING_CREATED, bthing_created_cb, NULL);
-```
 
-**MGOS_EV_BTHING_STATE_UPDATED** - Triggered when the state of a *bThing* has been updated. This event is triggered according the `mgos_bthing_notify_state` enum value configured for the *bThing*.
-```c
-static void bthing_state_updated_cb(int ev, void *ev_data, void *userdata) {
-  mgos_bthing_state *state = (mgos_bthing_state *)ev_data;
-  // do something...
-}
-mgos_event_add_handler(MGOS_EV_BTHING_STATE_UPDATED, bthing_state_updated_cb, NULL);
+mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, bthing_events_cb, NULL);
 ```
+|Event||
+|--|--|
+|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the *bThing* state to be updated. This can be sent to all registered *bThings* or to a specific one. After sending it, a `MGOS_EV_BTHING_STATE_UPDATED` event is forcibly triggered unless the *bThings* is configured as `MGOS_BTHING_NOTIFY_STATE_NEVER` (see [mgos_bthing_notify_state](#enum-mgos_bthing_notify_state) below).|
 
-**MGOS_EV_BTHING_UPDATE_STATE** - Send this message for requesting to update the state. This message can be sent to all registered *bThings* or to a specific one.
+Example:
 ```c
 // Send the message to all registered bThings
 mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, NULL);
@@ -45,7 +51,7 @@ enum mgos_bthing_notify_state {
   MGOS_BTHING_NOTIFY_STATE_ALWAYS
 };
 ```
-Ways a *bThing* can trigger the `MGOS_EV_BTHING_STATE_UPDATED` event.
+Ways a *bThing* can trigger the `MGOS_EV_BTHING_STATE_UPDATED` [event](#enum-mgos_bthing_event).
 
 |Value||
 |--|--|
@@ -107,23 +113,35 @@ Gets the next *bThing* iterating registered ones. Returns `false` if the end of 
 ### bThing.EVENT
 ```js
 bThing.EVENT: {
+  ANY,
   CREATED,
   STATE_UPDATED,
   UPDATE_STATE
 }
 ```
-Events triggered by a*bThing* or on which it is listening to. Use `Event.addGroupHandler(bThing.EVENT.BASE, ...)` for handling all triggered events in one shot.
+Events triggered by a*bThing* or on which it is listening to. Use `Event.addGroupHandler(bThing.EVENT.ANY, ...)` for handling all triggered events in one shot.
 
-**CREATED** - Triggered when a new *bThing* is created. 
+|Event||
+|--|--|
+|CREATED|Triggered when a new *bThing* is created.|
+|STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the *bThing* state notification setting (see [bThing.EVENT.STATE](#bthingnotify_state) below).|
+
+Example:
 ```js
-Event.addHandler(bThing.EVENT.CREATED, function(ev, thing, ud) {
+Event.addHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
   let thing = bThing.getFromHandle(evdata);
+  if (ev == bThing.EVENT.CREATED) {
+    // ...
+  } else if (ev == bThing.EVENT.STATE_UPDATED) {
+    // ...  
+  }
 }, null);
 ```
+|Event||
+|--|--|
+|UPDATE_STATE|Send this event-command to force the *bThing* state to be updated. This can be sent to all registered *bThings* or to a specific one. After sending it, a `bThing.EVENT.STATE_UPDATED` event is forcibly triggered unless the *bThings* is configured as `bThing.NOTIFY_STATE.NEVER` (see [bThing.EVENT.STATE](#bthingnotify_state) below).|
 
-**STATE_UPDATED** - Triggered when the state of a *bThing* has been updated. This event is triggered according the `bThing.NOTIFY_STATE` [value](#bthingnotify_state) configured for the *bThing*.
-
-**UPDATE_STATE** - Send this message for requesting to update the state. This message can be sent to all registered *bThings* or to a specific one.
+Example:
 ```js
 // Send the message to all registered bThings
 Event.trigger(bThing.EVENT.UPDATE_STATE, null);

@@ -73,7 +73,7 @@ let bThing = {
 
   // Event codes 
   EVENT: {
-    BASE: 0, // TODO: update
+    ANY: 0, // TODO: update
     CREATED: 0, 
     STATE_UPDATED: 0,
     UPDATE_STATE: 0,

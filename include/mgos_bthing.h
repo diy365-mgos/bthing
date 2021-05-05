@@ -35,12 +35,6 @@ typedef struct mg_bthing *mgos_bthing_t;
 /* bThing enumerator */
 typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 
-/* bThing base state */
-typedef struct mgos_bthing_state {
-  mgos_bthing_t thing;
-  void *value;
-} mgos_bthing_state_t;
-
 
 #define MGOS_BTHING_TYPE_SENSOR 1
 #define MGOS_BTHING_TYPE_ACTUATOR 3
@@ -56,7 +50,8 @@ typedef struct mgos_bthing_state {
 
 #define MGOS_BTHING_EVENT_BASE MGOS_EVENT_BASE('B', 'T', 'N')
 enum mgos_bthing_event {
-  MGOS_EV_BTHING_CREATED = MGOS_BTHING_EVENT_BASE, 
+  MGOS_EV_BTHING_ANY = MGOS_BTHING_EVENT_BASE, 
+  MGOS_EV_BTHING_CREATED, 
   MGOS_EV_BTHING_STATE_UPDATED,
   MGOS_EV_BTHING_UPDATE_STATE
 };
