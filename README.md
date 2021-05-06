@@ -209,7 +209,7 @@ Events triggered by a*bThing* or on which it is listening to. Use `Event.addGrou
 |Event||
 |--|--|
 |CREATED|Triggered when a new *bThing* is created.|
-|STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the *bThing* state notification setting (see [bThing.EVENT.STATE](#bthingnotify_state) below).|
+|STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the *bThing* state notification setting (see [bThing.NOTIFY_STATE](#bthingnotify_state) below).|
 
 Example:
 ```js
@@ -224,7 +224,7 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
 ```
 |Event||
 |--|--|
-|UPDATE_STATE|Send this event-command to force the *bThing* state to be updated. This can be sent to all registered *bThings* or to a specific one. After sending it, a `bThing.EVENT.STATE_UPDATED` event is forcibly triggered unless the *bThings* is configured as `bThing.NOTIFY_STATE.NEVER` (see [bThing.EVENT.STATE](#bthingnotify_state) below).|
+|UPDATE_STATE|Send this event-command to force the *bThing* state to be updated. This can be sent to all registered *bThings* or to a specific one. After sending it, a `bThing.EVENT.STATE_UPDATED` event is forcibly triggered unless the *bThings* is configured as `bThing.NOTIFY_STATE.NEVER` (see [bThing.NOTIFY_STATE](#bthingnotify_state) below).|
 
 Example:
 ```js
