@@ -129,7 +129,7 @@ Gets the next *bThing* iterating registered ones. Returns `false` if the end of 
 ```c
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);
 ```
-*Get-state* handler signature. Must return `true` on success, or `false` otherwise. The signature is available only `#ifdef MGOS_BTHING_HAVE_SENSORS` or `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+*Get-state* handler signature. Must return `true` on success, or `false` otherwise. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS` or `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
@@ -140,7 +140,7 @@ typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t
 ```c
 typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 ```
-*Set-state* handler signature. Must return `true` on success, or `false` otherwise. The signature is available only `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+*Set-state* handler signature. Must return `true` on success, or `false` otherwise. The signature is available only `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
@@ -153,7 +153,7 @@ bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
                                    mgos_bthing_get_state_handler_t get_state_cb,
                                    void *userdata);
 ```
-Sets the state handler of a *bThing* sensor/actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above). Returns `true` on success, or `false` otherwise. This function is available only `#ifdef MGOS_BTHING_HAVE_SENSORS` or `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+Sets the state handler of a *bThing* sensor/actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS` or `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
@@ -167,7 +167,7 @@ bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
                                     mgos_bthing_set_state_handler_t set_state_cb,
                                     void *userdata);
 ```
-Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above).  Returns `true` on success, or `false` otherwise. This function is available only `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above).  Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
@@ -179,7 +179,7 @@ Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_
 ```c
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 ```
-Returns the state of a *bThing* sensor/actuator, or `NULL` if error. This function is available only `#ifdef MGOS_BTHING_HAVE_SENSORS` or `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+Returns the state of a *bThing* sensor/actuator, or `NULL` if error. This function is available only `#if MGOS_BTHING_HAVE_SENSORS` or `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
@@ -188,7 +188,7 @@ Returns the state of a *bThing* sensor/actuator, or `NULL` if error. This functi
 ```c
 bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state);
 ```
-Sets the state of a *bThing* actuator. Returns `true` on success, or `false` otherwise. This function is available only `#ifdef MGOS_BTHING_HAVE_ACTUATOR`.
+Sets the state of a *bThing* actuator. Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
