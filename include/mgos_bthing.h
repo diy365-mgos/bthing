@@ -100,6 +100,9 @@ bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
                                     mgos_bthing_set_state_handler_t set_state_cb,
                                     void *userdata);
 
+mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
+bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

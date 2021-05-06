@@ -51,8 +51,12 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) {
   if (!thing) return false;
+  thing->is_updating = 1;
   if (thing->get_state_cb) {
-    if (!thing->get_state_cb((mgos_bthing_t)thing, thing->state, thing->state_cb_ud)) return false;
+    if (!thing->get_state_cb((mgos_bthing_t)thing, thing->state, thing->state_cb_ud)) {
+      thing->is_updating = 0;
+      return false;
+    }
   }
   enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_BASE_CAST(thing)->notify_state;
   if (notify_state != MGOS_BTHING_NOTIFY_STATE_NEVER) {
@@ -62,7 +66,23 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
       mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, thing);
     }
   }
+  thing->is_updating = 0;
   return true;
+}
+
+bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
+  if (thing) {
+    struct mg_bthing_sens *sens = MG_BTHING_ACTU_BASE_CAST(thing);
+    if (thing->set_state_cb) {
+      if (thing->set_state_cb((mgos_bthing_t)thing, state, sens->state_cb_ud)) {
+        return mg_bthing_get_state(sens, false);
+      }
+    } else {
+      return mgos_bvar_merge(state, sens->state);
+    }
+  }
+
+  return false;
 }
 
 bool mg_bthing_register(mgos_bthing_t thing) {

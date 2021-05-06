@@ -74,6 +74,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          enum mgos_bthing_notify_state notify_state);
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
+bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state);
 
 /* Register the bThing */
 bool mg_bthing_register(mgos_bthing_t thing);
