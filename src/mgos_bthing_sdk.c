@@ -3,6 +3,18 @@
 #include <stdarg.h>
 #include "mgos_bthing_sdk.h"
 
+struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing) {
+  return (struct mg_bthing *)thing;
+}
+
+struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
+}
+
+struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
+}
+
 bool mg_bthing_register(mgos_bthing_t thing) {
   if (!thing) return false;
   struct mg_bthing_enum *things = &s_context.things;

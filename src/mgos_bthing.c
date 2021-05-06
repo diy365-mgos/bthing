@@ -11,6 +11,10 @@ int mgos_bthing_get_type(mgos_bthing_t thing) {
   return (thing ? MG_BTHING_CAST(thing)->type : 0);
 }
 
+bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type) {
+  return ((mgos_bthing_get_type(thing) & type) == type);
+}
+
 mgos_bthing_t mgos_bthing_get(const char* id) {
   if (id) {
     struct mg_bthing_enum *things = &s_context.things;
@@ -36,6 +40,33 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
     return true;
   }
 }
+
+bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
+                                    mgos_bthing_set_state_handler_t set_state_cb, 
+                                    mgos_bthing_get_state_handler_t get_state_cb,
+                                    void *userdata) {
+  struct mg_bthing_actu *t = MG_BTHING_ACTU_CAST(thing);
+  if (t && get_state_cb) {
+    if (mgos_bthing_set_state_handler(thing, set_state_cb, userdata)) {
+      t->get_state_cb = get_state_cb;
+      return true;
+    }
+  }
+  return false;
+}
+
+bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
+                                   mgos_bthing_set_state_handler_t set_state_cb,
+                                   void *userdata) {
+  struct mg_bthing_sens *t = MG_BTHING_SENS_CAST(thing);
+  if (t && set_state_cb) {
+    t->set_state_cb = set_state_cb;
+    t->state_cb_ud = userdata;
+    return true;
+  }
+  return false;
+}
+
 
 bool mgos_bthing_init() {
   /* Initialize execution context */

@@ -20,6 +20,7 @@
 
 #include <stdbool.h>
 #include "mgos_event.h"
+#include "mgos_bvar.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,9 +33,8 @@ struct mg_bthing_enum;
 /* Generic and opaque bThing instance */
 typedef struct mg_bthing *mgos_bthing_t;
 
-/* bThing enumerator */
+/* bThings enumerator returned by mgos_bthing_get_all() */
 typedef struct mg_bthing_enum *mgos_bthing_enum_t;
-
 
 #define MGOS_BTHING_TYPE_SENSOR 1
 #define MGOS_BTHING_TYPE_ACTUATOR 3
@@ -67,11 +67,18 @@ enum mgos_bthing_notify_state {
   MGOS_BTHING_NOTIFY_STATE_ALWAYS,
 };
 
+typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+
+typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+
 /* Returns the ID of a *bThing*, or `NULL` if error. */
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
 
 /* Returns the type of a *bThing*, or `0` if error. */
 int mgos_bthing_get_type(mgos_bthing_t thing);
+
+/* Returns `true` if the *bThing* type is `type`. */
+bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type);
 
 /* Returns the *bThing* having the specified ID, or `NULL` otherwise. */
 mgos_bthing_t mgos_bthing_get(const char* id);
@@ -83,6 +90,15 @@ mgos_bthing_enum_t mgos_bthing_get_all();
  * Returns `false` if the end of the enumerator is reached, or `true` otherwise.
  */
 bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing);
+
+bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
+                                    mgos_bthing_set_state_handler_t set_state_cb, 
+                                    mgos_bthing_get_state_handler_t get_state_cb,
+                                    void *userdata);
+
+bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
+                                   mgos_bthing_set_state_handler_t set_state_cb,
+                                   void *userdata);
 
 #ifdef __cplusplus
 }

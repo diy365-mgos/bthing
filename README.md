@@ -76,11 +76,27 @@ Returns the type of a *bThing*, or `0` if error.
 |Parameter||
 |--|--|
 |thing|A *bThing*.|
+
+Example:
 ```c
-int type = mgos_bthing_get_type(thing);
-if ((type & MGOS_BTHING_TYPE_SENSOR) == MGOS_BTHING_TYPE_SENSOR)
+printf("The bThing type is: %d.", mgos_bthing_get_type(thing));
+```
+### mgos_bthing_is_typeof
+```c
+bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type)
+```
+Returns `true` if the *bThing* type is `type`.
+
+|Parameter||
+|--|--|
+|thing|A *bThing*.|
+|type|The type to check.|
+
+Example:
+```c
+if (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR))
   printf("The bThing is a sensor.");
-else if ((type & MGOS_BTHING_TYPE_ACTUATOR) == MGOS_BTHING_TYPE_ACTUATOR)
+else if (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR))
   printf("The bThing is an actuator.");
 else
   printf("Unknown bThing type.");
@@ -109,6 +125,56 @@ Gets the next *bThing* iterating registered ones. Returns `false` if the end of 
 |--|--|
 |things_enum|A reference to a *bThing* enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output *bThing*. Optional, if `NULL` no *bThing* is returned as output.|
+### (*mgos_bthing_set_state_handler_t)
+```c
+typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+```
+*Set-state* handler signature. Must return `true` on success, or `false` otherwise.
+
+|Parameter||
+|--|--|
+|thing|The *bThing* to set the state for.|
+|state|State value to set.|
+|userdata|Handler user-data.|
+### (*mgos_bthing_get_state_handler_t)
+```c
+typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+```
+*Get-state* handler signature. Must return `true` on success, or `false` otherwise.
+
+|Parameter||
+|--|--|
+|thing|The *bThing* for whom to return the status.|
+|state|State value to return.|
+|userdata|Handler user-data.|
+### mgos_bthing_set_state_handler
+```c
+bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
+                                   mgos_bthing_set_state_handler_t set_state_cb,
+                                   void *userdata);
+```
+Sets the state handler of a *bThing* sensor (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above). Returns `true` on success, or `false` otherwise.
+
+|Parameter||
+|--|--|
+|thing|A *bThing* sensor.|
+|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
+|userdata|User-data to pass to the handler or `NULL`.|
+### mgos_bthing_set_state_handlers
+```c
+bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
+                                    mgos_bthing_set_state_handler_t set_state_cb, 
+                                    mgos_bthing_get_state_handler_t get_state_cb,
+                                    void *userdata);
+```
+Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above).  Returns `true` on success, or `false` otherwise.
+
+|Parameter||
+|--|--|
+|thing|A *bThing* actuator.|
+|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
+|get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
+|userdata|User-data to pass to the handlers or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
 ```js
@@ -208,10 +274,23 @@ Returns the type of a *bThing*, or `0` if error.
 
 Example:
 ```js
-let type = <obj>.getType();
-if ((type & bThing.TYPE.SENSOR) == bThing.TYPE.SENSOR)
+print("The bThing type is:", <obj>.getType());
+```
+### .isTypeOf
+```js
+<obj>.isTypeOf(type);
+```
+Returns `true` if the *bThing* type is `type`.
+
+|Parameter||
+|--|--|
+|type|The type to check.|
+
+Example:
+```js
+if (<obj>.isTypeOf(bThing.TYPE.SENSOR))
   print("The bThing is a sensor.");
-else if ((type & bThing.TYPE.ACTUATOR) == bThing.TYPE.ACTUATOR)
+else if (<obj>.isTypeOf(bThing.TYPE.ACTUATOR))
   print("The bThing is an actuator.");
 else
   print("Unknown bThing type.");
