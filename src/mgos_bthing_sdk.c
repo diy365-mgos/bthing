@@ -7,14 +7,6 @@ struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing) {
   return (struct mg_bthing *)thing;
 }
 
-struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing) {
-  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
-}
-
-struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing) {
-  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
-}
-
 bool mg_bthing_init(struct mg_bthing *thing,
                     const char *id, int type, 
                     enum mgos_bthing_notify_state notify_state) {
@@ -26,6 +18,12 @@ bool mg_bthing_init(struct mg_bthing *thing,
   return false;
 }
 
+#if MGOS_BTHING_HAVE_SENSORS
+
+struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
+}
+
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
@@ -34,16 +32,6 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
     thing->state_cb_ud = NULL;
     thing->get_state_cb = NULL;
     thing->state = mgos_bvar_new();
-    return true;
-  }
-  return false;
-}
-
-bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
-                         const char *id, int type, 
-                         enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, type, notify_state)) {
-    thing->set_state_cb = NULL;
     return true;
   }
   return false;
@@ -70,6 +58,24 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
   return true;
 }
 
+#endif // MGOS_BTHING_HAVE_SENSORS
+
+#if MGOS_BTHING_HAVE_ACTUATORS
+
+struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
+}
+
+bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
+                         const char *id, int type, 
+                         enum mgos_bthing_notify_state notify_state) {
+  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, type, notify_state)) {
+    thing->set_state_cb = NULL;
+    return true;
+  }
+  return false;
+}
+
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
   if (thing) {
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_BASE_CAST(thing);
@@ -84,6 +90,8 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
 
   return false;
 }
+
+#endif // MGOS_BTHING_HAVE_ACTUATORS
 
 bool mg_bthing_register(mgos_bthing_t thing) {
   if (!thing) return false;

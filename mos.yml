@@ -3,9 +3,6 @@ type: lib
 description: Mongoose OS core library for the bThings ecosystem.
 version: 1.0
 
-build_vars:
-  MGOS_BTHING_HAVE_TYPES: 0
-
 sources:
   - src
 

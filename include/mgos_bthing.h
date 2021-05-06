@@ -39,6 +39,20 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 #define MGOS_BTHING_TYPE_SENSOR 1
 #define MGOS_BTHING_TYPE_ACTUATOR 3
 
+#ifdef MGOS_BTHING_HAVE_ACTUATOR 
+#define MGOS_BTHING_HAVE_SENSORS 1
+#define MGOS_BTHING_HAVE_ACTUATORS 1
+#else
+  #ifdef MGOS_BTHING_HAVE_SENSOR
+  #define MGOS_BTHING_HAVE_SENSORS 1
+  #define MGOS_BTHING_HAVE_ACTUATORS 0
+  #else
+  #define MGOS_BTHING_FORCE_HAVE_ANY 0
+  #define MGOS_BTHING_HAVE_SENSORS MGOS_BTHING_FORCE_HAVE_ANY
+  #define MGOS_BTHING_HAVE_ACTUATORS MGOS_BTHING_FORCE_HAVE_ANY
+  #endif 
+#endif
+
 #define MGOS_BTHING_ENV_DEVICEID "${device_id}"
 #define MGOS_BTHING_ENV_THINGID "${thing_id}"
 
@@ -87,9 +101,7 @@ mgos_bthing_enum_t mgos_bthing_get_all();
  */
 bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing);
 
-#if MGOS_BTHING_HAVE_TYPES
-
-#endif // 
+#if MGOS_BTHING_HAVE_SENSORS
 
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);
 
@@ -99,6 +111,9 @@ bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
+#endif // MGOS_BTHING_HAVE_SENSORS
+
+#if MGOS_BTHING_HAVE_ACTUATORS
 
 typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 
@@ -108,6 +123,8 @@ bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
                                     void *userdata);
 
 bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state);
+
+#endif // MGOS_BTHING_HAVE_ACTUATORS
 
 #ifdef __cplusplus
 }
