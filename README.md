@@ -127,7 +127,7 @@ Gets the next *bThing* iterating registered ones. Returns `false` if the end of 
 |thing|The output *bThing*. Optional, if `NULL` no *bThing* is returned as output.|
 ### (*mgos_bthing_set_state_handler_t)
 ```c
-typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 ```
 *Set-state* handler signature. Must return `true` on success, or `false` otherwise.
 
@@ -138,7 +138,7 @@ typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, void *state
 |userdata|Handler user-data.|
 ### (*mgos_bthing_get_state_handler_t)
 ```c
-typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, void *state, void *userdata);
+typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);
 ```
 *Get-state* handler signature. Must return `true` on success, or `false` otherwise.
 
@@ -150,7 +150,7 @@ typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, void *state
 ### mgos_bthing_set_state_handler
 ```c
 bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
-                                   mgos_bthing_set_state_handler_t set_state_cb,
+                                   mgos_bthing_get_state_handler_t get_state_cb,
                                    void *userdata);
 ```
 Sets the state handler of a *bThing* sensor (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above). Returns `true` on success, or `false` otherwise.
@@ -158,13 +158,13 @@ Sets the state handler of a *bThing* sensor (see [mgos_bthing_is_typeof()](#mgos
 |Parameter||
 |--|--|
 |thing|A *bThing* sensor.|
-|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
+|get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
 |userdata|User-data to pass to the handler or `NULL`.|
 ### mgos_bthing_set_state_handlers
 ```c
 bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
-                                    mgos_bthing_set_state_handler_t set_state_cb, 
-                                    mgos_bthing_get_state_handler_t get_state_cb,
+                                    mgos_bthing_get_state_handler_t get_state_cb, 
+                                    mgos_bthing_set_state_handler_t set_state_cb,
                                     void *userdata);
 ```
 Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above).  Returns `true` on success, or `false` otherwise.
@@ -172,8 +172,8 @@ Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_
 |Parameter||
 |--|--|
 |thing|A *bThing* actuator.|
-|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
 |get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
+|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
 |userdata|User-data to pass to the handlers or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT

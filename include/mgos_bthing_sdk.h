@@ -34,14 +34,14 @@ struct mg_bthing {
 struct mg_bthing_sens {
   struct mg_bthing base;
   void *state_cb_ud;
-  mgos_bthing_set_state_handler_t set_state_cb;
+  mgos_bthing_get_state_handler_t get_state_cb;
   unsigned char is_updating;
   mgos_bvar_t state;
 };
 
 struct mg_bthing_actu {
   struct mg_bthing_sens base;
-  mgos_bthing_get_state_handler_t get_state_cb;
+  mgos_bthing_set_state_handler_t set_state_cb;
 };
 
 struct mg_bthing_enum {
@@ -57,10 +57,23 @@ struct mg_bthing_ctx {
 static struct mg_bthing_ctx s_context;
 
 struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing);
-
 struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing);
-
 struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing);
+
+inline struct mg_bthing *MG_BTHING_SENS_BASE_CAST(struct mg_bthing_sens *thing) { return (struct mg_bthing *)thing; }
+inline struct mg_bthing_sens *MG_BTHING_ACTU_BASE_CAST(struct mg_bthing_actu *thing) { return (struct mg_bthing_sens *)thing; }
+
+bool mg_bthing_init(struct mg_bthing *thing,
+                    const char *id, int type, 
+                    enum mgos_bthing_notify_state notify_state);
+bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
+                         const char *id, int type, 
+                         enum mgos_bthing_notify_state notify_state);
+bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
+                         const char *id, int type, 
+                         enum mgos_bthing_notify_state notify_state);
+
+bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
 
 /* Register the bThing */
 bool mg_bthing_register(mgos_bthing_t thing);

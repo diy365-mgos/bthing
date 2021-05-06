@@ -15,6 +15,56 @@ struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing) {
   return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
 }
 
+bool mg_bthing_init(struct mg_bthing *thing,
+                    const char *id, int type, 
+                    enum mgos_bthing_notify_state notify_state) {
+  if (thing && id && (strlen(id) > 0)) {
+    thing->id = strdup(id);
+    thing->type = type;
+    thing->notify_state = notify_state;
+  }
+  return false;
+}
+
+bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
+                         const char *id, int type, 
+                         enum mgos_bthing_notify_state notify_state) {
+  if (mg_bthing_init(MG_BTHING_SENS_BASE_CAST(thing), id, type, notify_state)) {
+    thing->is_updating = 0;
+    thing->state_cb_ud = NULL;
+    thing->get_state_cb = NULL;
+    thing->state = mgos_bvar_new();
+    return true;
+  }
+  return false;
+}
+
+bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
+                         const char *id, int type, 
+                         enum mgos_bthing_notify_state notify_state) {
+  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, type, notify_state)) {
+    thing->set_state_cb = NULL;
+    return true;
+  }
+  return false;
+}
+
+bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) {
+  if (!thing) return false;
+  if (thing->get_state_cb) {
+    if (!thing->get_state_cb((mgos_bthing_t)thing, thing->state, thing->state_cb_ud)) return false;
+  }
+  enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_BASE_CAST(thing)->notify_state;
+  if (notify_state != MGOS_BTHING_NOTIFY_STATE_NEVER) {
+    if (force_notify_state == true ||
+        notify_state == MGOS_BTHING_NOTIFY_STATE_ALWAYS ||
+        (notify_state == MGOS_BTHING_NOTIFY_STATE_ON_CHANGE && (mgos_bvar_is_changed(thing->state)))) {
+      mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, thing);
+    }
+  }
+  return true;
+}
+
 bool mg_bthing_register(mgos_bthing_t thing) {
   if (!thing) return false;
   struct mg_bthing_enum *things = &s_context.things;
