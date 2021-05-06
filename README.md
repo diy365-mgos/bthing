@@ -134,8 +134,8 @@ typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t
 |Parameter||
 |--|--|
 |thing|The *bThing* for whom to return the status.|
-|state|State value to return.|
-|userdata|Handler user-data.|
+|state|The state value to return.|
+|userdata|The handler's *user-data*.|
 ### (*mgos_bthing_set_state_handler_t)
 ```c
 typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
@@ -145,8 +145,8 @@ typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_
 |Parameter||
 |--|--|
 |thing|The *bThing* to set the state for.|
-|state|State value to set.|
-|userdata|Handler user-data.|
+|state|The state value to set.|
+|userdata|The handler's *user-data*.|
 ### mgos_bthing_set_state_handler
 ```c
 bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
@@ -159,7 +159,7 @@ Sets the state handler of a *bThing* sensor/actuator (see [mgos_bthing_is_typeof
 |--|--|
 |thing|A *bThing* sensor/actuator.|
 |get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
-|userdata|User-data to pass to the handler or `NULL`.|
+|userdata|The *user-data* to pass to the handler or `NULL`.|
 ### mgos_bthing_set_state_handlers
 ```c
 bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
@@ -174,7 +174,7 @@ Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_
 |thing|A *bThing* actuator.|
 |get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
 |set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
-|userdata|User-data to pass to the handlers or `NULL`.|
+|userdata|The *user-data* to pass to the handlers or `NULL`.|
 ### mgos_bthing_get_state
 ```c
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
