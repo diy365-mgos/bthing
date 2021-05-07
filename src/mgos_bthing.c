@@ -2,6 +2,9 @@
 #include "mgos_bthing_sdk.h"
 #include "mgos_bthing.h"
 
+#ifdef MGOS_HAVE_MJS
+#include "mjs.h"
+#endif
 
 const char *mgos_bthing_get_id(mgos_bthing_t thing) {
   return (thing ? MG_BTHING_CAST(thing)->id : NULL);
