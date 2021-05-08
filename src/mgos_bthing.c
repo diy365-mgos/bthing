@@ -46,13 +46,13 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
 
 #if MGOS_BTHING_HAVE_SENSORS
 
-bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
-                                   mgos_bthing_get_state_handler_t get_state_cb,
-                                   void *userdata) {
+bool mgos_bthing_on_get_state(mgos_bthing_t thing,
+                              mgos_bthing_get_state_handler_t get_state_cb,
+                              void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST(thing);
-  if (sens && get_state_cb) {
+  if (sens && !sens->get_state_cb) {
     sens->get_state_cb = get_state_cb;
-    sens->state_cb_ud = userdata;
+    sens->get_state_ud = (get_state_cb ? userdata : NULL);
     return true;
   }
   return false;
@@ -85,16 +85,14 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
 
 #if MGOS_BTHING_HAVE_ACTUATORS
 
-bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
-                                    mgos_bthing_get_state_handler_t get_state_cb, 
-                                    mgos_bthing_set_state_handler_t set_state_cb,
-                                    void *userdata) {
+bool mgos_bthing_on_set_state(mgos_bthing_t thing,
+                              mgos_bthing_set_state_handler_t set_state_cb,
+                              void *userdata) {
   struct mg_bthing_actu *actu = MG_BTHING_ACTU_CAST(thing);
-  if (actu && set_state_cb) {
-    if (mgos_bthing_set_state_handler(thing, get_state_cb, userdata)) {
-      actu->set_state_cb = set_state_cb;
-      return true;
-    }
+  if (actu && !actu->set_state_cb) {
+    actu->set_state_cb = set_state_cb;
+    actu->set_state_ud = (set_state_cb ? userdata : NULL);
+    return true;
   }
   return false;
 }

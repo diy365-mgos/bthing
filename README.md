@@ -149,32 +149,30 @@ typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_
 |userdata|The handler's *user-data*.|
 ### mgos_bthing_set_state_handler
 ```c
-bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
-                                   mgos_bthing_get_state_handler_t get_state_cb,
-                                   void *userdata);
+bool mgos_bthing_on_get_state(mgos_bthing_t thing,
+                              mgos_bthing_get_state_handler_t get_state_cb,
+                              void *userdata);
 ```
-Sets the state handler of a *bThing* sensor/actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Sets the *get-state* handler of a *bThing* sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHING_TYPE_SENSOR)`). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|A *bThing* sensor/actuator.|
-|get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
-|userdata|The *user-data* to pass to the handler or `NULL`.|
-### mgos_bthing_set_state_handlers
+|get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t) or `NULL` to reset the handler.|
+|userdata|The *user-data* to pass to the handler or `NULL`. Ignored if `get_state_cb` is `NULL`.|
+### mgos_bthing_on_set_state
 ```c
-bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
-                                    mgos_bthing_get_state_handler_t get_state_cb, 
-                                    mgos_bthing_set_state_handler_t set_state_cb,
-                                    void *userdata);
+bool mgos_bthing_on_set_state(mgos_bthing_t thing,
+                              mgos_bthing_set_state_handler_t set_state_cb,
+                              void *userdata);
 ```
-Sets state handlers of a *bThing* actuator (see [mgos_bthing_is_typeof()](#mgos_bthing_is_typeof) above).  Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_ACTUATORS`.
+Sets the *set-state* handler of a *bThing* actuator (`mgos_bthing_is_typeof(MGOS_BTHING_TYPE_ACTUATOR)`). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_ACTUATORS`.
 
 |Parameter||
 |--|--|
 |thing|A *bThing* actuator.|
-|get_state_cb|The [get-state handler](#mgos_bthing_get_state_handler_t).|
-|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t).|
-|userdata|The *user-data* to pass to the handlers or `NULL`.|
+|set_state_cb|The [set-state handler](#mgos_bthing_set_state_handler_t) or `NULL` to reset the handler.|
+|userdata|The *user-data* to pass to the handlers or `NULL`. Ignored if `set_state_cb` is `NULL`.|
 ### mgos_bthing_get_state
 ```c
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);

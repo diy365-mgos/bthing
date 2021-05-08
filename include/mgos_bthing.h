@@ -47,7 +47,7 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
   #define MGOS_BTHING_HAVE_SENSORS 1
   #define MGOS_BTHING_HAVE_ACTUATORS 0
   #else
-  #define MGOS_BTHING_FORCE_HAVE_ANY 0
+  #define MGOS_BTHING_FORCE_HAVE_ANY 1
   #define MGOS_BTHING_HAVE_SENSORS MGOS_BTHING_FORCE_HAVE_ANY
   #define MGOS_BTHING_HAVE_ACTUATORS MGOS_BTHING_FORCE_HAVE_ANY
   #endif 
@@ -105,9 +105,9 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
 
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);
 
-bool mgos_bthing_set_state_handler(mgos_bthing_t thing,
-                                   mgos_bthing_get_state_handler_t get_state_cb,
-                                   void *userdata);
+bool mgos_bthing_on_get_state(mgos_bthing_t thing,
+                              mgos_bthing_get_state_handler_t get_state_cb,
+                              void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
@@ -117,10 +117,9 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
 typedef bool (*mgos_bthing_set_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 
-bool mgos_bthing_set_state_handlers(mgos_bthing_t thing,
-                                    mgos_bthing_get_state_handler_t get_state_cb, 
-                                    mgos_bthing_set_state_handler_t set_state_cb,
-                                    void *userdata);
+bool mgos_bthing_on_set_state(mgos_bthing_t thing,
+                              mgos_bthing_set_state_handler_t set_state_cb,
+                              void *userdata);
 
 bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state);
 
