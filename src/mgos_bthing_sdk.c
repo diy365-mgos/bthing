@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include "mgos.h"
 #include "mgos_bthing_sdk.h"
 
 struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing) {
@@ -29,9 +30,10 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          enum mgos_bthing_notify_state notify_state) {
   if (mg_bthing_init(MG_BTHING_SENS_BASE_CAST(thing), id, type, notify_state)) {
     thing->is_updating = 0;
-    thing->get_state_ud = NULL;
+    thing->state_cb_ud = NULL;
     thing->get_state_cb = NULL;
     thing->state = mgos_bvar_new();
+    thing->cfg = NULL;
     return true;
   }
   return false;
@@ -41,7 +43,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
   if (!thing) return false;
   thing->is_updating = 1;
   if (thing->get_state_cb) {
-    if (!thing->get_state_cb((mgos_bthing_t)thing, thing->state, thing->get_state_ud)) {
+    if (!thing->get_state_cb((mgos_bthing_t)thing, thing->state, thing->state_cb_ud)) {
       thing->is_updating = 0;
       return false;
     }
@@ -58,12 +60,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
   return true;
 }
 
-bool mg_bthing_sens_register(struct mg_bthing_sens *thing) {
-  if (!mg_bthing_register(MG_BTHING_SENS_BASE_CAST(thing))) return false;
-  //TODO MG_BTHING_SENS_BASE_CAST(thing)->type = ??
-  return true;
-}
-
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
@@ -76,7 +72,9 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
   if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, type, notify_state)) {
+    thing->cfg = NULL;
     thing->set_state_cb = NULL;
+    thing->setting_state_cb = NULL;
     return true;
   }
   return false;
@@ -85,12 +83,12 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
   if (thing) {
     if (thing->setting_state_cb) {
-      if (!thing->setting_state_cb(thing, state, thing->set_state_ud)) return false;
+      if (!thing->setting_state_cb(thing, state, thing->state_cb_ud)) return false;
     }
 
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_BASE_CAST(thing);
     if (thing->set_state_cb) {
-      if (thing->set_state_cb((mgos_bthing_t)thing, state, thing->set_state_ud)) {
+      if (thing->set_state_cb((mgos_bthing_t)thing, state, thing->state_cb_ud)) {
         return mg_bthing_get_state(sens, false);
       }
     } else {
@@ -101,12 +99,15 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
   return false;
 }
 
-bool mg_bthing_actu_register(struct mg_bthing_actu *thing,
-                             mg_bthing_setting_state_handler_t setting_state_cb) {
-  if (!mg_bthing_sens_register(MG_BTHING_ACTU_BASE_CAST(thing))) return false;
-  //TODO: MG_BTHING_ACTU_BASE_CAST(thing)->type = ??
-  thing->setting_state_cb = setting_state_cb;
-  return true;
+bool mg_bthing_on_setting_state(struct mg_bthing_actu *thing, mg_bthing_setting_state_handler_t setting_state_cb) {
+  if (thing) {
+    if (!thing->setting_state_cb || !setting_state_cb) {
+      thing->setting_state_cb = setting_state_cb;
+      return true;
+    }
+    LOG(LL_ERROR, ("The setting-state handler is already (bThing '%s')", mgos_bthing_get_id((mgos_bthing_t)thing)));
+  }
+  return false;
 }
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS

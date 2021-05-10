@@ -35,8 +35,9 @@ struct mg_bthing {
 
 struct mg_bthing_sens {
   struct mg_bthing base;
+  void *cfg;
   mgos_bthing_get_state_handler_t get_state_cb;
-  void *get_state_ud;
+  void *state_cb_ud;
   unsigned char is_updating;
   mgos_bvar_t state;
 };
@@ -46,13 +47,13 @@ struct mg_bthing_sens {
 #if MGOS_BTHING_HAVE_ACTUATORS
 
 struct mg_bthing_actu;
-
 typedef bool (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing, mgos_bvarc_t state, void *userdata);
 
 struct mg_bthing_actu {
   struct mg_bthing_sens base;
+  void *cfg;
   mgos_bthing_set_state_handler_t set_state_cb;
-  void *set_state_ud;
+  void *state_cb_ud;
   mg_bthing_setting_state_handler_t setting_state_cb;
 };
 
@@ -88,8 +89,6 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
 
-bool mg_bthing_sens_register(struct mg_bthing_sens *thing);
-
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
@@ -104,8 +103,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state);
 
-bool mg_bthing_actu_register(struct mg_bthing_actu *thing,
-                             mg_bthing_setting_state_handler_t setting_state_cb);
+bool mg_bthing_on_setting_state(struct mg_bthing_actu *thing, mg_bthing_setting_state_handler_t setting_state_cb);
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
 

@@ -50,10 +50,13 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST(thing);
-  if (sens && !sens->get_state_cb) {
-    sens->get_state_cb = get_state_cb;
-    sens->get_state_ud = (get_state_cb ? userdata : NULL);
-    return true;
+  if (sens) {
+    if (!sens->get_state_cb || !get_state_cb) {
+      sens->get_state_cb = get_state_cb;
+      sens->state_cb_ud = (get_state_cb ? userdata : NULL);
+      return true;
+    }
+    LOG(LL_ERROR, ("The get-state handler is already (bThing '%s')", mgos_bthing_get_id(thing)));
   }
   return false;
 }
@@ -89,10 +92,13 @@ bool mgos_bthing_on_set_state(mgos_bthing_t thing,
                               mgos_bthing_set_state_handler_t set_state_cb,
                               void *userdata) {
   struct mg_bthing_actu *actu = MG_BTHING_ACTU_CAST(thing);
-  if (actu && !actu->set_state_cb) {
-    actu->set_state_cb = set_state_cb;
-    actu->set_state_ud = (set_state_cb ? userdata : NULL);
-    return true;
+  if (actu) {
+    if (!actu->set_state_cb || !set_state_cb) {
+      actu->set_state_cb = set_state_cb;
+      actu->state_cb_ud = (set_state_cb ? userdata : NULL);
+      return true;
+    }
+    LOG(LL_ERROR, ("The set-state handler is already (bThing '%s')", mgos_bthing_get_id(thing)));
   }
   return false;
 }
@@ -115,7 +121,7 @@ bool mgos_bthing_init() {
   if (!mgos_event_add_handler(MGOS_EV_BTHING_UPDATE_STATE, mg_bthing_update_state_cb, NULL)) return false;
   #endif
   
-  LOG(LL_INFO, ("MGOS_BTHING_EVENT_BASE %d", MGOS_BTHING_EVENT_BASE));
+  LOG(LL_DEBUG, ("MGOS_BTHING_EVENT_BASE %d", MGOS_BTHING_EVENT_BASE));
     
   return true;
 }
