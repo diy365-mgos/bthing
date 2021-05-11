@@ -20,7 +20,7 @@ bool mgos_bthing_typeof(mgos_bthing_t thing, int type) {
 
 mgos_bthing_t mgos_bthing_get(const char* id) {
   if (id) {
-    struct mg_bthing_enum *things = &s_context.things;
+    struct mg_bthing_enum *things = &(mg_bthing_context()->things);
     while (things && things->thing) {
       if (0 == strcasecmp(id, MG_BTHING_CAST(things->thing)->id)) return things->thing;
       things = things->next_item;
@@ -30,7 +30,7 @@ mgos_bthing_t mgos_bthing_get(const char* id) {
 }
 
 mgos_bthing_enum_t mgos_bthing_get_all() {
-  return (mgos_bthing_enum_t)&s_context.things;
+  return (mgos_bthing_enum_t)&(mg_bthing_context()->things);
 }
 
 bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing) {
@@ -111,10 +111,6 @@ bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state) {
 
 
 bool mgos_bthing_init() {
-  /* Initialize execution context */
-  s_context.things.thing = NULL;
-  s_context.things.next_item = NULL;
-
   if (!mgos_event_register_base(MGOS_BTHING_EVENT_BASE, "bThing events")) return false;
 
   #if MGOS_BTHING_HAVE_SENSORS

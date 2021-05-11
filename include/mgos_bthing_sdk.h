@@ -86,8 +86,7 @@ struct mg_bthing_ctx {
   struct mg_bthing_enum things;
 };
 
-/* Excecution context instance */
-static struct mg_bthing_ctx s_context;
+struct mg_bthing_ctx *mg_bthing_context();
 
 struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing);
 

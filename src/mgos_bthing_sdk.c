@@ -3,6 +3,18 @@
 #include "mgos.h"
 #include "mgos_bthing_sdk.h"
 
+/* Excecution context instance */
+struct mg_bthing_ctx *s_context;
+struct mg_bthing_ctx *mg_bthing_context() {
+  if (!s_context) {
+    /* Initialize execution context */
+    s_context = calloc(1, sizeof(struct mg_bthing_ctx));
+    s_context->things.thing = NULL;
+    s_context->things.next_item = NULL;
+  }
+  return s_context; 
+}
+
 struct mg_bthing *MG_BTHING_CAST(mgos_bthing_t thing) {
   return (struct mg_bthing *)thing;
 }
@@ -177,7 +189,7 @@ mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_ac
 
 bool mg_bthing_register(mgos_bthing_t thing) {
   if (!thing) return false;
-  struct mg_bthing_enum *things = &s_context.things;
+  struct mg_bthing_enum *things = &(mg_bthing_context()->things);
   if (things->thing) {
     struct mg_bthing_enum *new_item = calloc(1, sizeof(struct mg_bthing_enum ));
     new_item->thing = things->thing;
