@@ -18,6 +18,15 @@ bool mg_bthing_init(struct mg_bthing *thing,
   return false;
 }
 
+void mg_bthing_reset(struct mg_bthing *thing) {
+  if (thing) {
+    free(thing->id);
+    thing->id = NULL;
+    thing->type = 0;
+    thing->notify_state = MGOS_BTHING_NOTIFY_STATE_NEVER;
+  }
+}
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing) {
@@ -49,6 +58,20 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
     return true;
   }
   return false;
+}
+
+void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
+  if (thing) {
+    mg_bthing_reset(MG_BTHING_SENS_BASE_CAST(thing));
+    free(thing->cfg);
+    thing->cfg = NULL;
+    mg_bthing_on_getting_state(thing, NULL);
+    thing->get_state_cb = NULL;
+    thing->state_cb_ud = NULL;
+    thing->is_updating = 0;
+    mgos_bvar_free(thing->state);
+    thing->state = NULL;
+  }
 }
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) {
@@ -111,6 +134,17 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
     return true;
   }
   return false;
+}
+
+void mg_bthing_actu_init(struct mg_bthing_actu *thing) {
+  if (thing) {
+    mg_bthing_sens_reset(MG_BTHING_ACTU_BASE_CAST(thing));
+    free(thing->cfg);
+    thing->cfg = NULL;
+    mg_bthing_on_setting_state(thing, NULL); 
+    thing->set_state_cb = NULL;
+    thing->state_cb_ud = NULL;
+  }
 }
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {

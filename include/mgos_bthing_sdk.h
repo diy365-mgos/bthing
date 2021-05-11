@@ -95,6 +95,8 @@ bool mg_bthing_init(struct mg_bthing *thing,
                     const char *id, int type, 
                     enum mgos_bthing_notify_state notify_state);
 
+void mg_bthing_reset(struct mg_bthing *thing);
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing);
@@ -104,6 +106,8 @@ struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing);
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state);
+
+void mg_bthing_sens_reset(struct mg_bthing_sens *thing);
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
 
@@ -121,6 +125,8 @@ struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing);
 bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state);
+
+void mg_bthing_actu_reset(struct mg_bthing_actu *thing);
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state);
 
