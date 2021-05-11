@@ -54,6 +54,8 @@ struct mg_bthing_sens {
   mgos_bvar_t state;
 };
 
+#define MG_BTHING_SENS_NEW calloc(1, sizeof(mg_bthing_sens))
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
@@ -70,6 +72,8 @@ struct mg_bthing_actu {
   mgos_bthing_set_state_handler_t set_state_cb;
   void *state_cb_ud;
 };
+
+#define MG_BTHING_ACTU_NEW calloc(1, sizeof(mg_bthing_actu))
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
 
