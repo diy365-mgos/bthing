@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdarg.h>
 #include "mgos.h"
 #include "mgos_bthing_sdk.h"
 
