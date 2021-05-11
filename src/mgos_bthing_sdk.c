@@ -39,7 +39,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_init(MG_BTHING_SENS_BASE_CAST(thing), id, type, notify_state)) {
+  if (mg_bthing_init(MG_BTHING_SENS_BASE_CAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, mg_bthing_sens_getting_state_cb);
     thing->get_state_cb = NULL;
@@ -103,7 +103,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
 bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, type, notify_state)) {
+  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
     thing->cfg = NULL;
     mg_bthing_on_setting_state(thing, mg_bthing_actu_setting_state_cb); 
     thing->set_state_cb = NULL;
