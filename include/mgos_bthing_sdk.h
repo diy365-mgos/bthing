@@ -31,11 +31,23 @@ struct mg_bthing {
   enum mgos_bthing_notify_state notify_state;
 };
 
+enum MG_BTHING_STATE_RESULT {
+  MG_BTHING_STATE_RESULT_ERROR,
+  MG_BTHING_STATE_RESULT_SUCCESS,
+  MG_BTHING_STATE_RESULT_NO_HANDLER
+};
+
 #if MGOS_BTHING_HAVE_SENSORS
+
+struct mg_bthing_sens;
+typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
+                                                                         mgos_bvar_t state,
+                                                                         void *userdata);
 
 struct mg_bthing_sens {
   struct mg_bthing base;
   void *cfg;
+  mg_bthing_getting_state_handler_t getting_state_cb;
   mgos_bthing_get_state_handler_t get_state_cb;
   void *state_cb_ud;
   unsigned char is_updating;
@@ -47,14 +59,16 @@ struct mg_bthing_sens {
 #if MGOS_BTHING_HAVE_ACTUATORS
 
 struct mg_bthing_actu;
-typedef bool (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing, mgos_bvarc_t state, void *userdata);
+typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing,
+                                                                         mgos_bvarc_t state,
+                                                                         void *userdata);
 
 struct mg_bthing_actu {
   struct mg_bthing_sens base;
   void *cfg;
+  mg_bthing_setting_state_handler_t setting_state_cb;
   mgos_bthing_set_state_handler_t set_state_cb;
   void *state_cb_ud;
-  mg_bthing_setting_state_handler_t setting_state_cb;
 };
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
@@ -89,6 +103,9 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
 
+mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *thing, 
+                                                             mg_bthing_getting_state_handler_t getting_state_cb);
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
@@ -103,7 +120,8 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state);
 
-bool mg_bthing_on_setting_state(struct mg_bthing_actu *thing, mg_bthing_setting_state_handler_t setting_state_cb);
+mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_actu *thing, 
+                                                             mg_bthing_setting_state_handler_t setting_state_cb);
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
 
