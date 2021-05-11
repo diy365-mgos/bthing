@@ -101,6 +101,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
         notify_state == MGOS_BTHING_NOTIFY_STATE_ALWAYS ||
         (notify_state == MGOS_BTHING_NOTIFY_STATE_ON_CHANGE && (mgos_bvar_is_changed(thing->state)))) {
       mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, thing);
+      mgos_bvar_set_unchanged(thing->state);
     }
   }
   thing->is_updating = 0;
