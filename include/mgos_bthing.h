@@ -47,9 +47,8 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
   #define MGOS_BTHING_HAVE_SENSORS 1
   #define MGOS_BTHING_HAVE_ACTUATORS 0
   #else
-  #define MGOS_BTHING_FORCE_HAVE_ANY 0
-  #define MGOS_BTHING_HAVE_SENSORS MGOS_BTHING_FORCE_HAVE_ANY
-  #define MGOS_BTHING_HAVE_ACTUATORS MGOS_BTHING_FORCE_HAVE_ANY
+  #define MGOS_BTHING_HAVE_SENSORS 0
+  #define MGOS_BTHING_HAVE_ACTUATORS 0
   #endif 
 #endif
 

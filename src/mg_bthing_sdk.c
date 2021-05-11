@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mgos.h"
-#include "mgos_bthing.h"
 #include "mg_bthing_sdk.h"
 
 /* Excecution context instance */
@@ -150,7 +149,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
   return false;
 }
 
-void mg_bthing_actu_init(struct mg_bthing_actu *thing) {
+void mg_bthing_actu_reset(struct mg_bthing_actu *thing) {
   if (thing) {
     mg_bthing_sens_reset(MG_BTHING_ACTU_BASE_CAST(thing));
     free(thing->cfg);
