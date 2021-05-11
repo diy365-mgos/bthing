@@ -2,6 +2,7 @@
 #include <string.h>
 #include "mgos.h"
 #include "mg_bthing_sdk.h"
+#include "mgos_bthing.h"
 
 /* Excecution context instance */
 struct mg_bthing_ctx *s_context;
