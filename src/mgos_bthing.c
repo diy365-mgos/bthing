@@ -1,5 +1,5 @@
 #include <mgos.h>
-#include "mgos_bthing_sdk.h"
+#include "mg_bthing_sdk.h"
 #include "mgos_bthing.h"
 
 #ifdef MGOS_HAVE_MJS

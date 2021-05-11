@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "mgos.h"
-#include "mgos_bthing_sdk.h"
+#include "mgos_bthing.h"
+#include "mg_bthing_sdk.h"
 
 /* Excecution context instance */
 struct mg_bthing_ctx *s_context;

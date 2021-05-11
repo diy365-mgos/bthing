@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#ifndef MGOS_BTHING_SDK_H_
-#define MGOS_BTHING_SDK_H_
+#ifndef MG_BTHING_SDK_H_
+#define MG_BTHING_SDK_H_
 
 #include <stdbool.h>
 #include "mgos_bthing.h"
@@ -151,4 +151,4 @@ bool mg_bthing_sreplaces(const char *src, char **out, int count, ...);
 }
 #endif /* __cplusplus */
 
-#endif /* MGOS_BTHING_SDK_H_ */
+#endif /* MG_BTHING_SDK_H_ */
