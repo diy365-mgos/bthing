@@ -54,7 +54,7 @@ struct mg_bthing_sens {
   mgos_bvar_t state;
 };
 
-#define MG_BTHING_SENS_NEW(s) s=calloc(1, sizeof(mg_bthing_sens))
+#define MG_BTHING_SENS_NEW(s) s=calloc(1, sizeof(struct mg_bthing_sens))
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
@@ -73,7 +73,7 @@ struct mg_bthing_actu {
   void *state_cb_ud;
 };
 
-#define MG_BTHING_ACTU_NEW(a) a=calloc(1, sizeof(mg_bthing_actu))
+#define MG_BTHING_ACTU_NEW(a) a=calloc(1, sizeof(struct mg_bthing_actu))
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
 
