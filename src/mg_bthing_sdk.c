@@ -56,6 +56,8 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
     if (thing->get_state_cb((mgos_bthing_t)thing, state, userdata))
       return MG_BTHING_STATE_RESULT_SUCCESS;
   }
+  LOG(LL_ERROR, ("Error getting bThing '%s' state. The get-state handler returned 'false'.",
+    mgos_bthing_get_id((mgos_bthing_t)thing)));
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
@@ -93,11 +95,13 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
   if (!thing) return false;
   thing->is_updating = 1;
   if (thing->getting_state_cb) {
-    if (!thing->getting_state_cb(thing, thing->state, thing->state_cb_ud) == MG_BTHING_STATE_RESULT_ERROR) {
+    if (thing->getting_state_cb(thing, thing->state, thing->state_cb_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       thing->is_updating = 0;
+      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(thing)));
       return false;
     }
   }
+
   enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_DOWNCAST(thing)->notify_state;
   if (notify_state != MGOS_BTHING_NOTIFY_STATE_NEVER) {
     if (force_notify_state == true ||
