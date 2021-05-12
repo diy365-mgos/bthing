@@ -43,7 +43,7 @@ void mg_bthing_reset(struct mg_bthing *thing) {
 #if MGOS_BTHING_HAVE_SENSORS
 
 struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing) {
-  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
+  return NULL; // (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
 }
 
 enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
