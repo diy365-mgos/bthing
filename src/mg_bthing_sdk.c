@@ -97,7 +97,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
   if (thing->getting_state_cb) {
     if (thing->getting_state_cb(thing, thing->state, thing->state_cb_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       thing->is_updating = 0;
-      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(thing)));
+      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id((mgos_bthing_t)thing)));
       return false;
     }
   }
