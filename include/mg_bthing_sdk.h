@@ -100,7 +100,7 @@ void mg_bthing_reset(struct mg_bthing *thing);
 
 struct mg_bthing_sens *MG_BTHING_SENS_CAST(mgos_bthing_t thing);
 
-#define MG_BTHING_SENS_BASE_CAST(t) (&(t->base))
+#define MG_BTHING_SENS_DOWNCAST(t) (&(t->base))
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
@@ -119,7 +119,7 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 
 struct mg_bthing_actu *MG_BTHING_ACTU_CAST(mgos_bthing_t thing);
 
-#define MG_BTHING_ACTU_BASE_CAST(t) (&(t->base))
+#define MG_BTHING_ACTU_DOWNCAST(t) (&(t->base))
 
 bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          const char *id, int type, 

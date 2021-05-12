@@ -60,7 +60,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_init(MG_BTHING_SENS_BASE_CAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
+  if (mg_bthing_init(MG_BTHING_SENS_DOWNCAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, mg_bthing_sens_getting_state_cb);
     thing->get_state_cb = NULL;
@@ -74,7 +74,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
   if (thing) {
-    mg_bthing_reset(MG_BTHING_SENS_BASE_CAST(thing));
+    mg_bthing_reset(MG_BTHING_SENS_DOWNCAST(thing));
     free(thing->cfg);
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, NULL);
@@ -95,7 +95,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
       return false;
     }
   }
-  enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_BASE_CAST(thing)->notify_state;
+  enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_DOWNCAST(thing)->notify_state;
   if (notify_state != MGOS_BTHING_NOTIFY_STATE_NEVER) {
     if (force_notify_state == true ||
         notify_state == MGOS_BTHING_NOTIFY_STATE_ALWAYS ||
@@ -139,7 +139,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
 bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_sens_init(MG_BTHING_ACTU_BASE_CAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
+  if (mg_bthing_sens_init(MG_BTHING_ACTU_DOWNCAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
     thing->cfg = NULL;
     mg_bthing_on_setting_state(thing, mg_bthing_actu_setting_state_cb); 
     thing->set_state_cb = NULL;
@@ -151,7 +151,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
 
 void mg_bthing_actu_reset(struct mg_bthing_actu *thing) {
   if (thing) {
-    mg_bthing_sens_reset(MG_BTHING_ACTU_BASE_CAST(thing));
+    mg_bthing_sens_reset(MG_BTHING_ACTU_DOWNCAST(thing));
     free(thing->cfg);
     thing->cfg = NULL;
     mg_bthing_on_setting_state(thing, NULL); 
@@ -162,7 +162,7 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *thing) {
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
   if (thing) {
-    struct mg_bthing_sens *sens = MG_BTHING_ACTU_BASE_CAST(thing);
+    struct mg_bthing_sens *sens = MG_BTHING_ACTU_DOWNCAST(thing);
 
     enum MG_BTHING_STATE_RESULT res = (!thing->setting_state_cb ? 
       MG_BTHING_STATE_RESULT_NO_HANDLER : thing->setting_state_cb(thing, state, thing->state_cb_ud));
