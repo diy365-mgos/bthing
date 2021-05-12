@@ -1,6 +1,5 @@
 #include <mgos.h>
 #include "mg_bthing_sdk.h"
-#include "mgos_bthing.h"
 
 #ifdef MGOS_HAVE_MJS
 #include "mjs.h"
@@ -14,7 +13,7 @@ int mgos_bthing_get_type(mgos_bthing_t thing) {
   return (thing ? MG_BTHING_CAST(thing)->type : 0);
 }
 
-bool mgos_bthing_typeof(mgos_bthing_t thing, int type) {
+bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type) {
   return ((mgos_bthing_get_type(thing) & type) == type);
 }
 
