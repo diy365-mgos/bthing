@@ -93,10 +93,10 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
 
 bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) {
   if (!thing) return false;
-  thing->is_updating = 1;
+  thing->is_updating += 1;
   if (thing->getting_state_cb) {
     if (thing->getting_state_cb(thing, thing->state, thing->state_cb_ud) == MG_BTHING_STATE_RESULT_ERROR) {
-      thing->is_updating = 0;
+      thing->is_updating -= 1;
       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id((mgos_bthing_t)thing)));
       return false;
     }
@@ -111,7 +111,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) 
       mgos_bvar_set_unchanged(thing->state);
     }
   }
-  thing->is_updating = 0;
+  thing->is_updating -= 1;
   return true;
 }
 
