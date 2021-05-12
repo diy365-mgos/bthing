@@ -26,7 +26,9 @@ bool mg_bthing_init(struct mg_bthing *thing,
     thing->id = strdup(id);
     thing->type = type;
     thing->notify_state = notify_state;
+    return true;
   }
+  LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
   return false;
 }
 
@@ -60,7 +62,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
 bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
                          const char *id, int type, 
                          enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_init(MG_BTHING_SENS_DOWNCAST(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
+  if (mg_bthing_init(MG_BTHING_SENS_DOWNCAST(thing), id, (type | MGOS_BTHING_TYPE_SENSOR), notify_state)) {
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, mg_bthing_sens_getting_state_cb);
     thing->get_state_cb = NULL;
@@ -69,6 +71,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
     thing->state = mgos_bvar_new();
     return true;
   }
+  LOG(LL_ERROR, ("Error initializing the bThing '%s' as SENSOR'.", (id ? id : "")));
   return false;
 }
 
@@ -146,6 +149,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
     thing->state_cb_ud = NULL;
     return true;
   }
+  LOG(LL_ERROR, ("Error initializing the bThing '%s' as ACTUATOR'.", (id ? id : "")));
   return false;
 }
 
