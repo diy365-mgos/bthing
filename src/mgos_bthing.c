@@ -55,7 +55,7 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
       sens->state_cb_ud = (get_state_cb ? userdata : NULL);
       return true;
     }
-    LOG(LL_ERROR, ("The get-state handler is already (bThing '%s')", mgos_bthing_get_id(thing)));
+    LOG(LL_ERROR, ("The get-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
   }
   return false;
 }
@@ -97,7 +97,7 @@ bool mgos_bthing_on_set_state(mgos_bthing_t thing,
       actu->state_cb_ud = (set_state_cb ? userdata : NULL);
       return true;
     }
-    LOG(LL_ERROR, ("The set-state handler is already (bThing '%s')", mgos_bthing_get_id(thing)));
+    LOG(LL_ERROR, ("The set-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
   }
   return false;
 }
