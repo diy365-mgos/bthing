@@ -76,7 +76,7 @@ inline struct mg_bthing_sens *MG_BTHING_SENS_CAST1(mgos_bthing_t thing) { return
 inline struct mg_bthing_sens *MG_BTHING_SENS_CAST2(struct mg_bthing *thing) { return (mgos_bthing_is_typeof(MG_BTHING_CAST2(thing), MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL); }
 
 // Convert (struct mg_bthing_sens *) into (struct mg_bthing *)
-inline struct mg_bthing *MG_BTHING_SENS_CAST3(struct mg_bthing_sens *thing) { return &(t->base); }
+inline struct mg_bthing *MG_BTHING_SENS_CAST3(struct mg_bthing_sens *thing) { return &(thing->base); }
 
 // Convert (struct mg_bthing_sens *) into (mgos_bthing_t)
 inline mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing) { return MG_BTHING_CAST1(MG_BTHING_SENS_CAST3(thing)); }
@@ -114,7 +114,7 @@ inline struct mg_bthing_actu *MG_BTHING_ACTU_CAST1(mgos_bthing_t thing) { return
 inline struct mg_bthing_actu *MG_BTHING_ACTU_CAST2(struct mg_bthing *thing) { return (mgos_bthing_is_typeof(MG_BTHING_CAST2(thing), MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL); }
 
 // Convert (struct mg_bthing_actu *) into (struct mg_bthing_sens *)
-inline struct mg_bthing_sens *MG_BTHING_ACTU_CAST3(struct mg_bthing_actu *thing) { return &(t->base); }
+inline struct mg_bthing_sens *MG_BTHING_ACTU_CAST3(struct mg_bthing_actu *thing) { return &(thing->base); }
 
 // Convert (struct mg_bthing_actu *) into (struct mg_bthing *)
 inline struct mg_bthing *MG_BTHING_ACTU_CAST4(struct mg_bthing_actu *thing) { return MG_BTHING_SENS_CAST3(MG_BTHING_ACTU_CAST3(thing)); }
