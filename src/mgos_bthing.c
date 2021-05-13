@@ -6,11 +6,11 @@
 #endif
 
 const char *mgos_bthing_get_id(mgos_bthing_t thing) {
-  return (thing ? MG_BTHING_CAST(thing)->id : NULL);
+  return (thing ? MG_BTHING_CAST1(thing)->id : NULL);
 }
 
 int mgos_bthing_get_type(mgos_bthing_t thing) {
-  return (thing ? MG_BTHING_CAST(thing)->type : 0);
+  return (thing ? MG_BTHING_CAST1(thing)->type : 0);
 }
 
 bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type) {
@@ -21,7 +21,7 @@ mgos_bthing_t mgos_bthing_get(const char* id) {
   if (id) {
     struct mg_bthing_enum *things = &(mg_bthing_context()->things);
     while (things && things->thing) {
-      if (0 == strcasecmp(id, MG_BTHING_CAST(things->thing)->id)) return things->thing;
+      if (0 == strcasecmp(id, MG_BTHING_CAST1(things->thing)->id)) return things->thing;
       things = things->next_item;
     }
   }
@@ -48,7 +48,7 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata) {
-  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST(thing);
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
     if (!sens->get_state_cb || !get_state_cb) {
       sens->get_state_cb = get_state_cb;
@@ -61,7 +61,7 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
 }
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
-  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST(thing);
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens, false) : true));
   return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
 }
@@ -69,14 +69,13 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
   if (ev_data) {
-    mg_bthing_get_state(MG_BTHING_SENS_CAST((mgos_bthing_t)ev_data), true);
+    mg_bthing_get_state(MG_BTHING_SENS_CAST1((mgos_bthing_t)ev_data), true);
   } else {
     mgos_bthing_t thing;
     mgos_bthing_enum_t things = mgos_bthing_get_all();
 
     while(mgos_bthing_get_next(&things, &thing)) {
-      struct mg_bthing_sens *sensor = MG_BTHING_SENS_CAST(thing);
-      mg_bthing_get_state(sensor, true);
+      mg_bthing_get_state(MG_BTHING_SENS_CAST1(thing), true);
     }
   }
 
@@ -90,7 +89,7 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
 bool mgos_bthing_on_set_state(mgos_bthing_t thing,
                               mgos_bthing_set_state_handler_t set_state_cb,
                               void *userdata) {
-  struct mg_bthing_actu *actu = MG_BTHING_ACTU_CAST(thing);
+  struct mg_bthing_actu *actu = MG_BTHING_ACTU_CAST1(thing);
   if (actu) {
     if (!actu->set_state_cb || !set_state_cb) {
       actu->set_state_cb = set_state_cb;
@@ -103,7 +102,7 @@ bool mgos_bthing_on_set_state(mgos_bthing_t thing,
 }
 
 bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state) {
-  return mg_bthing_set_state(MG_BTHING_ACTU_CAST(thing), state);
+  return mg_bthing_set_state(MG_BTHING_ACTU_CAST1(thing), state);
 }
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
