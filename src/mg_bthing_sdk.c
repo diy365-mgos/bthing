@@ -3,6 +3,21 @@
 #include "mgos.h"
 #include "mg_bthing_sdk.h"
 
+/*****************************************
+ * Cast Functions
+ */
+
+// Convert (mgos_bthing_t) into (struct mg_bthing *)
+struct mg_bthing *MG_BTHING_CAST1(mgos_bthing_t thing) { 
+  return (struct mg_bthing *)thing;
+}
+
+// Convert (struct mg_bthing *) into (mgos_bthing_t) 
+mgos_bthing_t MG_BTHING_CAST2(struct mg_bthing *thing) {
+  return (mgos_bthing_t)thing;
+}
+/*****************************************/
+
 /* Excecution context instance */
 struct mg_bthing_ctx *s_context;
 struct mg_bthing_ctx *mg_bthing_context() {
@@ -38,6 +53,31 @@ void mg_bthing_reset(struct mg_bthing *thing) {
 }
 
 #if MGOS_BTHING_HAVE_SENSORS
+
+/*****************************************
+ * Cast Functions
+ */
+
+// Convert (mgos_bthing_t) into (struct mg_bthing_sens *) or NULL if conversion fails
+struct mg_bthing_sens *MG_BTHING_SENS_CAST1(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
+}
+
+// Convert (struct mg_bthing *) into (struct mg_bthing_sens *) or NULL if conversion fails
+struct mg_bthing_sens *MG_BTHING_SENS_CAST2(struct mg_bthing *thing) {
+  return (mgos_bthing_is_typeof(MG_BTHING_CAST2(thing), MGOS_BTHING_TYPE_SENSOR) ? (struct mg_bthing_sens *)thing : NULL);
+}
+
+// Convert (struct mg_bthing_sens *) into (struct mg_bthing *)
+struct mg_bthing *MG_BTHING_SENS_CAST3(struct mg_bthing_sens *thing) {
+  return &(thing->base);
+}
+
+// Convert (struct mg_bthing_sens *) into (mgos_bthing_t)
+mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing) {
+  return MG_BTHING_CAST1(MG_BTHING_SENS_CAST3(thing));
+}
+/*****************************************/
 
 enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
                                                             mgos_bvar_t state,
@@ -118,6 +158,36 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
+
+/*****************************************
+ * Cast Functions
+ */
+
+#define MG_BTHING_ACTU_CAST3(t) (&(t->base))
+
+// Convert (mgos_bthing_t) into (struct mg_bthing_actu *) or NULL if conversion fails
+struct mg_bthing_actu *MG_BTHING_ACTU_CAST1(mgos_bthing_t thing) {
+  return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
+}
+
+// Convert (struct mg_bthing *) into (struct mg_bthing_actu *) or NULL if conversion fails
+struct mg_bthing_actu *MG_BTHING_ACTU_CAST2(struct mg_bthing *thing) {
+  return (mgos_bthing_is_typeof(MG_BTHING_CAST2(thing), MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
+}
+
+// Convert (struct mg_bthing_actu *) into (struct mg_bthing_sens *)
+struct mg_bthing_sens *MG_BTHING_ACTU_CAST3(struct mg_bthing_actu *thing) {
+  return &(thing->base);
+}
+
+// Convert (struct mg_bthing_actu *) into (struct mg_bthing *)
+struct mg_bthing *MG_BTHING_ACTU_CAST4(struct mg_bthing_actu *thing) {
+  return MG_BTHING_SENS_CAST3(MG_BTHING_ACTU_CAST3(thing));
+}
+
+// Convert (struct mg_bthing_actu *) into (mgos_bthing_t)
+mgos_bthing_t MG_BTHING_ACTU_CAST5(struct mg_bthing_actu *thing) { return MG_BTHING_CAST1(MG_BTHING_ACTU_CAST4(thing)); }
+/*****************************************/
 
 enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_actu *thing,
                                                             mgos_bvarc_t state,
