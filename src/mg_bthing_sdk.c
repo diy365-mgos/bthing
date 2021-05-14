@@ -163,8 +163,6 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
  * Cast Functions
  */
 
-#define MG_BTHING_ACTU_CAST3(t) (&(t->base))
-
 // Convert (mgos_bthing_t) into (struct mg_bthing_actu *) or NULL if conversion fails
 struct mg_bthing_actu *MG_BTHING_ACTU_CAST1(mgos_bthing_t thing) {
   return (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR) ? (struct mg_bthing_actu *)thing : NULL);
