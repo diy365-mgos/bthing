@@ -194,7 +194,7 @@ Sets the state of a *bThing* actuator. Returns `true` on success, or `false` oth
 |state|The state value to set.|
 ## JS APIs Reference
 ### bThing.EVENT
-```js
+```javascript
 bThing.EVENT: {
   ANY,
   CREATED,
@@ -210,7 +210,7 @@ Events triggered by a*bThing* or on which it is listening to. Use `Event.addGrou
 |STATE_UPDATED|Triggered when the state of a *bThing* has been updated. This event is triggered according the *bThing* state notification setting (see [bThing.NOTIFY_STATE](#bthingnotify_state) below).|
 
 Example:
-```js
+```javascript
 Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
   let thing = bThing.getFromHandle(evdata);
   if (ev == bThing.EVENT.CREATED) {
@@ -225,14 +225,14 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
 |UPDATE_STATE|Send this event-command to force the *bThing* state to be updated. This can be sent to all registered *bThings* or to a specific one. After sending it, a `bThing.EVENT.STATE_UPDATED` event is forcibly triggered unless the *bThings* is configured as `bThing.NOTIFY_STATE.NEVER` (see [bThing.NOTIFY_STATE](#bthingnotify_state) below).|
 
 Example:
-```js
+```javascript
 // Send the message to all registered bThings
 Event.trigger(bThing.EVENT.UPDATE_STATE, null);
 // Send the message to a specific bThing
 Event.trigger(bThing.EVENT.UPDATE_STATE, thing);
 ```
 ### bThing.NOTIFY_STATE
-```js
+```javascript
 bThing.NOTIFY_STATE: {
   NEVER,
   ON_CHANGE,
@@ -247,13 +247,13 @@ Ways a *bThing* can trigger the `bThing.EVENT.STATE_UPDATED` [event](#bthingeven
 |ON_CHANGE|The event is triggered only when the state is updated and its value is changed. |
 |ALWAYS|The event is triggered every time the state is updated.|
 ### bThing.getAllThings
-```js
+```javascript
 bThing.getAllThings();
 ```
 Returns the array of all registered *bThings*.
 
 Example:
-```js
+```javascript
 let things = bThing.getAllThings();
 for (let i = 0; i < things.length; ++i) {
   let thing = things[i];
@@ -261,7 +261,7 @@ for (let i = 0; i < things.length; ++i) {
 }
 ```
 ### bThing.getFromHandle
-```js
+```javascript
 bThing.getFromHandle(handle);
 ```
 Returns a *bThing* using its C/C++ handle, or `null` if not found.
@@ -270,7 +270,7 @@ Returns a *bThing* using its C/C++ handle, or `null` if not found.
 |--|--|
 |handle|A C/C++ *bThing* handle.|
 ### bThing.getFromId
-```js
+```javascript
 bThing.getFromId(id);
 ```
 Returns the *bThing* having the specified ID, or `null` if not found.
@@ -279,22 +279,22 @@ Returns the *bThing* having the specified ID, or `null` if not found.
 |--|--|
 |id|A *bThing* ID.|
 ### .getId
-```js
+```javascript
 <obj>.getId();
 ```
 Returns the ID of a *bThing*, or `null` if error.
 ### .getType
-```js
+```javascript
 <obj>.getType();
 ```
 Returns the type of a *bThing*, or `0` if error.
 
 Example:
-```js
+```javascript
 print("The bThing type is:", <obj>.getType());
 ```
 ### .isTypeOf
-```js
+```javascript
 <obj>.isTypeOf(type);
 ```
 Returns `true` if the *bThing* type is `type`.
@@ -304,7 +304,7 @@ Returns `true` if the *bThing* type is `type`.
 |type|The type to check.|
 
 Example:
-```js
+```javascript
 if (<obj>.isTypeOf(bThing.TYPE.SENSOR))
   print("The bThing is a sensor.");
 else if (<obj>.isTypeOf(bThing.TYPE.ACTUATOR))
