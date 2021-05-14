@@ -93,19 +93,19 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
-                         const char *id, int type, 
-                         enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_init(MG_BTHING_SENS_CAST3(thing), id, (type | MGOS_BTHING_TYPE_SENSOR), notify_state)) {
-    thing->cfg = NULL;
-    mg_bthing_on_getting_state(thing, mg_bthing_sens_getting_state_cb);
-    thing->get_state_cb = NULL;
-    thing->state_cb_ud = NULL;
-    thing->is_updating = 0;
-    thing->state = mgos_bvar_new();
+bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
+  if (sens) {
+    struct mg_bthing *t = MG_BTHING_SENS_CAST3(actu);
+    t->type = (t->type | MGOS_BTHING_TYPE_SENSOR);
+
+    sens->cfg = NULL;
+    mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
+    sens->get_state_cb = NULL;
+    sens->state_cb_ud = NULL;
+    sens->is_updating = 0;
+    sens->state = mgos_bvar_new();
     return true;
   }
-  LOG(LL_ERROR, ("Error initializing the bThing '%s' as SENSOR'.", (id ? id : "")));
   return false;
 }
 
@@ -199,17 +199,19 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
-                         const char *id, int type, 
-                         enum mgos_bthing_notify_state notify_state) {
-  if (mg_bthing_sens_init(MG_BTHING_ACTU_CAST3(thing), id, (type | MGOS_BTHING_TYPE_ACTUATOR), notify_state)) {
-    thing->cfg = NULL;
-    mg_bthing_on_setting_state(thing, mg_bthing_actu_setting_state_cb); 
-    thing->set_state_cb = NULL;
-    thing->state_cb_ud = NULL;
+bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
+  const char *id = NULL;
+  if (actu) {
+    // Update the bThing type
+    struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
+    t->type = (t->type | MGOS_BTHING_TYPE_ACTUATOR);
+
+    actu->cfg = NULL;
+    mg_bthing_on_setting_state(actu, mg_bthing_actu_setting_state_cb); 
+    actu->set_state_cb = NULL;
+    actu->state_cb_ud = NULL;
     return true;
   }
-  LOG(LL_ERROR, ("Error initializing the bThing '%s' as ACTUATOR'.", (id ? id : "")));
   return false;
 }
 
@@ -238,7 +240,8 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
       return true;
     }
   }
-
+  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'",
+    mgos_bthing_get_id(MG_BTHING_ACTU_CAST5(thing))));
   return false;
 }
 

@@ -144,9 +144,7 @@ void mg_bthing_reset(struct mg_bthing *thing);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *thing,
-                         const char *id, int type, 
-                         enum mgos_bthing_notify_state notify_state);
+bool mg_bthing_sens_init(struct mg_bthing_sens *thing);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *thing);
 
@@ -159,9 +157,7 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 
 #if MGOS_BTHING_HAVE_ACTUATORS
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *thing,
-                         const char *id, int type, 
-                         enum mgos_bthing_notify_state notify_state);
+bool mg_bthing_actu_init(struct mg_bthing_actu *thing);
 
 void mg_bthing_actu_reset(struct mg_bthing_actu *thing);
 
