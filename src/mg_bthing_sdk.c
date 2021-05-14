@@ -95,7 +95,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
   if (sens) {
-    struct mg_bthing *t = MG_BTHING_SENS_CAST3(actu);
+    struct mg_bthing *t = MG_BTHING_SENS_CAST3(sens);
     t->type = (t->type | MGOS_BTHING_TYPE_SENSOR);
 
     sens->cfg = NULL;
