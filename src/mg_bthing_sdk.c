@@ -206,7 +206,6 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
 }
 
 bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
-  const char *id = NULL;
   if (actu) {
     struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
     if (!t->id) {
