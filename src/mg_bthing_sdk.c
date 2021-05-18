@@ -117,7 +117,6 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
   if (thing) {
-    mg_bthing_reset(MG_BTHING_SENS_CAST3(thing));
     free(thing->cfg);
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, NULL);
@@ -225,14 +224,13 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
   return false;
 }
 
-void mg_bthing_actu_reset(struct mg_bthing_actu *thing) {
-  if (thing) {
-    mg_bthing_sens_reset(MG_BTHING_ACTU_CAST3(thing));
-    free(thing->cfg);
-    thing->cfg = NULL;
-    mg_bthing_on_setting_state(thing, NULL); 
-    thing->set_state_cb = NULL;
-    thing->state_cb_ud = NULL;
+void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
+  if (actu) {
+    free(actu->cfg);
+    actu->cfg = NULL;
+    mg_bthing_on_setting_state(actu, NULL); 
+    actu->set_state_cb = NULL;
+    actu->state_cb_ud = NULL;
   }
 }
 

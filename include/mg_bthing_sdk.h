@@ -144,26 +144,26 @@ void mg_bthing_reset(struct mg_bthing *thing);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *thing);
+bool mg_bthing_sens_init(struct mg_bthing_sens *sens);
 
-void mg_bthing_sens_reset(struct mg_bthing_sens *thing);
+void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
-bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state);
+bool mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_notify_state);
 
-mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *thing, 
+mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *thing);
+bool mg_bthing_actu_init(struct mg_bthing_actu *actu);
 
-void mg_bthing_actu_reset(struct mg_bthing_actu *thing);
+void mg_bthing_actu_reset(struct mg_bthing_actu *actu);
 
-bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state);
+bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state);
 
-mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_actu *thing, 
+mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_actu *actu, 
                                                              mg_bthing_setting_state_handler_t setting_state_cb);
 
 #endif // MGOS_BTHING_HAVE_ACTUATORS
