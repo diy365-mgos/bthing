@@ -124,8 +124,8 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
     mg_bthing_on_getting_state(thing, NULL);
     thing->get_state_cb = NULL;
     thing->get_state_ud = NULL;
-    sens->updating_state_cb = NULL;
-    sens->updating_state_ud = NULL;
+    thing->updating_state_cb = NULL;
+    thing->updating_state_ud = NULL;
     thing->is_updating = 0;
     mgos_bvar_free(thing->state);
     thing->state = NULL;
@@ -143,8 +143,8 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode
     }
   }
 
-  if (sens->updating_state_cb) {
-    sens->updating_state_cb(thing, thing->state, thing->updating_state_ud);
+  if (thing->updating_state_cb) {
+    thing->updating_state_cb(thing, thing->state, thing->updating_state_ud);
   }
   mgos_event_trigger(MGOS_EV_BTHING_UPDATING_STATE, thing);
 
