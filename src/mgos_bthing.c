@@ -52,7 +52,7 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
   if (sens) {
     if (!sens->get_state_cb || !get_state_cb) {
       sens->get_state_cb = get_state_cb;
-      sens->state_cb_ud = (get_state_cb ? userdata : NULL);
+      sens->get_state_ud = (get_state_cb ? userdata : NULL);
       return true;
     }
     LOG(LL_ERROR, ("The get-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
@@ -82,6 +82,21 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   (void) userdata;
 }
 
+bool mgos_bthing_on_updating_state(mgos_bthing_t thing,
+                                   mgos_bthing_updating_state_handler_t updating_state_cb,
+                                   void *userdata) {
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
+  if (sens) {
+    if (!sens->updating_state_cb || !updating_state_cb) {
+      sens->updating_state_cb = updating_state_cb;
+      sens->updating_state_ud = (updating_state_cb ? userdata : NULL);
+      return true;
+    }
+    LOG(LL_ERROR, ("The updating-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
+  }
+  return false;
+}
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
@@ -93,7 +108,7 @@ bool mgos_bthing_on_set_state(mgos_bthing_t thing,
   if (actu) {
     if (!actu->set_state_cb || !set_state_cb) {
       actu->set_state_cb = set_state_cb;
-      actu->state_cb_ud = (set_state_cb ? userdata : NULL);
+      actu->set_state_ud = (set_state_cb ? userdata : NULL);
       return true;
     }
     LOG(LL_ERROR, ("The set-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));

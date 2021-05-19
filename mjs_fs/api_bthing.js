@@ -59,10 +59,10 @@ let bThing = {
     ACTUATOR: 3,
   },
   
-  // enum mgos_bthing_notify_state
-  NOTIFY_STATE: {
+  // enum mgos_bthing_pub_state_mode
+  PUB_STATE_MODE: {
     NEVER: 0,
-    ON_CHANGE: 1,
+    CHANGED: 1,
     ALWAYS: 2
   },
  
@@ -76,7 +76,8 @@ let bThing = {
   EVENT: {
     ANY: 0, // TODO: update
     CREATED: 0, 
-    STATE_UPDATED: 0,
+    UPDATING_STATE: 0,
+    PUBLISHING_STATE: 0,
     UPDATE_STATE: 0,
   },
   

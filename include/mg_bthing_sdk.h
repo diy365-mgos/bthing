@@ -34,7 +34,7 @@ enum MG_BTHING_STATE_RESULT {
 struct mg_bthing {
   char *id;
   int type;
-  enum mgos_bthing_notify_state notify_state;
+  enum mgos_bthing_pub_state_mode pub_state_mode;
 };
 
 /*****************************************
@@ -60,7 +60,9 @@ struct mg_bthing_sens {
   void *cfg;
   mg_bthing_getting_state_handler_t getting_state_cb;
   mgos_bthing_get_state_handler_t get_state_cb;
-  void *state_cb_ud;
+  void *get_state_ud;
+  mgos_bthing_updating_state_handler_t updating_state_cb;
+  void *updating_state_ud;
   unsigned char is_updating;
   mgos_bvar_t state;
 };
@@ -98,7 +100,7 @@ struct mg_bthing_actu {
   void *cfg;
   mg_bthing_setting_state_handler_t setting_state_cb;
   mgos_bthing_set_state_handler_t set_state_cb;
-  void *state_cb_ud;
+  void *set_state_ud;
 };
 
 /*****************************************
@@ -138,7 +140,7 @@ struct mg_bthing_ctx *mg_bthing_context();
 
 bool mg_bthing_init(struct mg_bthing *thing,
                     const char *id, int type, 
-                    enum mgos_bthing_notify_state notify_state);
+                    enum mgos_bthing_pub_state_mode pub_state_mode);
 
 void mg_bthing_reset(struct mg_bthing *thing);
 
@@ -148,7 +150,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
-bool mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_notify_state);
+bool mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_pub_state_mode);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);

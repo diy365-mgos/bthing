@@ -32,11 +32,11 @@ struct mg_bthing_ctx *mg_bthing_context() {
 
 bool mg_bthing_init(struct mg_bthing *thing,
                     const char *id, int type, 
-                    enum mgos_bthing_notify_state notify_state) {
+                    enum mgos_bthing_pub_state_mode pub_state_mode) {
   if (thing && id && (strlen(id) > 0)) {
     thing->id = strdup(id);
     thing->type = type;
-    thing->notify_state = notify_state;
+    thing->pub_state_mode = pub_state_mode;
     return true;
   }
   LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
@@ -48,7 +48,7 @@ void mg_bthing_reset(struct mg_bthing *thing) {
     free(thing->id);
     thing->id = NULL;
     thing->type = 0;
-    thing->notify_state = MGOS_BTHING_NOTIFY_STATE_NEVER;
+    thing->pub_state_mode = MGOS_BTHING_PUB_STATE_MODE_NEVER;
   }
 }
 
@@ -107,7 +107,9 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
     sens->cfg = NULL;
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
-    sens->state_cb_ud = NULL;
+    sens->get_state_ud = NULL;
+    sens->updating_state_cb = NULL;
+    sens->updating_state_ud = NULL;
     sens->is_updating = 0;
     sens->state = mgos_bvar_new();
     return true;
@@ -121,33 +123,41 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
     thing->cfg = NULL;
     mg_bthing_on_getting_state(thing, NULL);
     thing->get_state_cb = NULL;
-    thing->state_cb_ud = NULL;
+    thing->get_state_ud = NULL;
+    sens->updating_state_cb = NULL;
+    sens->updating_state_ud = NULL;
     thing->is_updating = 0;
     mgos_bvar_free(thing->state);
     thing->state = NULL;
   }
 }
 
-bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_notify_state) {
+bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode) {
   if (!thing) return false;
   thing->is_updating += 1;
   if (thing->getting_state_cb) {
-    if (thing->getting_state_cb(thing, thing->state, thing->state_cb_ud) == MG_BTHING_STATE_RESULT_ERROR) {
+    if (thing->getting_state_cb(thing, thing->state, thing->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       thing->is_updating -= 1;
       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(MG_BTHING_SENS_CAST4(thing))));
       return false;
     }
   }
 
-  enum mgos_bthing_notify_state notify_state = MG_BTHING_SENS_CAST3(thing)->notify_state;
-  if (notify_state != MGOS_BTHING_NOTIFY_STATE_NEVER) {
-    if (force_notify_state == true ||
-        notify_state == MGOS_BTHING_NOTIFY_STATE_ALWAYS ||
-        (notify_state == MGOS_BTHING_NOTIFY_STATE_ON_CHANGE && (mgos_bvar_is_changed(thing->state)))) {
-      mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, thing);
-      mgos_bvar_set_unchanged(thing->state);
+  if (sens->updating_state_cb) {
+    sens->updating_state_cb(thing, thing->state, thing->updating_state_ud);
+  }
+  mgos_event_trigger(MGOS_EV_BTHING_UPDATING_STATE, thing);
+
+  enum mgos_bthing_pub_state_mode pub_state_mode = MG_BTHING_SENS_CAST3(thing)->pub_state_mode;
+  if (pub_state_mode != MGOS_BTHING_PUB_STATE_MODE_NEVER) {
+    if (force_pub_state_mode == true ||
+        pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_ALWAYS ||
+        (pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_CHANGED && (mgos_bvar_is_changed(thing->state)))) {
+      mgos_event_trigger(MGOS_EV_BTHING_PUBLISHING_STATE, thing);
     }
   }
+
+  mgos_bvar_set_unchanged(thing->state);
   thing->is_updating -= 1;
   return true;
 }
@@ -218,7 +228,7 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
     actu->cfg = NULL;
     mg_bthing_on_setting_state(actu, mg_bthing_actu_setting_state_cb); 
     actu->set_state_cb = NULL;
-    actu->state_cb_ud = NULL;
+    actu->set_state_ud = NULL;
     return true;
   }
   return false;
@@ -230,7 +240,7 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
     actu->cfg = NULL;
     mg_bthing_on_setting_state(actu, NULL); 
     actu->set_state_cb = NULL;
-    actu->state_cb_ud = NULL;
+    actu->set_state_ud = NULL;
   }
 }
 
@@ -239,7 +249,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(thing);
 
     enum MG_BTHING_STATE_RESULT res = (!thing->setting_state_cb ? 
-      MG_BTHING_STATE_RESULT_NO_HANDLER : thing->setting_state_cb(thing, state, thing->state_cb_ud));
+      MG_BTHING_STATE_RESULT_NO_HANDLER : thing->setting_state_cb(thing, state, thing->set_state_ud));
     
     if (res == MG_BTHING_STATE_RESULT_NO_HANDLER)
       return mgos_bvar_merge(state, sens->state);
