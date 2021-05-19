@@ -196,6 +196,30 @@ Sets the state of a *bThing* actuator. Returns `true` on success, or `false` oth
 |--|--|
 |thing|A *bThing* actuator.|
 |state|The state value to set.|
+### (*mgos_bthing_updating_state_handler_t)
+```c
+typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+```
+*Updating-state* handler signature. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|thing|The *bThing* updating the state.|
+|state|The updated state value.|
+|userdata|The handler's *user-data*.|
+### mgos_bthing_on_updating_state
+```c
+bool mgos_bthing_on_updating_state(mgos_bthing_t thing,
+                                   mgos_bthing_updating_state_handler_t updating_state_cb,
+                                   void *userdata);
+```
+Sets the *updating-state* handler of a *bThing* sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHING_TYPE_SENSOR)`). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|thing|A *bThing* sensor/actuator.|
+|updating_state_cb|The [updating-state handler](#mgos_bthing_updating_state_handler_t) or `NULL` to reset the handler.|
+|userdata|The *user-data* to pass to the handler or `NULL`. Ignored if `updating_state_cb` is `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
 ```javascript
