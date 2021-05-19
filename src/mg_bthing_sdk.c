@@ -144,7 +144,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode
   }
 
   if (thing->updating_state_cb) {
-    thing->updating_state_cb(thing, thing->state, thing->updating_state_ud);
+    thing->updating_state_cb(MG_BTHING_SENS_CAST4(thing), thing->state, thing->updating_state_ud);
   }
   mgos_event_trigger(MGOS_EV_BTHING_UPDATING_STATE, thing);
 
