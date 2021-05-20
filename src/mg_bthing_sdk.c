@@ -93,7 +93,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
+bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg, bool free_cfg) {
   if (sens) {
     struct mg_bthing *t = MG_BTHING_SENS_CAST3(sens);
     if (!t->id) {
@@ -104,7 +104,8 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
     // Update bThing type
     t->type = (t->type | MGOS_BTHING_TYPE_SENSOR);
 
-    sens->cfg = NULL;
+    sens->cfg = cfg;
+    sens->free_cfg = (free_cfg ? 1 : 0);
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
@@ -117,18 +118,20 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens) {
   return false;
 }
 
-void mg_bthing_sens_reset(struct mg_bthing_sens *thing) {
-  if (thing) {
-    free(thing->cfg);
-    thing->cfg = NULL;
-    mg_bthing_on_getting_state(thing, NULL);
-    thing->get_state_cb = NULL;
-    thing->get_state_ud = NULL;
-    thing->updating_state_cb = NULL;
-    thing->updating_state_ud = NULL;
-    thing->is_updating = 0;
-    mgos_bvar_free(thing->state);
-    thing->state = NULL;
+void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
+  if (sens) {
+    if ((sens->free_cfg == 1) && sens->cfg) {
+      free(sens->cfg);
+      sens->cfg = NULL;
+    }
+    mg_bthing_on_getting_state(sens, NULL);
+    sens->get_state_cb = NULL;
+    sens->get_state_ud = NULL;
+    sens->updating_state_cb = NULL;
+    sens->updating_state_ud = NULL;
+    sens->is_updating = 0;
+    mgos_bvar_free(sens->state);
+    sens->state = NULL;
   }
 }
 
@@ -214,7 +217,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
+bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg, bool free_cfg) {
   if (actu) {
     struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
     if (!t->id) {
@@ -225,7 +228,8 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
     // Update the bThing type
     t->type = (t->type | MGOS_BTHING_TYPE_ACTUATOR);
 
-    actu->cfg = NULL;
+    actu->cfg = cfg;
+    actu->free_cfg = (free_cfg ? 1 : 0);
     mg_bthing_on_setting_state(actu, mg_bthing_actu_setting_state_cb); 
     actu->set_state_cb = NULL;
     actu->set_state_ud = NULL;
@@ -236,8 +240,10 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu) {
 
 void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
   if (actu) {
-    free(actu->cfg);
-    actu->cfg = NULL;
+    if ((actu->free_cfg == 1) && actu->cfg) {
+      free(actu->cfg);
+      actu->cfg = NULL;
+    }
     mg_bthing_on_setting_state(actu, NULL); 
     actu->set_state_cb = NULL;
     actu->set_state_ud = NULL;

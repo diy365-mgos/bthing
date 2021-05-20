@@ -58,6 +58,7 @@ typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct 
 struct mg_bthing_sens {
   struct mg_bthing base;
   void *cfg;
+  unsigned char free_cfg;
   mg_bthing_getting_state_handler_t getting_state_cb;
   mgos_bthing_get_state_handler_t get_state_cb;
   void *get_state_ud;
@@ -98,6 +99,7 @@ typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_setting_state_handler_t)(struct 
 struct mg_bthing_actu {
   struct mg_bthing_sens base;
   void *cfg;
+  unsigned char free_cfg;
   mg_bthing_setting_state_handler_t setting_state_cb;
   mgos_bthing_set_state_handler_t set_state_cb;
   void *set_state_ud;
@@ -146,7 +148,7 @@ void mg_bthing_reset(struct mg_bthing *thing);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *sens);
+bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg, bool free_cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
@@ -159,7 +161,7 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 
 #if MGOS_BTHING_HAVE_ACTUATORS
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *actu);
+bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg, bool free_cfg);
 
 void mg_bthing_actu_reset(struct mg_bthing_actu *actu);
 
