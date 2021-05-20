@@ -18,7 +18,7 @@ Events triggered by a*bThing* or on which it is listening to. Use `mgos_event_ad
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new *bThing* is created.|
 |MGOS_EV_BTHING_UPDATING_STATE|Triggered when the state of a *bThing* has been updated.|
-|MGOS_EV_BTHING_PUBLISHING_STATE|Triggered when the state of a *bThing* has been updated and it is ready to be published. This event is triggered according the *bThing* state notification setting (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
+|MGOS_EV_BTHING_PUBLISHING_STATE|Triggered when the state of a *bThing* has been updated and it is ready to be published. This event is triggered according the *bThing* publish-state setting (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
 
 Example:
 ```c
@@ -237,7 +237,7 @@ Events triggered by a*bThing* or on which it is listening to. Use `Event.addGrou
 |--|--|
 |CREATED|Triggered when a new *bThing* is created.|
 |UPDATING_STATE|Triggered when the state of a *bThing* has been updated.|
-|PUBLISHING_STATE|Triggered when the state of a *bThing* has been updated and it is ready to be published. This event is triggered according the *bThing* state notification setting (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
+|PUBLISHING_STATE|Triggered when the state of a *bThing* has been updated and it is ready to be published. This event is triggered according the *bThing* publish-state setting (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
 
 Example:
 ```javascript
