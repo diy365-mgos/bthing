@@ -117,10 +117,12 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
   return false;
 }
 
-void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
+void mg_bthing_sens_reset(struct mg_bthing_sens *sens, bool free_cfg) {
   if (sens) {
-    free(sens->cfg);
-    sens->cfg = NULL;
+    if (free_cfg) {
+      free(sens->cfg);
+      sens->cfg = NULL;
+    }
     mg_bthing_on_getting_state(sens, NULL);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
@@ -234,10 +236,12 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg) {
   return false;
 }
 
-void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
+void mg_bthing_actu_reset(struct mg_bthing_actu *actu, bool free_cfg) {
   if (actu) {
-    free(actu->cfg);
-    actu->cfg = NULL;
+    if (free_cfg) {
+      free(actu->cfg);
+      actu->cfg = NULL;
+    }
     mg_bthing_on_setting_state(actu, NULL); 
     actu->set_state_cb = NULL;
     actu->set_state_ud = NULL;
