@@ -95,6 +95,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
   if (sens) {
+    memset(0, sizieof(struct mg_bthing_sens));
     struct mg_bthing *t = MG_BTHING_SENS_CAST3(sens);
     if (!t->id) {
       LOG(LL_ERROR, ("bSensor init failed. Invoke 'mg_bthing_init()' function first."));
@@ -218,6 +219,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
 
 bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg) {
   if (actu) {
+    memset(0, sizieof(struct mg_bthing_actu));
     struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
     if (!t->id) {
       LOG(LL_ERROR, ("bActuator init failed. Invoke 'mg_bthing_init()' function first."));
