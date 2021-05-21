@@ -93,7 +93,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg, bool free_cfg) {
+bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
   if (sens) {
     struct mg_bthing *t = MG_BTHING_SENS_CAST3(sens);
     if (!t->id) {
@@ -105,7 +105,6 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg, bool free_cfg) 
     t->type = (t->type | MGOS_BTHING_TYPE_SENSOR);
 
     sens->cfg = cfg;
-    sens->free_cfg = (free_cfg ? 1 : 0);
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
@@ -120,10 +119,8 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg, bool free_cfg) 
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   if (sens) {
-    if ((sens->free_cfg == 1) && sens->cfg) {
-      free(sens->cfg);
-      sens->cfg = NULL;
-    }
+    free(sens->cfg);
+    sens->cfg = NULL;
     mg_bthing_on_getting_state(sens, NULL);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
@@ -217,7 +214,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
-bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg, bool free_cfg) {
+bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg) {
   if (actu) {
     struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
     if (!t->id) {
@@ -229,7 +226,6 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg, bool free_cfg) 
     t->type = (t->type | MGOS_BTHING_TYPE_ACTUATOR);
 
     actu->cfg = cfg;
-    actu->free_cfg = (free_cfg ? 1 : 0);
     mg_bthing_on_setting_state(actu, mg_bthing_actu_setting_state_cb); 
     actu->set_state_cb = NULL;
     actu->set_state_ud = NULL;
@@ -240,10 +236,8 @@ bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg, bool free_cfg) 
 
 void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
   if (actu) {
-    if ((actu->free_cfg == 1) && actu->cfg) {
-      free(actu->cfg);
-      actu->cfg = NULL;
-    }
+    free(actu->cfg);
+    actu->cfg = NULL;
     mg_bthing_on_setting_state(actu, NULL); 
     actu->set_state_cb = NULL;
     actu->set_state_ud = NULL;
