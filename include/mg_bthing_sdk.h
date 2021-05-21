@@ -148,7 +148,7 @@ void mg_bthing_reset(struct mg_bthing *thing);
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
-void mg_bthing_sens_reset(struct mg_bthing_sens *sens, bool free_cfg);
+void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
 bool mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_pub_state_mode);
 
@@ -161,7 +161,7 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 
 bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg);
 
-void mg_bthing_actu_reset(struct mg_bthing_actu *actu, bool free_cfg);
+void mg_bthing_actu_reset(struct mg_bthing_actu *actu);
 
 bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state);
 
