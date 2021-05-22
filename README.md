@@ -1,6 +1,9 @@
 # bThings Core Library
 ## Overview
 Mongoose OS core library for the bThings ecosystem.
+|Sensors|Actuators|Others|
+|--|--|--|
+|[bSensors](https://github.com/diy365-mgos/bsensor), [bBinarySensors](https://github.com/diy365-mgos/bbinsensor)|[bActuators](https://github.com/diy365-mgos/bactuator), [bBinaryActuators](https://github.com/diy365-mgos/bbinactuator)|*Coming soon...*|
 ## C/C++ APIs Reference
 ### enum mgos_bthing_event
 ```c
