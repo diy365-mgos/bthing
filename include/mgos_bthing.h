@@ -111,7 +111,7 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
 
 typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 
-bool mgos_bthing_on_updating_state(mgos_bthing_t thing,
+void mgos_bthing_on_updating_state(mgos_bthing_t thing,
                                    mgos_bthing_updating_state_handler_t updating_state_cb,
                                    void *userdata);
 

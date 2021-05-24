@@ -82,19 +82,24 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   (void) userdata;
 }
 
-bool mgos_bthing_on_updating_state(mgos_bthing_t thing,
+void mgos_bthing_on_updating_state(mgos_bthing_t thing,
                                    mgos_bthing_updating_state_handler_t updating_state_cb,
                                    void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
-    if (!sens->updating_state_cb || !updating_state_cb) {
-      sens->updating_state_cb = updating_state_cb;
-      sens->updating_state_ud = (updating_state_cb ? userdata : NULL);
-      return true;
+    struct mg_bthing_updating_state *u_s = sens->updating_state;
+    while (u_s) {
+      if (u_s->callback == updating_state_cb && u_s->userdata == userdata) return;
+      u_s = u_s->next;
     }
-    LOG(LL_ERROR, ("The updating-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
+ 
+    u_s = calloc(1, sizeof(mg_bthing_updating_state));
+    u_s->callback = updating_state_cb;
+    u_s->userdata = userdata;
+
+    if (sens->updating_state) u_s->next = sens->updating_state;
+    sens->updating_state = u_s;
   }
-  return false;
 }
 
 #endif // MGOS_BTHING_HAVE_SENSORS

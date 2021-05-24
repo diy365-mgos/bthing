@@ -107,8 +107,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
-    sens->updating_state_cb = NULL;
-    sens->updating_state_ud = NULL;
+    sens->updating_state = NULL;
     sens->is_updating = 0;
     sens->state = mgos_bvar_new();
     sens->cfg = cfg;
@@ -123,8 +122,14 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
     mg_bthing_on_getting_state(sens, NULL);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
-    sens->updating_state_cb = NULL;
-    sens->updating_state_ud = NULL;
+
+    struct mg_bthing_updating_state *updating_state = sens->updating_state;
+    while (updating_state) {
+      struct mg_bthing_updating_state *tmp = updating_state->next;
+      free( updating_state);
+      updating_state = tmp;
+    }
+ 
     sens->is_updating = 0;
     mgos_bvar_free(sens->state);
     sens->state = NULL;
@@ -142,9 +147,12 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode
     }
   }
 
-  if (thing->updating_state_cb) {
-    thing->updating_state_cb(MG_BTHING_SENS_CAST4(thing), thing->state, thing->updating_state_ud);
+  struct mg_bthing_updating_state *updating_state = thing->updating_state;
+  while (updating_state) {
+    updating_state->callback(MG_BTHING_SENS_CAST4(thing), thing->state, updating_state->userdata);
+    updating_state = updating_state->next;
   }
+  
   mgos_event_trigger(MGOS_EV_BTHING_UPDATING_STATE, thing);
 
   enum mgos_bthing_pub_state_mode pub_state_mode = MG_BTHING_SENS_CAST3(thing)->pub_state_mode;
