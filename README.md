@@ -86,7 +86,7 @@ Returns the type of a bThing, or `0` if error.
 
 Example:
 ```c
-printf("The bThing type is: %d.", mgos_bthing_get_type(thing));
+LOG(LL_INFO, ("The bThing type is: %d.", mgos_bthing_get_type(thing)));
 ```
 ### mgos_bthing_is_typeof
 ```c
@@ -102,11 +102,11 @@ Returns `true` if the bThing type is `type`.
 Example:
 ```c
 if (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_SENSOR))
-  printf("The bThing is a sensor.");
+  LOG(LL_INFO, ("The bThing is a sensor."));
 else if (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR))
-  printf("The bThing is an actuator.");
+  LOG(LL_INFO, ("The bThing is an actuator."));
 else
-  printf("Unknown bThing type.");
+  LOG(LL_INFO, ("Unknown bThing type."));
 ```
 ### mgos_bthing_get
 ```c
