@@ -93,7 +93,7 @@ void mgos_bthing_on_updating_state(mgos_bthing_t thing,
       u_s = u_s->next;
     }
  
-    u_s = calloc(1, sizeof(mg_bthing_updating_state));
+    u_s = calloc(1, sizeof(struct mg_bthing_updating_state));
     u_s->callback = updating_state_cb;
     u_s->userdata = userdata;
 

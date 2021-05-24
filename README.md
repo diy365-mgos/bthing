@@ -213,15 +213,15 @@ typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_b
 ### mgos_bthing_on_updating_state
 ```c
 void mgos_bthing_on_updating_state(mgos_bthing_t thing,
-                                   mgos_bthing_updating_state_handler_t updating_state_cb,
+                                   mgos_bthing_updating_state_handler_t handler,
                                    void *userdata);
 ```
-Adds an *updating-state* handler. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Adds an *updating-state* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|updating_state_cb|The [updating-state handler](#mgos_bthing_updating_state_handler_t) to add.|
+|handler|The [updating-state handler](#mgos_bthing_updating_state_handler_t) to add.|
 |userdata|The handler's *user-data* or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
