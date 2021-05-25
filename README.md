@@ -10,7 +10,7 @@ Mongoose OS core library for the bThings ecosystem.
 enum mgos_bthing_event {
   MGOS_EV_BTHING_ANY,
   MGOS_EV_BTHING_CREATED, 
-  MGOS_EV_BTHING_UPDATING_STATE,
+  MGOS_EV_BTHING_STATE_CHANGED,
   MGOS_EV_BTHING_PUBLISHING_STATE,
   MGOS_EV_BTHING_UPDATE_STATE
 };
@@ -20,7 +20,7 @@ Events triggered by abThing or on which it is listening to. Use `mgos_event_add_
 |Event||
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created.|
-|MGOS_EV_BTHING_UPDATING_STATE|Triggered when the state of a bThing has been updated.|
+|MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state value of a bThing is changed.|
 |MGOS_EV_BTHING_PUBLISHING_STATE|Triggered when the state of a bThing has been updated and it is ready to be published. This event is triggered according the bThing publish-state setting (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
 
 Example:
@@ -29,7 +29,7 @@ static void bthing_events_cb(int ev, void *ev_data, void *userdata) {
   mgos_bthing_t thing = (mgos_bthing_t)ev_data;
   if (ev == case MGOS_EV_BTHING_CREATED) {
     // ...
-  } else if (ev == case MGOS_EV_BTHING_UPDATING_STATE) {
+  } else if (ev == case MGOS_EV_BTHING_STATE_CHANGED) {
     // ...
   } else if (ev == case MGOS_EV_BTHING_PUBLISHING_STATE) {
     // ...
@@ -41,7 +41,7 @@ mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, bthing_events_cb, NULL);
 ```
 |Event||
 |--|--|
-|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `MGOS_EV_BTHING_UPDATING_STATE` event is triggered and a `MGOS_EV_BTHING_PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `MGOS_BTHING_PUB_STATE_MODE_NEVER` (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
+|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `MGOS_EV_BTHING_STATE_CHANGED` event is triggered and a `MGOS_EV_BTHING_PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `MGOS_BTHING_PUB_STATE_MODE_NEVER` (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
 
 Example:
 ```c
@@ -199,9 +199,9 @@ Sets the state of a bThing actuator. Returns `true` on success, or `false` other
 |--|--|
 |thing|A bThing actuator.|
 |state|The state value to set.|
-### (*mgos_bthing_updating_state_handler_t)
+### (*mgos_bthing_state_changed_handler_t)
 ```c
-typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 ```
 *Updating-state* handler signature. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
@@ -210,18 +210,18 @@ typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_b
 |thing|The bThing updating the state.|
 |state|The updated state value.|
 |userdata|The handler's *user-data*.|
-### mgos_bthing_on_updating_state
+### mgos_bthing_on_state_changed
 ```c
-void mgos_bthing_on_updating_state(mgos_bthing_t thing,
-                                   mgos_bthing_updating_state_handler_t handler,
+void mgos_bthing_on_state_changed(mgos_bthing_t thing,
+                                   mgos_bthing_state_changed_handler_t handler,
                                    void *userdata);
 ```
-Adds an *updating-state* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Adds an *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|handler|The [updating-state handler](#mgos_bthing_updating_state_handler_t) to add.|
+|handler|The [state-changed handler](#mgos_bthing_state_changed_handler_t) to add.|
 |userdata|The handler's *user-data* or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
@@ -229,7 +229,7 @@ Adds an *updating-state* handler, only if the *handler/userdata* pair is not yet
 bThing.EVENT: {
   ANY,
   CREATED,
-  UPDATING_STATE,
+  STATE_CHANGED,
   PUBLISHING_STATE,
   UPDATE_STATE
 }
@@ -239,7 +239,7 @@ Events triggered by abThing or on which it is listening to. Use `Event.addGroupH
 |Event||
 |--|--|
 |CREATED|Triggered when a new bThing is created.|
-|UPDATING_STATE|Triggered when the state of a bThing has been updated.|
+|STATE_CHANGED|Triggered when the state value of a bThing is changed.|
 |PUBLISHING_STATE|Triggered when the state of a bThing has been updated and it is ready to be published. This event is triggered according the bThing publish-state setting (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
 
 Example:
@@ -248,7 +248,7 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
   let thing = bThing.getFromHandle(evdata);
   if (ev == bThing.EVENT.CREATED) {
     // ...
-  } else if (ev == bThing.EVENT.UPDATING_STATE) {
+  } else if (ev == bThing.EVENT.STATE_CHANGED) {
     // ...  
   } else if (ev == bThing.EVENT.PUBLISHING_STATE) {
     // ...  
@@ -257,7 +257,7 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
 ```
 |Event||
 |--|--|
-|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `bThing.EVENT.UPDATING_STATE` event is triggered and a `bThing.EVENT.PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `bThing.PUB_STATE_MODE.NEVER` (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
+|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `bThing.EVENT.STATE_CHANGED` event is triggered and a `bThing.EVENT.PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `bThing.PUB_STATE_MODE.NEVER` (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
 
 Example:
 ```javascript

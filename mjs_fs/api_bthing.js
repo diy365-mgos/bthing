@@ -76,7 +76,7 @@ let bThing = {
   EVENT: {
     ANY: 0, // TODO: update
     CREATED: 0, 
-    UPDATING_STATE: 0,
+    STATE_CHANGED: 0,
     PUBLISHING_STATE: 0,
     UPDATE_STATE: 0,
   },

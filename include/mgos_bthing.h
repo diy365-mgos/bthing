@@ -61,11 +61,11 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 #define MGOS_BTHING_NO_TICKS 0
 #define MGOS_BTHING_NO_PIN -1
 
-#define MGOS_BTHING_EVENT_BASE MGOS_EVENT_BASE('B', 'T', 'N')
+#define MGOS_BTHING_EVENT_BASE MGOS_EVENT_BASE('B', 'T', 'G')
 enum mgos_bthing_event {
   MGOS_EV_BTHING_ANY = MGOS_BTHING_EVENT_BASE, 
   MGOS_EV_BTHING_CREATED, 
-  MGOS_EV_BTHING_UPDATING_STATE,
+  MGOS_EV_BTHING_STATE_CHANGED,
   MGOS_EV_BTHING_PUBLISHING_STATE,
   MGOS_EV_BTHING_UPDATE_STATE
 };
@@ -109,10 +109,10 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata);
 
-typedef void (*mgos_bthing_updating_state_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 
-void mgos_bthing_on_updating_state(mgos_bthing_t thing,
-                                   mgos_bthing_updating_state_handler_t updating_state_cb,
+void mgos_bthing_on_state_changed(mgos_bthing_t thing,
+                                   mgos_bthing_state_changed_handler_t state_changed_cb,
                                    void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);

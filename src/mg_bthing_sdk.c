@@ -107,7 +107,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
-    sens->updating_state = NULL;
+    sens->state_changed = NULL;
     sens->is_updating = 0;
     sens->state = mgos_bvar_new();
     sens->cfg = cfg;
@@ -123,11 +123,11 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
 
-    struct mg_bthing_updating_state *updating_state = sens->updating_state;
-    while (updating_state) {
-      struct mg_bthing_updating_state *tmp = updating_state->next;
-      free( updating_state);
-      updating_state = tmp;
+    struct mg_bthing_state_changed_handlers *state_changed = sens->state_changed;
+    while (state_changed) {
+      struct mg_bthing_state_changed_handlers *tmp = state_changed->next;
+      free( state_changed);
+      state_changed = tmp;
     }
  
     sens->is_updating = 0;
@@ -147,24 +147,28 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode
     }
   }
 
-  struct mg_bthing_updating_state *updating_state = thing->updating_state;
-  while (updating_state) {
-    updating_state->callback(MG_BTHING_SENS_CAST4(thing), thing->state, updating_state->userdata);
-    updating_state = updating_state->next;
+  bool is_changed = mgos_bvar_is_changed(thing->state);
+
+  if (is_changed) {
+    struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
+    while (sc) {
+      sc->callback(MG_BTHING_SENS_CAST4(thing), thing->state, sc->userdata);
+      sc = sc->next;
+    }
+    
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
   }
-  
-  mgos_event_trigger(MGOS_EV_BTHING_UPDATING_STATE, thing);
 
   enum mgos_bthing_pub_state_mode pub_state_mode = MG_BTHING_SENS_CAST3(thing)->pub_state_mode;
   if (pub_state_mode != MGOS_BTHING_PUB_STATE_MODE_NEVER) {
-    if (force_pub_state_mode == true ||
-        pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_ALWAYS ||
-        (pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_CHANGED && (mgos_bvar_is_changed(thing->state)))) {
+    if (force_pub_state_mode == true || pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_ALWAYS ||
+        ((pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_CHANGED) && is_changed)) {
       mgos_event_trigger(MGOS_EV_BTHING_PUBLISHING_STATE, thing);
     }
   }
 
-  mgos_bvar_set_unchanged(thing->state);
+  if (is_changed) mgos_bvar_set_unchanged(thing->state);
+
   thing->is_updating -= 1;
   return true;
 }

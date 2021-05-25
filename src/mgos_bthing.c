@@ -82,23 +82,23 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   (void) userdata;
 }
 
-void mgos_bthing_on_updating_state(mgos_bthing_t thing,
-                                   mgos_bthing_updating_state_handler_t updating_state_cb,
+void mgos_bthing_on_state_changed(mgos_bthing_t thing,
+                                   mgos_bthing_state_changed_handler_t state_changed_cb,
                                    void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
-    struct mg_bthing_updating_state *u_s = sens->updating_state;
-    while (u_s) {
-      if (u_s->callback == updating_state_cb && u_s->userdata == userdata) return;
-      u_s = u_s->next;
+    struct mg_bthing_state_changed_handlers *sc = sens->state_changed;
+    while (sc) {
+      if (sc->callback == state_changed_cb && sc->userdata == userdata) return;
+      sc = sc->next;
     }
  
-    u_s = calloc(1, sizeof(struct mg_bthing_updating_state));
-    u_s->callback = updating_state_cb;
-    u_s->userdata = userdata;
+    sc = calloc(1, sizeof(struct mg_bthing_state_changed_handlers));
+    sc->callback = state_changed_cb;
+    sc->userdata = userdata;
 
-    if (sens->updating_state) u_s->next = sens->updating_state;
-    sens->updating_state = u_s;
+    if (sens->state_changed) sc->next = sens->state_changed;
+    sens->state_changed = sc;
   }
 }
 
