@@ -67,7 +67,7 @@ Ways a bThing can trigger the `MGOS_EV_BTHING_PUBLISHING_STATE` [event](#enum-mg
 |MGOS_BTHING_PUB_STATE_MODE_ALWAYS|The event is triggered every time the state is updated.|
 ### mgos_bthing_get_id
 ```c
-const char *mgos_bthing_get_id(mgos_bthing_t thing)
+const char *mgos_bthing_get_id(mgos_bthing_t thing);
 ```
 Returns the ID of a bThing, or `NULL` if error.
 
@@ -76,7 +76,7 @@ Returns the ID of a bThing, or `NULL` if error.
 |thing|A bThing.|
 ### mgos_bthing_get_type
 ```c
-int mgos_bthing_get_type(mgos_bthing_t thing)
+int mgos_bthing_get_type(mgos_bthing_t thing);
 ```
 Returns the type of a bThing, or `0` if error.
 
@@ -90,7 +90,7 @@ LOG(LL_INFO, ("The bThing type is: %d.", mgos_bthing_get_type(thing)));
 ```
 ### mgos_bthing_is_typeof
 ```c
-bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type)
+bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type);
 ```
 Returns `true` if the bThing type is `type`.
 
@@ -110,7 +110,7 @@ else
 ```
 ### mgos_bthing_get
 ```c
-mgos_bthing_t mgos_bthing_get(const char* id)
+mgos_bthing_t mgos_bthing_get(const char* id);
 ```
 Returns the bThing having the specified ID, or `NULL` if not found.
 
@@ -119,7 +119,7 @@ Returns the bThing having the specified ID, or `NULL` if not found.
 |id|A bThing ID.|
 ### mgos_bthing_get_all
 ```c
-mgos_bthing_enum_t mgos_bthing_get_all()
+mgos_bthing_enum_t mgos_bthing_get_all();
 ```
 Returns the enumerator for iterating all registered bThings, or `NULL` if error. The enumerator can be used with `mgos_bthing_get_next()`.
 ### mgos_bthing_get_next
