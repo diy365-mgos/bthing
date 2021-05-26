@@ -213,8 +213,8 @@ typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bv
 ### mgos_bthing_on_state_changed
 ```c
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                   mgos_bthing_state_changed_handler_t handler,
-                                   void *userdata);
+                                  mgos_bthing_state_changed_handler_t handler,
+                                  void *userdata);
 ```
 Adds an *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
