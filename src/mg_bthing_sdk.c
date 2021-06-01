@@ -45,7 +45,6 @@ void mg_bthing_reset(struct mg_bthing *thing) {
     free(thing->id);
     thing->id = NULL;
     thing->type = 0;
-    thing->pub_state_mode = MGOS_BTHING_PUB_STATE_MODE_NEVER;
   }
 }
 
