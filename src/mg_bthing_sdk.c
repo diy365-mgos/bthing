@@ -30,13 +30,10 @@ struct mg_bthing_ctx *mg_bthing_context() {
   return s_context; 
 }
 
-bool mg_bthing_init(struct mg_bthing *thing,
-                    const char *id, int type, 
-                    enum mgos_bthing_pub_state_mode pub_state_mode) {
+bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type) {
   if (thing && id && (strlen(id) > 0)) {
     thing->id = strdup(id);
     thing->type = type;
-    thing->pub_state_mode = pub_state_mode;
     return true;
   }
   LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
@@ -136,7 +133,7 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode) {
+bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_state_changed) {
   if (!thing) return false;
   thing->is_updating += 1;
   if (thing->getting_state_cb) {
@@ -147,27 +144,18 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_pub_state_mode
     }
   }
 
-  bool is_changed = mgos_bvar_is_changed(thing->state);
-
-  if (is_changed) {
+  if (force_state_changed || mgos_bvar_is_changed(thing->state)) {
+    // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
       sc->callback(MG_BTHING_SENS_CAST4(thing), thing->state, sc->userdata);
       sc = sc->next;
     }
-    
+    // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
-  }
 
-  enum mgos_bthing_pub_state_mode pub_state_mode = MG_BTHING_SENS_CAST3(thing)->pub_state_mode;
-  if (pub_state_mode != MGOS_BTHING_PUB_STATE_MODE_NEVER) {
-    if (force_pub_state_mode == true || pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_ALWAYS ||
-        ((pub_state_mode == MGOS_BTHING_PUB_STATE_MODE_CHANGED) && is_changed)) {
-      mgos_event_trigger(MGOS_EV_BTHING_PUBLISHING_STATE, thing);
-    }
+    mgos_bvar_set_unchanged(thing->state);
   }
-
-  if (is_changed) mgos_bvar_set_unchanged(thing->state);
 
   thing->is_updating -= 1;
   return true;

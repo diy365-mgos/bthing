@@ -34,7 +34,6 @@ enum MG_BTHING_STATE_CB_RET {
 struct mg_bthing {
   char *id;
   int type;
-  enum mgos_bthing_pub_state_mode pub_state_mode;
 };
 
 /*****************************************
@@ -143,9 +142,7 @@ struct mg_bthing_ctx {
 
 struct mg_bthing_ctx *mg_bthing_context();
 
-bool mg_bthing_init(struct mg_bthing *thing,
-                    const char *id, int type, 
-                    enum mgos_bthing_pub_state_mode pub_state_mode);
+bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type);
 
 void mg_bthing_reset(struct mg_bthing *thing);
 

@@ -11,7 +11,6 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_ANY,
   MGOS_EV_BTHING_CREATED, 
   MGOS_EV_BTHING_STATE_CHANGED,
-  MGOS_EV_BTHING_PUBLISHING_STATE,
   MGOS_EV_BTHING_UPDATE_STATE
 };
 ```
@@ -21,7 +20,6 @@ Events triggered by abThing or on which it is listening to. Use `mgos_event_add_
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state value of a bThing is changed.|
-|MGOS_EV_BTHING_PUBLISHING_STATE|Triggered when the state of a bThing has been updated and it is ready to be published. This event is triggered according the bThing publish-state setting (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
 
 Example:
 ```c
@@ -31,8 +29,6 @@ static void bthing_events_cb(int ev, void *ev_data, void *userdata) {
     // ...
   } else if (ev == case MGOS_EV_BTHING_STATE_CHANGED) {
     // ...
-  } else if (ev == case MGOS_EV_BTHING_PUBLISHING_STATE) {
-    // ...
   }
   (void) userdata;
 }
@@ -41,7 +37,7 @@ mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, bthing_events_cb, NULL);
 ```
 |Event||
 |--|--|
-|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `MGOS_EV_BTHING_STATE_CHANGED` event is triggered and a `MGOS_EV_BTHING_PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `MGOS_BTHING_PUB_STATE_MODE_NEVER` (see [mgos_bthing_pub_state_mode](#enum-mgos_bthing_pub_state_mode) below).|
+|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `MGOS_EV_BTHING_STATE_CHANGED` event is forcibly triggered.|
 
 Example:
 ```c
@@ -50,21 +46,6 @@ mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, NULL);
 // Send the message to a specific bThing
 mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, thing);
 ```
-### enum mgos_bthing_pub_state_mode
-```c
-enum mgos_bthing_pub_state_mode {
-  MGOS_BTHING_PUB_STATE_MODE_NEVER,
-  MGOS_BTHING_PUB_STATE_MODE_CHANGED,
-  MGOS_BTHING_PUB_STATE_MODE_ALWAYS
-};
-```
-Ways a bThing can trigger the `MGOS_EV_BTHING_PUBLISHING_STATE` [event](#enum-mgos_bthing_event).
-
-|Value||
-|--|--|
-|MGOS_BTHING_PUB_STATE_MODE_NEVER|The event is never triggered.|
-|MGOS_BTHING_PUB_STATE_MODE_CHANGED|The event is triggered only when the state is updated and its value is changed. |
-|MGOS_BTHING_PUB_STATE_MODE_ALWAYS|The event is triggered every time the state is updated.|
 ### mgos_bthing_get_id
 ```c
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
@@ -230,7 +211,6 @@ bThing.EVENT: {
   ANY,
   CREATED,
   STATE_CHANGED,
-  PUBLISHING_STATE,
   UPDATE_STATE
 }
 ```
@@ -240,7 +220,6 @@ Events triggered by abThing or on which it is listening to. Use `Event.addGroupH
 |--|--|
 |CREATED|Triggered when a new bThing is created.|
 |STATE_CHANGED|Triggered when the state value of a bThing is changed.|
-|PUBLISHING_STATE|Triggered when the state of a bThing has been updated and it is ready to be published. This event is triggered according the bThing publish-state setting (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
 
 Example:
 ```javascript
@@ -250,14 +229,12 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
     // ...
   } else if (ev == bThing.EVENT.STATE_CHANGED) {
     // ...  
-  } else if (ev == bThing.EVENT.PUBLISHING_STATE) {
-    // ...  
   }
 }, null);
 ```
 |Event||
 |--|--|
-|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `bThing.EVENT.STATE_CHANGED` event is triggered and a `bThing.EVENT.PUBLISHING_STATE` event is forcibly triggered unless the bThings is configured as `bThing.PUB_STATE_MODE.NEVER` (see [bThing.PUB_STATE_MODE](#bthingpub_state_mode) below).|
+|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `bThing.EVENT.STATE_CHANGED` event is forcibly triggered.|
 
 Example:
 ```javascript
@@ -266,21 +243,6 @@ Event.trigger(bThing.EVENT.UPDATE_STATE, null);
 // Send the message to a specific bThing
 Event.trigger(bThing.EVENT.UPDATE_STATE, thing);
 ```
-### bThing.PUB_STATE_MODE
-```javascript
-bThing.PUB_STATE_MODE: {
-  NEVER,
-  CHANGED,
-  ALWAYS
-}
-```
-Ways a bThing can trigger the `bThing.EVENT.PUBLISHING_STATE` [event](#bthingevent).
-
-|Value||
-|--|--|
-|NEVER|The event is never triggered.|
-|CHANGED|The event is triggered only when the state is updated and its value is changed. |
-|ALWAYS|The event is triggered every time the state is updated.|
 ### bThing.getAllThings
 ```javascript
 bThing.getAllThings();

@@ -59,13 +59,6 @@ let bThing = {
     ACTUATOR: 3,
   },
   
-  // enum mgos_bthing_pub_state_mode
-  PUB_STATE_MODE: {
-    NEVER: 0,
-    CHANGED: 1,
-    ALWAYS: 2
-  },
- 
   // enum mgos_bthing_state_ev
   STATE_EV: {
     SET: 1,
@@ -77,7 +70,6 @@ let bThing = {
     ANY: 0, // TODO: update
     CREATED: 0, 
     STATE_CHANGED: 0,
-    PUBLISHING_STATE: 0,
     UPDATE_STATE: 0,
   },
   
