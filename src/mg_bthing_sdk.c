@@ -241,8 +241,11 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
 }
 
 bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
-  if (thing) {
+  if (thing && state) {
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(thing);
+
+    // if current state == new requested state... nothing to do
+    if (mgos_bvar_cmp(state, sens->state) == 0) return true; 
 
     enum MG_BTHING_STATE_CB_RET res = (!thing->setting_state_cb ? 
       MG_BTHING_STATE_CB_RET_NOTHING : thing->setting_state_cb(thing, state, thing->set_state_ud));
