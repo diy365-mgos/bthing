@@ -75,18 +75,18 @@ mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing) {
 }
 /*****************************************/
 
-enum MG_BTHING_STATE_CB_RET mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
+enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
                                                             mgos_bvar_t state,
                                                             void *userdata) {
   if (thing) {
     if (!thing->get_state_cb)
-      return MG_BTHING_STATE_CB_RET_NOTHING;
+      return MG_BTHING_STATE_RESULT_UNHANDLED;
     if (thing->get_state_cb(MG_BTHING_SENS_CAST4(thing), state, userdata))
-      return MG_BTHING_STATE_CB_RET_SUCCESS;
+      return MG_BTHING_STATE_RESULT_SUCCESS;
   }
   LOG(LL_ERROR, ("Error getting bThing '%s' state. The get-state handler returned 'false'.",
     mgos_bthing_get_id(MG_BTHING_SENS_CAST4(thing))));
-  return MG_BTHING_STATE_CB_RET_ERROR;
+  return MG_BTHING_STATE_RESULT_ERROR;
 }
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
@@ -136,7 +136,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_state_changed)
   if (!thing) return false;
   thing->is_updating += 1;
   if (thing->getting_state_cb) {
-    if (thing->getting_state_cb(thing, thing->state, thing->get_state_ud) == MG_BTHING_STATE_CB_RET_ERROR) {
+    if (thing->getting_state_cb(thing, thing->state, thing->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       thing->is_updating -= 1;
       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(MG_BTHING_SENS_CAST4(thing))));
       return false;
@@ -200,16 +200,16 @@ struct mg_bthing *MG_BTHING_ACTU_CAST4(struct mg_bthing_actu *thing) {
 mgos_bthing_t MG_BTHING_ACTU_CAST5(struct mg_bthing_actu *thing) { return MG_BTHING_CAST1(MG_BTHING_ACTU_CAST4(thing)); }
 /*****************************************/
 
-enum MG_BTHING_STATE_CB_RET mg_bthing_actu_setting_state_cb(struct mg_bthing_actu *thing,
+enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_actu *thing,
                                                             mgos_bvarc_t state,
                                                             void *userdata) {
   if (thing) {
     if (!thing->set_state_cb)
-      return MG_BTHING_STATE_CB_RET_NOTHING;
+      return MG_BTHING_STATE_RESULT_UNHANDLED;
     if (thing->set_state_cb(MG_BTHING_ACTU_CAST5(thing), state, userdata))
-      return MG_BTHING_STATE_CB_RET_SUCCESS;
+      return MG_BTHING_STATE_RESULT_SUCCESS;
   }
-  return MG_BTHING_STATE_CB_RET_ERROR;
+  return MG_BTHING_STATE_RESULT_ERROR;
 }
 
 bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg) {
@@ -247,12 +247,12 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
     // if current state == new requested state... nothing to do
     if (mgos_bvar_cmp(state, sens->state) == 0) return true; 
 
-    enum MG_BTHING_STATE_CB_RET res = (!thing->setting_state_cb ? 
-      MG_BTHING_STATE_CB_RET_NOTHING : thing->setting_state_cb(thing, state, thing->set_state_ud));
+    enum MG_BTHING_STATE_RESULT res = (!thing->setting_state_cb ? 
+      MG_BTHING_STATE_RESULT_UNHANDLED : thing->setting_state_cb(thing, state, thing->set_state_ud));
     
-    if (res == MG_BTHING_STATE_CB_RET_NOTHING)
+    if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
       return mgos_bvar_merge(state, sens->state);
-    else if (res == MG_BTHING_STATE_CB_RET_SUCCESS) {
+    else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
       mg_bthing_get_state(sens, false);
       return true;
     }

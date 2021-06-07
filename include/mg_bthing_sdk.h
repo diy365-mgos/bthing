@@ -25,10 +25,10 @@
 extern "C" {
 #endif
 
-enum MG_BTHING_STATE_CB_RET {
-  MG_BTHING_STATE_CB_RET_ERROR,
-  MG_BTHING_STATE_CB_RET_SUCCESS,
-  MG_BTHING_STATE_CB_RET_NOTHING
+enum MG_BTHING_STATE_RESULT {
+  MG_BTHING_STATE_RESULT_ERROR,
+  MG_BTHING_STATE_RESULT_SUCCESS,
+  MG_BTHING_STATE_RESULT_UNHANDLED
 };
 
 struct mg_bthing {
@@ -50,7 +50,7 @@ struct mg_bthing *MG_BTHING_CAST1(mgos_bthing_t thing);
 #if MGOS_BTHING_HAVE_SENSORS
 
 struct mg_bthing_sens;
-typedef enum MG_BTHING_STATE_CB_RET (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
+typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
                                                                          mgos_bvar_t state,
                                                                          void *userdata);
 
@@ -95,7 +95,7 @@ mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing);
 #if MGOS_BTHING_HAVE_ACTUATORS
 
 struct mg_bthing_actu;
-typedef enum MG_BTHING_STATE_CB_RET (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing,
+typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing,
                                                                          mgos_bvarc_t state,
                                                                          void *userdata);
 
