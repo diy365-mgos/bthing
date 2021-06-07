@@ -113,6 +113,17 @@ Gets the next bThing iterating registered ones. Returns `false` if the end of th
 |--|--|
 |things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
+### mgos_bthing_typeof_get_next
+```c
+bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type) ;
+```
+Gets the next bThing of given type, iterating registered ones. Returns `false` if the end of the enumerator is reached, or `true` otherwise.
+
+|Parameter||
+|--|--|
+|things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
+|thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
+|type|The bThing type to take into account enumerating.|
 ### (*mgos_bthing_get_state_handler_t)
 ```c
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);

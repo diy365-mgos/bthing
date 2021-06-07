@@ -43,6 +43,12 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
   }
 }
 
+bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type) {
+  if (!mgos_bthing_get_next(things_enum, thing)) return false;
+  if (mgos_bthing_is_typeof(*thing, type)) return true;
+  return mgos_bthing_typeof_get_next(things_enum, thing, type);
+}
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,

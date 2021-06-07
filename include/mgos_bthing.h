@@ -93,6 +93,10 @@ mgos_bthing_enum_t mgos_bthing_get_all();
  * Returns `false` if the end of the enumerator is reached, or `true` otherwise.
  */
 bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing);
+/* Gets the next *bThing* of given type, iterating registered ones. 
+ * Returns `false` if the end of the enumerator is reached, or `true` otherwise.
+ */
+bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
