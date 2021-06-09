@@ -13,9 +13,10 @@ filesystem:
   - fs
 
 config_schema:
-  - ["device.id", "ZT??????"]
+  - ["device.id", "bThing-??????"]
 
 libs:
+  - origin: https://github.com/mongoose-os-libs/core
   - origin: https://github.com/diy365-mgos/bvar
 
 tags:
