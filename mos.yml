@@ -13,7 +13,7 @@ filesystem:
   - fs
 
 config_schema:
-  - ["device.id", "bThing-??????"]
+  - ["device.id", "ZT??????"]
 
 libs:
   - origin: https://github.com/diy365-mgos/bvar
