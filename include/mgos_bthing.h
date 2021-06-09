@@ -53,7 +53,7 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 #endif
 
 #define MGOS_BTHING_ENV_DEVICEID "${device_id}"
-#define MGOS_BTHING_ENV_THINGID "${thing_id}"
+#define MGOS_BTHING_ENV_THINGID "${bthing_id}"
 
 #define MGOS_BTHING_STR_ON "ON"
 #define MGOS_BTHING_STR_OFF "OFF"
