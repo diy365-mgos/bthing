@@ -302,10 +302,7 @@ int mg_bthing_scount(const char *str1, const char* str2) {
   return count;
 }
 
-bool mg_bthing_sreplace(const char *src,
-                              const char *tag,
-                              const char* replace_with,
-                              char **out) {
+bool mg_bthing_sreplace(const char *src, const char *tag, const char* replace_with, char **out) {
   *out = NULL;
 
   /* count 'tag' occurrences in 'src' */
@@ -343,10 +340,7 @@ bool mg_bthing_sreplace(const char *src,
   return true;
 }
 
-bool mg_bthing_sreplaces(const char *src,
-                               char **out,
-                               int count,
-                               ...) {
+bool mg_bthing_sreplaces(const char *src, char **out, int count, ...) {
   *out = NULL;
 
   char *string = (char *)src;
