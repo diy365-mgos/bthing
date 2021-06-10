@@ -175,6 +175,10 @@ mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_ac
 /* Register the bThing */
 bool mg_bthing_register(mgos_bthing_t thing);
 
+void mg_bthing_state_changed_off();
+void mg_bthing_state_changed_on();
+bool mg_bthing_is_state_changed_off();
+
 /* Count recurrences of str2 in str1 */
 int mg_bthing_scount(const char *str1, const char* str2);
 

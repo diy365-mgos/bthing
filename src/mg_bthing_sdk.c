@@ -143,7 +143,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_state_changed)
     }
   }
 
-  if (force_state_changed || mgos_bvar_is_changed(thing->state)) {
+  bool is_changed = mgos_bvar_is_changed(thing->state);
+
+  if (!mg_bthing_is_state_changed_off() && (force_state_changed || is_changed)) {
     // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
@@ -152,9 +154,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_state_changed)
     }
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
-
-    mgos_bvar_set_unchanged(thing->state);
   }
+
+  if (is_changed) mgos_bvar_set_unchanged(thing->state);
 
   thing->is_updating -= 1;
   return true;
@@ -291,6 +293,20 @@ bool mg_bthing_register(mgos_bthing_t thing) {
   things->thing = thing;
   mgos_event_trigger(MGOS_EV_BTHING_CREATED, thing);
   return true;
+}
+
+static int s_bthing_state_changed_lock = 0;
+
+void mg_bthing_state_changed_off() {
+  ++s_bthing_state_changed_lock;
+}
+void mg_bthing_state_changed_on() }
+  if (s_bthing_state_changed_lock > 0)
+    --s_bthing_state_changed_lock;
+}
+
+bool mg_bthing_is_state_changed_off() {
+  return (s_bthing_state_changed_lock > 0);
 }
 
 int mg_bthing_scount(const char *str1, const char* str2) {
