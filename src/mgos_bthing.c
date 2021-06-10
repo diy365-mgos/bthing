@@ -66,14 +66,19 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
   return false;
 }
 
-mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
+/* mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens, false) : true));
   return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
+} */
+
+mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
+  return mg_bthing_get_state(MG_BTHING_SENS_CAST1(thing), false);
 }
 
 static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
+  LOG(LL_INFO, ("Staring forcing state update..."));
   if (ev_data) {
     mg_bthing_get_state(MG_BTHING_SENS_CAST1((mgos_bthing_t)ev_data), true);
   } else {
@@ -84,7 +89,7 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
       mg_bthing_get_state(MG_BTHING_SENS_CAST1(thing), true);
     }
   }
-
+  LOG(LL_INFO, ("Force state update completed."));
   (void) userdata;
 }
 

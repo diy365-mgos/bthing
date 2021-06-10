@@ -152,7 +152,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
-bool mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_state_changed);
+mgos_bvarc_t mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_state_changed);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
