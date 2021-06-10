@@ -244,8 +244,15 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
   if (thing && state) {
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(thing);
 
-    // if current state == new requested state... nothing to do
-    if (mgos_bvar_cmp(state, sens->state) == 0) return true; 
+    // compare the requested state with the sensor's state
+    enum mgos_bvar_cmp_res cmp = mgos_bvar_cmp(state, sens->state);
+    if ((cmp & MGOS_BVAR_CMP_RES_EQUAL) == MGOS_BVAR_CMP_RES_EQUAL && 
+        (cmp == MGOS_BVAR_CMP_RES_EQUAL || (cmp & MGOS_BVAR_CMP_RES_MINOR) == MGOS_BVAR_CMP_RES_MINOR)) {
+      // The requested and the sensor's state are equal, or
+      // the requested state is contained (as exact copy) into the sensor's state.
+      // So, nothing to do.
+      return true;
+    } 
 
     enum MG_BTHING_STATE_RESULT res = (!thing->setting_state_cb ? 
       MG_BTHING_STATE_RESULT_UNHANDLED : thing->setting_state_cb(thing, state, thing->set_state_ud));
