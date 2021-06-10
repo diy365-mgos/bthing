@@ -162,7 +162,7 @@ bool mg_bthing_get_state_ex(struct mg_bthing_sens *thing, bool force_state_chang
   return true;
 }
 
-mgos_bvarc_t mg_bthing_get_state(struct mg_bthing_sens *thing, bool force_state_changed) {
+mgos_bvarc_t mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_state_changed) {
   bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state_ex(sens, force_state_changed) : true));
   return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
 }
