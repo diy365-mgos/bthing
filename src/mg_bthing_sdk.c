@@ -300,7 +300,7 @@ static int s_bthing_state_changed_lock = 0;
 void mg_bthing_state_changed_off() {
   ++s_bthing_state_changed_lock;
 }
-void mg_bthing_state_changed_on() }
+void mg_bthing_state_changed_on() {
   if (s_bthing_state_changed_lock > 0)
     --s_bthing_state_changed_lock;
 }
