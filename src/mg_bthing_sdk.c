@@ -132,7 +132,7 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-bool mg_bthing_get_state_ex(struct mg_bthing_sens *thing, bool force_state_changed) {
+bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
   if (!thing) return false;
   thing->is_updating += 1;
   if (thing->getting_state_cb) {
@@ -144,8 +144,10 @@ bool mg_bthing_get_state_ex(struct mg_bthing_sens *thing, bool force_state_chang
   }
 
   bool is_changed = mgos_bvar_is_changed(thing->state);
+  enum mg_bthing_state_changed_mode scm = mg_bthing_get_state_changed_mode();
 
-  if (!mg_bthing_is_state_changed_off() && (force_state_changed || is_changed)) {
+  if (((scm & MG_BTHING_STATE_CHANGED_MODE_SILENT) != MG_BTHING_STATE_CHANGED_MODE_SILENT) &&
+      (((scm & MG_BTHING_STATE_CHANGED_MODE_FORCED) == MG_BTHING_STATE_CHANGED_MODE_FORCED) || is_changed)) {
     // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
@@ -162,9 +164,8 @@ bool mg_bthing_get_state_ex(struct mg_bthing_sens *thing, bool force_state_chang
   return true;
 }
 
-mgos_bvarc_t mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_state_changed) {
-  bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state_ex(sens, force_state_changed) : true));
-  return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
+bool mg_bthing_update_state(struct mg_bthing_sens *sens) {
+  return (mgos_bthing_get_state(MG_BTHING_SENS_CAST3(sens)) != NULL);
 }
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *thing, 
@@ -267,7 +268,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
     if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
       return mgos_bvar_merge(state, sens->state);
     else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
-      mg_bthing_get_state(sens, false);
+      mg_bthing_update_state(sens);
       return true;
     }
   }
@@ -300,18 +301,14 @@ bool mg_bthing_register(mgos_bthing_t thing) {
   return true;
 }
 
-static int s_bthing_state_changed_lock = 0;
+enum mg_bthing_state_changed_mode s_state_changed_mode = MG_BTHING_STATE_CHANGED_MODE_DEFAULT;
 
-void mg_bthing_state_changed_off() {
-  ++s_bthing_state_changed_lock;
-}
-void mg_bthing_state_changed_on() {
-  if (s_bthing_state_changed_lock > 0)
-    --s_bthing_state_changed_lock;
+void mg_bthing_set_state_changed_mode(enum mg_bthing_state_changed_mode mode) {
+  s_state_changed_mode = mode;
 }
 
-bool mg_bthing_is_state_changed_off() {
-  return (s_bthing_state_changed_lock > 0);
+enum mg_bthing_state_changed_mode mg_bthing_get_state_changed_mode() {
+  return s_state_changed_mode;
 }
 
 int mg_bthing_scount(const char *str1, const char* str2) {

@@ -152,7 +152,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
-mgos_bvarc_t mg_bthing_get_state(struct mg_bthing_sens *sens, bool force_state_changed);
+bool mg_bthing_update_state(struct mg_bthing_sens *sens);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
@@ -175,9 +175,14 @@ mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_ac
 /* Register the bThing */
 bool mg_bthing_register(mgos_bthing_t thing);
 
-void mg_bthing_state_changed_off();
-void mg_bthing_state_changed_on();
-bool mg_bthing_is_state_changed_off();
+enum mg_bthing_state_changed_mode {
+  MG_BTHING_STATE_CHANGED_MODE_DEFAULT = 0, //000
+  MG_BTHING_STATE_CHANGED_MODE_SILENT = 1,  //001
+  MG_BTHING_STATE_CHANGED_MODE_FORCED = 2   //010
+};
+
+void mg_bthing_set_state_changed_mode(enum mg_bthing_state_changed_mode mode);
+enum mg_bthing_state_changed_mode mg_bthing_get_state_changed_mode();
 
 /* Count recurrences of str2 in str1 */
 int mg_bthing_scount(const char *str1, const char* str2);

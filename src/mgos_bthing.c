@@ -66,30 +66,35 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
   return false;
 }
 
-/* mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
-  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens, false) : true));
-  return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
-} */
-
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
-  return mg_bthing_get_state(MG_BTHING_SENS_CAST1(thing), false);
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
+  bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens) : true));
+  return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
 }
 
 static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
-  LOG(LL_INFO, ("Staring forcing state update..."));
+  
+  // set state_changed as forced (however it could be in silent mode)
+  enum mg_bthing_state_changed_mode scm = mg_bthing_get_state_changed_mode();
+  mg_bthing_set_state_changed_mode(scm | MG_BTHING_STATE_CHANGED_MODE_FORCED);
+  
   if (ev_data) {
-    mg_bthing_get_state(MG_BTHING_SENS_CAST1((mgos_bthing_t)ev_data), true);
+    // force the update of one specific bThing
+    mg_bthing_update_state(MG_BTHING_SENS_CAST1((mgos_bthing_t)ev_data));
   } else {
+    // force the update of all registered bThings
     mgos_bthing_t thing;
     mgos_bthing_enum_t things = mgos_bthing_get_all();
 
     while(mgos_bthing_get_next(&things, &thing)) {
-      mg_bthing_get_state(MG_BTHING_SENS_CAST1(thing), true);
+      mg_bthing_update_state(MG_BTHING_SENS_CAST1(thing));
     }
   }
-  LOG(LL_INFO, ("Force state update completed."));
+
+  // restore the previous state_changed mode
+  mg_bthing_set_state_changed_mode(scm);
+  
   (void) userdata;
 }
 
