@@ -66,6 +66,8 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
   return false;
 }
 
+bool mg_bthing_get_state(struct mg_bthing_sens *);
+
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens) : true));
@@ -94,7 +96,7 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
 
   // restore the previous state_changed mode
   mg_bthing_set_state_changed_mode(scm);
-  
+
   (void) userdata;
 }
 
