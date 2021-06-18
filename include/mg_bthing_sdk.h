@@ -31,12 +31,6 @@ enum MG_BTHING_STATE_RESULT {
   MG_BTHING_STATE_RESULT_UNHANDLED
 };
 
-enum mg_bthing_state_changed_mode {
-  MG_BTHING_STATE_CHANGED_MODE_DEFAULT = 0, //000
-  MG_BTHING_STATE_CHANGED_MODE_SILENT = 1,  //001
-  MG_BTHING_STATE_CHANGED_MODE_FORCED = 2   //010
-};
-
 struct mg_bthing {
   char *id;
   int type;
@@ -144,6 +138,7 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
+  bool force_state_changed;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();
@@ -182,9 +177,6 @@ mg_bthing_setting_state_handler_t mg_bthing_on_setting_state(struct mg_bthing_ac
 
 /* Register the bThing */
 bool mg_bthing_register(mgos_bthing_t thing);
-
-void mg_bthing_set_state_changed_mode(enum mg_bthing_state_changed_mode mode);
-enum mg_bthing_state_changed_mode mg_bthing_get_state_changed_mode();
 
 /* Count recurrences of str2 in str1 */
 int mg_bthing_scount(const char *str1, const char* str2);

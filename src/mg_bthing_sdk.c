@@ -26,6 +26,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
+    s_context->force_state_changed = false;
   }
   return s_context; 
 }
@@ -144,10 +145,8 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
   }
 
   bool is_changed = mgos_bvar_is_changed(thing->state);
-  enum mg_bthing_state_changed_mode scm = mg_bthing_get_state_changed_mode();
-
-  if (((scm & MG_BTHING_STATE_CHANGED_MODE_SILENT) != MG_BTHING_STATE_CHANGED_MODE_SILENT) &&
-      (((scm & MG_BTHING_STATE_CHANGED_MODE_FORCED) == MG_BTHING_STATE_CHANGED_MODE_FORCED) || is_changed)) {
+ 
+  if (mg_bthing_state_changed_is_forced() || is_changed)) {
     // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
@@ -303,16 +302,6 @@ bool mg_bthing_register(mgos_bthing_t thing) {
   things->thing = thing;
   mgos_event_trigger(MGOS_EV_BTHING_CREATED, thing);
   return true;
-}
-
-enum mg_bthing_state_changed_mode s_state_changed_mode = MG_BTHING_STATE_CHANGED_MODE_DEFAULT;
-
-void mg_bthing_set_state_changed_mode(enum mg_bthing_state_changed_mode mode) {
-  s_state_changed_mode = mode;
-}
-
-enum mg_bthing_state_changed_mode mg_bthing_get_state_changed_mode() {
-  return s_state_changed_mode;
 }
 
 int mg_bthing_scount(const char *str1, const char* str2) {

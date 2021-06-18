@@ -77,9 +77,8 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
   
-  // set state_changed as forced (however it could be in silent mode)
-  enum mg_bthing_state_changed_mode scm = mg_bthing_get_state_changed_mode();
-  mg_bthing_set_state_changed_mode(scm | MG_BTHING_STATE_CHANGED_MODE_FORCED);
+  // force to trigger MGOS_EV_BTHING_STATE_CHANGED event 
+  mg_bthing_context()->force_state_changed = true;
   
   if (ev_data) {
     // force the update of one specific bThing
@@ -94,8 +93,8 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
     }
   }
 
-  // restore the previous state_changed mode
-  mg_bthing_set_state_changed_mode(scm);
+  // remove forced MGOS_EV_BTHING_STATE_CHANGED event trigger
+  mg_bthing_context()->force_state_changed = false;
 
   (void) userdata;
 }
