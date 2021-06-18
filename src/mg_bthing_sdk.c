@@ -168,6 +168,10 @@ bool mg_bthing_update_state(struct mg_bthing_sens *sens) {
   return (mgos_bthing_get_state(MG_BTHING_SENS_CAST3(sens)) != NULL);
 }
 
+mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing); {
+  return (mgos_bvarc_t)(thing ? MG_BTHING_SENS_CAST1(thing)->state : NULL);
+}
+
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *thing, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb) {
   if (!thing) return NULL;
