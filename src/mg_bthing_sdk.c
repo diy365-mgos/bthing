@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include "mgos.h"
 #include "mg_bthing_sdk.h"
 
@@ -381,4 +382,12 @@ bool mg_bthing_sreplaces(const char *src, char **out, int count, ...) {
   
   va_end(ap);
   return (*out != NULL);
+}
+
+int64_t mg_bthing_duration_micro(int64_t t1, int64_t t2) {
+  if (t2 < 0) t2 = t2 - INT64_MAX;
+  if (t1 > t2) {
+    return ((INT64_MAX - t1) + t2);
+  }
+  return (t2 - t1);
 }
