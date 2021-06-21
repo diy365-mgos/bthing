@@ -147,7 +147,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
 
   bool is_changed = mgos_bvar_is_changed(thing->state);
  
-  if (mg_bthing_state_changed_is_forced() || is_changed) {
+  if (mg_bthing_context()->force_state_changed || is_changed) {
     // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
@@ -295,7 +295,7 @@ bool mg_bthing_register(mgos_bthing_t thing) {
   if (!thing) return false;
   struct mg_bthing_enum *things = &(mg_bthing_context()->things);
   if (things->thing) {
-    struct mg_bthing_enum *new_item = calloc(1, sizeof(struct mg_bthing_enum ));
+    struct mg_bthing_enum *new_item = calloc(1, sizeof(struct mg_bthing_enum));
     new_item->thing = things->thing;
     new_item->next_item = things->next_item;
     things->next_item = new_item;
