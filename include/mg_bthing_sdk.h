@@ -188,7 +188,7 @@ bool mg_bthing_sreplace(const char *src, const char *str,
 /* TODO: comment */
 bool mg_bthing_sreplaces(const char *src, char **out, int count, ...);
 
-int64_t mg_bthing_duration_micro(int64_t t1, int64_t t2):
+int64_t mg_bthing_duration_micro(int64_t t1, int64_t t2);
 
 #ifdef __cplusplus
 }
