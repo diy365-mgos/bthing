@@ -147,7 +147,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
 
   bool is_changed = mgos_bvar_is_changed(thing->state);
  
-  if (mg_bthing_state_changed_is_forced() || is_changed)) {
+  if (mg_bthing_state_changed_is_forced() || is_changed) {
     // invoke state-changed handlers
     struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
     while (sc) {
@@ -168,7 +168,7 @@ bool mg_bthing_update_state(struct mg_bthing_sens *sens) {
   return (mgos_bthing_get_state(MG_BTHING_SENS_CAST3(sens)) != NULL);
 }
 
-mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing); {
+mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
   return (mgos_bvarc_t)(thing ? MG_BTHING_SENS_CAST1(thing)->state : NULL);
 }
 
