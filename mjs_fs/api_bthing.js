@@ -59,16 +59,11 @@ let bThing = {
     ACTUATOR: 3,
   },
   
-  // enum mgos_bthing_state_ev
-  STATE_EV: {
-    SET: 1,
-    GET: 0,
-  },
-
   // Event codes 
   EVENT: {
     ANY: 0, // TODO: update
-    CREATED: 0, 
+    CREATED: 0,
+    STATE_CHANGING: 0,
     STATE_CHANGED: 0,
     UPDATE_STATE: 0,
   },

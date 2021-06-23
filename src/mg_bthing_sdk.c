@@ -106,12 +106,23 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
     sens->state_changed = NULL;
+    sens->state_changing = NULL;
     sens->is_updating = 0;
     sens->state = mgos_bvar_new();
+    sens->tmp_state = mgos_bvar_new();
     sens->cfg = cfg;
     return true;
   }
   return false;
+}
+
+static void mg_bthing_state_change_handler_free(struct mg_bthing_state_change_handlers *h) {
+  struct mg_bthing_state_change_handlers *tmp;
+  while (h) {
+    tmp = h->next;
+    free(h);
+    h = tmp;
+  }
 }
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
@@ -121,16 +132,26 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
 
-    struct mg_bthing_state_changed_handlers *state_changed = sens->state_changed;
-    while (state_changed) {
-      struct mg_bthing_state_changed_handlers *tmp = state_changed->next;
-      free( state_changed);
-      state_changed = tmp;
-    }
- 
+    // dispose state_changed handlers
+    mg_bthing_state_change_handler_free(sens->state_changed);
+    sens->state_changed = NULL;
+    // dispose state_changing handlers
+    mg_bthing_state_change_handler_free(sens->state_changing);
+    sens->state_changing = NULL;
+
     sens->is_updating = 0;
     mgos_bvar_free(sens->state);
+    mgos_bvar_free(sens->tmp_state);
     sens->state = NULL;
+  }
+}
+
+static void mg_bthing_state_change_handlers_invoke(struct mgos_bthing_t thing,
+                                                   mgos_bvar_t state,
+                                                   struct mg_bthing_state_change_handlers *h) {
+  while (h) {
+    h->callback(thing, state, h->userdata);
+    h = h->next;
   }
 }
 
@@ -138,27 +159,42 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
   if (!thing) return false;
   thing->is_updating += 1;
   if (thing->getting_state_cb) {
-    if (thing->getting_state_cb(thing, thing->state, thing->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
+    if (thing->getting_state_cb(thing, thing->tmp_state, thing->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       thing->is_updating -= 1;
       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(MG_BTHING_SENS_CAST4(thing))));
       return false;
     }
   }
 
-  bool is_changed = mgos_bvar_is_changed(thing->state);
+  bool is_changed = mgos_bvar_is_changed(thing->tmp_state);
+
+  // STATE_CHANGING: invoke handlers and trigger the event
+  if (mg_bthing_context()->force_state_changed || is_changed) {
+    // invoke state-changing handlers
+    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->tmp_state, thing->state_changing)
+    // trigger STATE_CHANGING event
+    struct mgos_bthing_state_changing_arg arg = {
+      thing = thing,
+      cur_state = thing->state,
+      new_state = thing->tmp_state
+    };
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &arg);
+  }
+
+  mgos_bvar_copy(thing->tmp_state, thing->state);
  
+  // STATE_CHANGED: invoke handlers and trigger the event
   if (mg_bthing_context()->force_state_changed || is_changed) {
     // invoke state-changed handlers
-    struct mg_bthing_state_changed_handlers *sc = thing->state_changed;
-    while (sc) {
-      sc->callback(MG_BTHING_SENS_CAST4(thing), thing->state, sc->userdata);
-      sc = sc->next;
-    }
+    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->state, thing->state_changed)
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
   }
 
-  if (is_changed) mgos_bvar_set_unchanged(thing->state);
+  if (is_changed) {
+    mgos_bvar_set_unchanged(thing->tmp_state);
+    mgos_bvar_set_unchanged(thing->state);
+  }
 
   thing->is_updating -= 1;
   return true;

@@ -100,22 +100,42 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
 }
 
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_changed_handler_t state_changed_cb,
+                                  mgos_bthing_state_change_handler_t handler,
                                   void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
-    struct mg_bthing_state_changed_handlers *sc = sens->state_changed;
+    struct mg_bthing_state_change_handlers *sc = sens->state_changed;
     while (sc) {
-      if (sc->callback == state_changed_cb && sc->userdata == userdata) return;
+      if (sc->callback == handler && sc->userdata == userdata) return;
       sc = sc->next;
     }
  
-    sc = calloc(1, sizeof(struct mg_bthing_state_changed_handlers));
-    sc->callback = state_changed_cb;
+    sc = calloc(1, sizeof(struct mg_bthing_state_change_handlers));
+    sc->callback = handler;
     sc->userdata = userdata;
 
     if (sens->state_changed) sc->next = sens->state_changed;
     sens->state_changed = sc;
+  }
+}
+
+void mgos_bthing_on_state_changing(mgos_bthing_t thing,
+                                   mgos_bthing_state_change_handler_t handler,
+                                   void *userdata) {
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
+  if (sens) {
+    struct mg_bthing_state_change_handlers *sc = sens->state_changing;
+    while (sc) {
+      if (sc->callback == handler && sc->userdata == userdata) return;
+      sc = sc->next;
+    }
+ 
+    sc = calloc(1, sizeof(struct mg_bthing_state_change_handlers));
+    sc->callback = handler;
+    sc->userdata = userdata;
+
+    if (sens->state_changing) sc->next = sens->state_changing;
+    sens->state_changing = sc;
   }
 }
 

@@ -65,13 +65,9 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 #define MGOS_EV_BTHING_ANY MGOS_BTHING_EVENT_BASE
 enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED = MGOS_BTHING_EVENT_BASE,
+  MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
   MGOS_EV_BTHING_UPDATE_STATE
-};
-
-enum mgos_bthing_state_ev {
-  MGOS_BTHING_STATE_EV_SET,
-  MGOS_BTHING_STATE_EV_GET
 };
 
 /* Returns the ID of a *bThing*, or `NULL` if error. */
@@ -100,16 +96,26 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 
 #if MGOS_BTHING_HAVE_SENSORS
 
+struct mgos_bthing_state_changing_arg {
+  mgos_bthing_t thing;
+  mgos_bvarc_t cur_state;
+  mgos_bvarc_t new_state;
+};
+
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);
 
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata);
 
-typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+typedef void (*mgos_bthing_state_change_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                   mgos_bthing_state_changed_handler_t state_changed_cb,
+                                  mgos_bthing_state_change_handler_t handler,
+                                  void *userdata);
+
+void mgos_bthing_on_state_changing(mgos_bthing_t thing,
+                                   mgos_bthing_state_change_handler_t handler,
                                    void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);

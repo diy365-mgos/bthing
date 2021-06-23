@@ -9,7 +9,8 @@ Mongoose OS core library for the bThings ecosystem.
 ```c
 enum mgos_bthing_event {
   MGOS_EV_BTHING_ANY,
-  MGOS_EV_BTHING_CREATED, 
+  MGOS_EV_BTHING_CREATED,
+  MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
   MGOS_EV_BTHING_UPDATE_STATE
 };
@@ -19,16 +20,28 @@ Events triggered by abThing or on which it is listening to. Use `mgos_event_add_
 |Event||
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created.|
+|MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state value of a bThing is going to change.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state value of a bThing is changed.|
 
 Example:
 ```c
 static void bthing_events_cb(int ev, void *ev_data, void *userdata) {
-  mgos_bthing_t thing = (mgos_bthing_t)ev_data;
-  if (ev == case MGOS_EV_BTHING_CREATED) {
-    // ...
-  } else if (ev == case MGOS_EV_BTHING_STATE_CHANGED) {
-    // ...
+  
+  switch (ev) {
+    case MGOS_EV_BTHING_CREATED:
+      mgos_bthing_t thing = (mgos_bthing_t)ev_data;
+      // do something...
+      break;
+    case MGOS_EV_BTHING_STATE_CHANGING:
+      struct mgos_bthing_state_changing_arg *arg = (struct mgos_bthing_state_changing_arg *)ev_data;
+      // do something...
+      break;
+    case MGOS_EV_BTHING_STATE_CHANGED:
+      mgos_bthing_t thing = (mgos_bthing_t)ev_data;
+      // do something...
+      break;
+    default:
+      break;
   }
   (void) userdata;
 }
@@ -37,7 +50,7 @@ mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, bthing_events_cb, NULL);
 ```
 |Event||
 |--|--|
-|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `MGOS_EV_BTHING_STATE_CHANGED` event is forcibly triggered.|
+|MGOS_EV_BTHING_UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, events `MGOS_EV_BTHING_STATE_CHANGING` `MGOS_EV_BTHING_STATE_CHANGED` are forcibly triggered.|
 
 Example:
 ```c
@@ -191,9 +204,9 @@ Sets the state of a bThing actuator. Returns `true` on success, or `false` other
 |--|--|
 |thing|A bThing actuator.|
 |state|The state value to set.|
-### (*mgos_bthing_state_changed_handler_t)
+### (*mgos_bthing_state_change_handler_t)
 ```c
-typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+typedef void (*mgos_bthing_state_change_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 ```
 *Updating-state* handler signature. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
@@ -205,7 +218,7 @@ typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing, mgos_bv
 ### mgos_bthing_on_state_changed
 ```c
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_changed_handler_t handler,
+                                  mgos_bthing_state_change_handler_t handler,
                                   void *userdata);
 ```
 Adds an *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
@@ -213,7 +226,20 @@ Adds an *state-changed* handler, only if the *handler/userdata* pair is not yet 
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|handler|The [state-changed handler](#mgos_bthing_state_changed_handler_t) to add.|
+|handler|The [state-changed handler](#mgos_bthing_state_change_handler_t) to add.|
+|userdata|The handler's *user-data* or `NULL`.|
+### mgos_bthing_on_state_changing
+```c
+void mgos_bthing_on_state_changing(mgos_bthing_t thing,
+                                   mgos_bthing_state_change_handler_t handler,
+                                   void *userdata);
+```
+Adds an *state-changing* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|thing|A bThing.|
+|handler|The [state-changing handler](#mgos_bthing_state_change_handler_t) to add.|
 |userdata|The handler's *user-data* or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
@@ -230,6 +256,7 @@ Events triggered by abThing or on which it is listening to. Use `Event.addGroupH
 |Event||
 |--|--|
 |CREATED|Triggered when a new bThing is created.|
+|STATE_CHANGING|Triggered when the state value of a bThing is going to change.|
 |STATE_CHANGED|Triggered when the state value of a bThing is changed.|
 
 Example:
@@ -238,6 +265,8 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
   let thing = bThing.getFromHandle(evdata);
   if (ev == bThing.EVENT.CREATED) {
     // ...
+  } else if (ev == bThing.EVENT.STATE_CHANGING) {
+    // ...  
   } else if (ev == bThing.EVENT.STATE_CHANGED) {
     // ...  
   }
@@ -245,7 +274,7 @@ Event.addGroupHandler(bThing.EVENT.ANY, function(ev, evdata, ud) {
 ```
 |Event||
 |--|--|
-|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, a `bThing.EVENT.STATE_CHANGED` event is forcibly triggered.|
+|UPDATE_STATE|Send this event-command to force the bThing state to be updated. This can be sent to all registered bThings or to a specific one. After sending it, events `bThing.EVENT.STATE_CHANGING` and `bThing.EVENT.STATE_CHANGED` are forcibly triggered.|
 
 Example:
 ```javascript
