@@ -175,9 +175,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
     mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->tmp_state, thing->state_changing);
     // trigger STATE_CHANGING event
     struct mgos_bthing_state_changing_arg arg = {
-      thing = thing,
-      cur_state = thing->state,
-      new_state = thing->tmp_state
+      .thing = thing,
+      .cur_state = thing->state,
+      .new_state = thing->tmp_state
     };
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &arg);
   }
