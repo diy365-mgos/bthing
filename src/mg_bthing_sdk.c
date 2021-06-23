@@ -166,12 +166,13 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
     }
   }
 
+  bool is_forced = mg_bthing_context()->force_state_changed;
   bool is_changed = mgos_bvar_is_changed(thing->tmp_state);
 
   // STATE_CHANGING: invoke handlers and trigger the event
-  if (mg_bthing_context()->force_state_changed || is_changed) {
+  if (is_forced || is_changed) {
     // invoke state-changing handlers
-    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->tmp_state, thing->state_changing)
+    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->tmp_state, thing->state_changing);
     // trigger STATE_CHANGING event
     struct mgos_bthing_state_changing_arg arg = {
       thing = thing,
@@ -184,9 +185,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *thing) {
   mgos_bvar_copy(thing->tmp_state, thing->state);
  
   // STATE_CHANGED: invoke handlers and trigger the event
-  if (mg_bthing_context()->force_state_changed || is_changed) {
+  if (is_forced || is_changed) {
     // invoke state-changed handlers
-    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->state, thing->state_changed)
+    mg_bthing_state_change_handlers_invoke(MG_BTHING_SENS_CAST4(thing), thing->state, thing->state_changed);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
   }
