@@ -208,20 +208,24 @@ Sets the state of a bThing actuator. Returns `true` on success, or `false` other
 ```c
 typedef void (*mgos_bthing_state_change_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
 ```
-*Updating-state* handler signature. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Signature of *state-changed* (see `mgos_bthing_on_state_changed()`) and *state-changing* (see `mgos_bthing_on_state_changing()`) handlers. The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|The bThing updating the state.|
-|state|The updated state value.|
+|state|The state value.|
 |userdata|The handler's *user-data*.|
+
+**Remarks**
+In case of *state-changing* handler, the `state` parameter contains the new state value the bThing is going to get; in case of *state-changed* handler, it contains the newly updated bThing's state.
+
 ### mgos_bthing_on_state_changed
 ```c
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
                                   mgos_bthing_state_change_handler_t handler,
                                   void *userdata);
 ```
-Adds an *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Adds a *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
@@ -234,7 +238,7 @@ void mgos_bthing_on_state_changing(mgos_bthing_t thing,
                                    mgos_bthing_state_change_handler_t handler,
                                    void *userdata);
 ```
-Adds an *state-changing* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Adds a *state-changing* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
@@ -247,6 +251,7 @@ Adds an *state-changing* handler, only if the *handler/userdata* pair is not yet
 bThing.EVENT: {
   ANY,
   CREATED,
+  STATE_CHANGING,
   STATE_CHANGED,
   UPDATE_STATE
 }
