@@ -217,8 +217,8 @@ Signature of *state-changed* (see `mgos_bthing_on_state_changed()`) and *state-c
 |userdata|The handler's *user-data*.|
 
 **Remarks**
-In case of *state-changing* handler, the `state` parameter contains the new state value the bThing is going to get; in case of *state-changed* handler, it contains the newly updated bThing's state.
 
+In case of *state-changing* handler, the `state` parameter contains the new state value the bThing is going to get; in case of *state-changed* handler, it contains the newly updated bThing's state.
 ### mgos_bthing_on_state_changed
 ```c
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
