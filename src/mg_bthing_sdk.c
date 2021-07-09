@@ -148,7 +148,7 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
 
 static void mg_bthing_state_changed_handlers_invoke(mgos_bthing_t thing,
                                                     mgos_bvar_t state,
-                                                    struct mg_bthing_state_change_handlers *h) {
+                                                    struct mg_bthing_state_changed_handlers *h) {
   while (h) {
     h->callback(thing, state, h->base.userdata);
     h = h->base.next;
