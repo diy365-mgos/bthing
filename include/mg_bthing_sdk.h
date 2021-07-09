@@ -60,12 +60,12 @@ struct mg_bthing_state_changex_handlers {
 };
 
 struct mg_bthing_state_changed_handlers {
-  struct struct mg_bthing_state_changex_handlers base;
+  struct mg_bthing_state_changex_handlers base;
   mgos_bthing_state_changed_handler_t callback;
 };
 
 struct mg_bthing_state_changing_handlers {
-  struct struct mg_bthing_state_changex_handlers base;
+  struct mg_bthing_state_changex_handlers base;
   mgos_bthing_state_changing_handler_t callback;
 };
 
