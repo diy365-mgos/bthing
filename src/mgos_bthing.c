@@ -104,17 +104,17 @@ void mgos_bthing_on_state_changed(mgos_bthing_t thing,
                                   void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
-    struct mg_bthing_state_change_handlers *sc = sens->state_changed;
+    struct mg_bthing_state_changed_handlers *sc = sens->state_changed;
     while (sc) {
-      if (sc->callback == handler && sc->userdata == userdata) return;
-      sc = sc->next;
+      if (sc->callback == handler && sc->base.userdata == userdata) return;
+      sc = sc->base.next;
     }
  
-    sc = calloc(1, sizeof(struct mg_bthing_state_change_handlers));
+    sc = calloc(1, sizeof(struct mg_bthing_state_changed_handlers));
     sc->callback = handler;
-    sc->userdata = userdata;
+    sc->base.userdata = userdata;
 
-    if (sens->state_changed) sc->next = sens->state_changed;
+    if (sens->state_changed) sc->base.next = sens->state_changed;
     sens->state_changed = sc;
   }
 }
@@ -126,15 +126,15 @@ void mgos_bthing_on_state_changing(mgos_bthing_t thing,
   if (sens) {
     struct mg_bthing_state_changing_handlers *sc = sens->state_changing;
     while (sc) {
-      if (sc->callback == handler && sc->userdata == userdata) return;
-      sc = sc->next;
+      if (sc->callback == handler && sc->base.userdata == userdata) return;
+      sc = sc->base.next;
     }
  
     sc = calloc(1, sizeof(struct mg_bthing_state_changing_handlers));
     sc->callback = handler;
-    sc->userdata = userdata;
+    sc->base.userdata = userdata;
 
-    if (sens->state_changing) sc->next = sens->state_changing;
+    if (sens->state_changing) sc->base.next = sens->state_changing;
     sens->state_changing = sc;
   }
 }
