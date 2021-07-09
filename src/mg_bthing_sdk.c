@@ -117,7 +117,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
 }
 
 static void mg_bthing_state_changex_handler_free(struct mg_bthing_state_changex_handlers *h) {
-  struct mg_bthing_state_changes_handlers *tmp;
+  struct mg_bthing_state_changex_handlers *tmp;
   while (h) {
     tmp = h->next;
     free(h);
@@ -151,7 +151,7 @@ static void mg_bthing_state_changed_handlers_invoke(mgos_bthing_t thing,
                                                     struct mg_bthing_state_changed_handlers *h) {
   while (h) {
     h->callback(thing, state, h->base.userdata);
-    h = h->base.next;
+    h = (struct mg_bthing_state_changed_handlers *)h->base.next;
   }
 }
 
@@ -161,7 +161,7 @@ static void mg_bthing_state_changing_handlers_invoke(mgos_bthing_t thing,
                                                      struct mg_bthing_state_changing_handlers *h) {
   while (h) {
     h->callback(thing, cur_state, new_state, h->base.userdata);
-    h = h->base.next;
+    h = (struct mg_bthing_state_changing_handlers *)h->base.next;
   }
 }
 
