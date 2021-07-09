@@ -55,7 +55,7 @@ typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct 
                                                                          void *userdata);
 
 struct mg_bthing_state_changex_handlers {
-  struct mg_bthing_state_changed_handlers *next;
+  struct mg_bthing_state_changex_handlers *next;
   void *userdata;
 };
 
