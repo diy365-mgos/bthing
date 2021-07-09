@@ -146,11 +146,21 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-static void mg_bthing_state_change_handlers_invoke(mgos_bthing_t thing,
-                                                   mgos_bvar_t state,
-                                                   struct mg_bthing_state_change_handlers *h) {
+static void mg_bthing_state_changed_handlers_invoke(mgos_bthing_t thing,
+                                                    mgos_bvar_t state,
+                                                    struct mg_bthing_state_change_handlers *h) {
   while (h) {
     h->callback(thing, state, h->userdata);
+    h = h->next;
+  }
+}
+
+static void mg_bthing_state_changing_handlers_invoke(mgos_bthing_t thing,
+                                                     mgos_bvar_t cur_state,
+                                                     mgos_bvar_t new_state,
+                                                     struct mg_bthing_state_changing_handlers *h) {
+  while (h) {
+    h->callback(thing, cur_state, new_state, h->userdata);
     h = h->next;
   }
 }
@@ -168,15 +178,20 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     }
   }
 
+  struct mgos_bthing_state_changing_arg arg = { 
+    .thing = thing, 
+    .cur_state = sens->state, 
+    .new_state = sens->tmp_state
+  };
+
   bool is_forced = mg_bthing_context()->force_state_changed;
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
 
   // STATE_CHANGING: invoke handlers and trigger the event
   if (is_forced || is_changed) {
     // invoke state-changing handlers
-    mg_bthing_state_change_handlers_invoke(thing, sens->tmp_state, sens->state_changing);
+    mg_bthing_state_changing_handlers_invoke(thing, sens->state, sens->tmp_state, sens->state_changing);
     // trigger STATE_CHANGING event
-    struct mgos_bthing_state_changing_arg arg = { .thing = thing, .cur_state = sens->state, .new_state = sens->tmp_state };
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &arg);
   }
 
@@ -185,9 +200,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   // STATE_CHANGED: invoke handlers and trigger the event
   if (is_forced || is_changed) {
     // invoke state-changed handlers
-    mg_bthing_state_change_handlers_invoke(thing, sens->state, sens->state_changed);
+    mg_bthing_state_changed_handlers_invoke(thing, sens->state, sens->state_changed);
     // trigger STATE_CHANGED event
-    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, thing);
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &arg);
   }
 
   if (is_changed) {

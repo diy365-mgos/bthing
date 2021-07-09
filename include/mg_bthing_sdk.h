@@ -55,9 +55,15 @@ typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct 
                                                                          void *userdata);
 
 struct mg_bthing_state_change_handlers {
-  mgos_bthing_state_change_handler_t callback;
+  mgos_bthing_state_changed_handler_t callback;
   void *userdata;
   struct mg_bthing_state_change_handlers *next;
+};
+
+struct mg_bthing_state_changing_handlers {
+  mgos_bthing_state_changing_handler_t callback;
+  void *userdata;
+  struct mg_bthing_state_changing_handlers *next;
 };
 
 struct mg_bthing_sens {
@@ -67,7 +73,7 @@ struct mg_bthing_sens {
   mgos_bthing_get_state_handler_t get_state_cb;
   void *get_state_ud;
   struct mg_bthing_state_change_handlers *state_changed;
-  struct mg_bthing_state_change_handlers *state_changing;
+  struct mg_bthing_state_changing_handlers *state_changing;
   unsigned char is_updating;
   mgos_bvar_t state;
   mgos_bvar_t tmp_state;

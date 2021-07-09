@@ -96,6 +96,11 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 
 #if MGOS_BTHING_HAVE_SENSORS
 
+struct mgos_bthing_state_changed_arg {
+  mgos_bthing_t thing;
+  mgos_bvarc_t state;
+};
+
 struct mgos_bthing_state_changing_arg {
   mgos_bthing_t thing;
   mgos_bvarc_t cur_state;
@@ -108,14 +113,21 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata);
 
-typedef void (*mgos_bthing_state_change_handler_t)(mgos_bthing_t thing, mgos_bvarc_t state, void *userdata);
+typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing,
+                                                    mgos_bvarc_t state,
+                                                    void *userdata);
 
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_change_handler_t handler,
+                                  mgos_bthing_state_changed_handler_t handler,
                                   void *userdata);
 
+typedef void (*mgos_bthing_state_changing_handler_t)(mgos_bthing_t thing,
+                                                     mgos_bvarc_t cur_state,
+                                                     mgos_bvarc_t new_state,
+                                                     void *userdata);
+
 void mgos_bthing_on_state_changing(mgos_bthing_t thing,
-                                   mgos_bthing_state_change_handler_t handler,
+                                   mgos_bthing_state_changing_handler_t handler,
                                    void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
