@@ -37,6 +37,7 @@ mgos_event_trigger(MGOS_EV_BTHING_UPDATE_STATE, thing);
 ```c
 struct mgos_bthing_state_changed_arg {
   mgos_bthing_t thing;
+  bool state_init;
   mgos_bvarc_t state;
 };
 ```
@@ -45,11 +46,13 @@ Event-data passed to `MGOS_EV_BTHING_STATE_CHANGED` event's handlers (see [mgos_
 |Fields||
 |--|--|
 |thing|The bThing which state is changed.|
+|state_init|`true` if the state has been initialzed, `false` otherwise.|
 |state|The state.|
 ### mgos_bthing_state_changing_arg
 ```c
 struct mgos_bthing_state_changing_arg {
   mgos_bthing_t thing;
+  bool state_init;
   mgos_bvarc_t cur_state;
   mgos_bvarc_t new_state;
 };
@@ -59,6 +62,7 @@ Event-data passed to `MGOS_EV_BTHING_STATE_CHANGING` event's handlers (see [mgos
 |Fields||
 |--|--|
 |thing|The bThing which state is going to change.|
+|state_init|`true` if the state going to be initialzed, `false` otherwise.|
 |cur_state|The current state.|
 |new_state|The new state.|
 ### mgos_bthing_get_id
@@ -208,16 +212,14 @@ Sets the state of a bThing actuator. Returns `true` on success, or `false` other
 |state|The state value to set.|
 ### (*mgos_bthing_state_changed_handler_t)
 ```c
-typedef void (*mgos_bthing_state_changed_handler_t)(mgos_bthing_t thing,
-                                                    mgos_bvarc_t state,
+typedef void (*mgos_bthing_state_changed_handler_t)(struct mgos_bthing_state_changed_arg *args,
                                                     void *userdata);
 ```
 Signature of *state-changed* handlers. (see `mgos_bthing_on_state_changed()` below). The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
-|thing|The bThing which state is changed.|
-|state|The state value.|
+|args|The handler's parameters.|
 |userdata|The handler's *user-data*.|
 ### mgos_bthing_on_state_changed
 ```c
@@ -234,18 +236,14 @@ Adds a *state-changed* handler, only if the *handler/userdata* pair is not yet r
 |userdata|The handler's *user-data* or `NULL`.|
 ### (*mgos_bthing_state_changing_handler_t)
 ```c
-typedef void (*mgos_bthing_state_changing_handler_t)(mgos_bthing_t thing,
-                                                     mgos_bvarc_t cur_state,
-                                                     mgos_bvarc_t new_state,
+typedef void (*mgos_bthing_state_changing_handler_t)(struct mgos_bthing_state_changing_arg *args,
                                                      void *userdata);
 ```
 Signature of *state-changing* handlers (see `mgos_bthing_on_state_changing()` below). The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
-|thing|The bThing which state is going to change.|
-|cur_state|The current state value.|
-|new_state|The new state value.|
+|args|The handler's parameters.|
 |userdata|The handler's *user-data*.|
 ### mgos_bthing_on_state_changing
 ```c

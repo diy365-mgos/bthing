@@ -146,21 +146,18 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-static void mg_bthing_state_changed_handlers_invoke(mgos_bthing_t thing,
-                                                    mgos_bvar_t state,
+static void mg_bthing_state_changed_handlers_invoke(struct mgos_bthing_state_changed_arg *args,
                                                     struct mg_bthing_state_changed_handlers *h) {
   while (h) {
-    h->callback(thing, state, h->base.userdata);
+    h->callback(args, h->base.userdata);
     h = (struct mg_bthing_state_changed_handlers *)h->base.next;
   }
 }
 
-static void mg_bthing_state_changing_handlers_invoke(mgos_bthing_t thing,
-                                                     mgos_bvar_t cur_state,
-                                                     mgos_bvar_t new_state,
+static void mg_bthing_state_changing_handlers_invoke(struct mgos_bthing_state_changing_arg *args,
                                                      struct mg_bthing_state_changing_handlers *h) {
   while (h) {
-    h->callback(thing, cur_state, new_state, h->base.userdata);
+    h->callback(args, h->base.userdata);
     h = (struct mg_bthing_state_changing_handlers *)h->base.next;
   }
 }
@@ -178,8 +175,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     }
   }
 
-  struct mgos_bthing_state_changing_arg arg = { 
-    .thing = thing, 
+  struct mgos_bthing_state_changing_arg args = { 
+    .thing = thing,
+    .state_init = mgos_bvar_is_null(sens->state),
     .cur_state = sens->state, 
     .new_state = sens->tmp_state
   };
@@ -190,9 +188,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   // STATE_CHANGING: invoke handlers and trigger the event
   if (is_forced || is_changed) {
     // invoke state-changing handlers
-    mg_bthing_state_changing_handlers_invoke(thing, sens->state, sens->tmp_state, sens->state_changing);
+    mg_bthing_state_changing_handlers_invoke(&args, sens->state_changing);
     // trigger STATE_CHANGING event
-    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &arg);
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
   }
 
   mgos_bvar_copy(sens->tmp_state, sens->state);
@@ -200,9 +198,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   // STATE_CHANGED: invoke handlers and trigger the event
   if (is_forced || is_changed) {
     // invoke state-changed handlers
-    mg_bthing_state_changed_handlers_invoke(thing, sens->state, sens->state_changed);
+    mg_bthing_state_changed_handlers_invoke(&args, sens->state_changed);
     // trigger STATE_CHANGED event
-    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &arg);
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
   }
 
   if (is_changed) {
