@@ -198,7 +198,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   // STATE_CHANGED: invoke handlers and trigger the event
   if (is_forced || is_changed) {
     // invoke state-changed handlers
-    mg_bthing_state_changed_handlers_invoke(&args, sens->state_changed);
+    mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state_changed_arg *)&args, sens->state_changed);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
   }
