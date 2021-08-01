@@ -194,6 +194,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
 
     if (is_changed) {
       mgos_bvar_copy(sens->tmp_state, sens->state);
+      LOG(LL_INFO, ("OFFICAIL STATE HAS BEEN CHANGED."));
     }
   
     // STATE_CHANGED: invoke handlers and trigger the event
