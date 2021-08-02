@@ -186,22 +186,25 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
         .new_state = sens->tmp_state
       };
 
+    LOG(LL_INFO, ("NOTIFYING STATE CHANGING..."));
     // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
     mg_bthing_state_changing_handlers_invoke(&args, sens->state_changing);
     // trigger STATE_CHANGING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
+    LOG(LL_INFO, ("NOTIFYING STATE CHANGING DONE."));
 
     if (is_changed) {
       mgos_bvar_copy(sens->tmp_state, sens->state);
-      LOG(LL_INFO, ("OFFICAIL STATE HAS BEEN CHANGED."));
     }
-  
+
+    LOG(LL_INFO, ("NOTIFYING STATE CHANGED..."));
     // STATE_CHANGED: invoke handlers and trigger the event
     // invoke state-changed handlers
     mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state_changed_arg *)&args, sens->state_changed);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
+    LOG(LL_INFO, ("NOTIFYING STATE CHANGED DONE."));
 
     if (is_changed) {
       mgos_bvar_set_unchanged(sens->tmp_state);
