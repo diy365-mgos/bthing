@@ -27,7 +27,6 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
-    s_context->requesting_update_state = false;
   }
   return s_context; 
 }
@@ -146,7 +145,7 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-static void mg_bthing_state_changed_handlers_invoke(struct mgos_bthing_state_changed_arg *args,
+static void mg_bthing_state_changed_handlers_invoke(struct mgos_bthing_state *args,
                                                     struct mg_bthing_state_changed_handlers *h) {
   while (h) {
     h->callback(args, h->base.userdata);
@@ -154,7 +153,7 @@ static void mg_bthing_state_changed_handlers_invoke(struct mgos_bthing_state_cha
   }
 }
 
-static void mg_bthing_state_changing_handlers_invoke(struct mgos_bthing_state_changing_arg *args,
+static void mg_bthing_state_changing_handlers_invoke(struct mgos_bthing_state_change *args,
                                                      struct mg_bthing_state_changing_handlers *h) {
   while (h) {
     h->callback(args, h->base.userdata);
@@ -177,24 +176,21 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
 
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
 
-   struct mgos_bthing_state_changing_arg args = { 
+   struct mgos_bthing_state_change args = { 
     .thing = thing,
     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
     .cur_state = sens->state, 
     .new_state = sens->tmp_state
   };
 
-  // initialize args.state_flags
-  if (mgos_bvar_is_null(sens->state))
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
-  if (mg_bthing_context()->requesting_update_state)
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_REQUESTING_UPDATE;
-  if (is_changed)
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
+  bool is_init = mgos_bvar_is_null(sens->state);
+  if (is_changed || is_init)) {
 
-  if ((args.state_flags & MGOS_BTHING_STATE_FLAG_CHANGED) == MGOS_BTHING_STATE_FLAG_CHANGED) {
     // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGING;
+    if (is_init)
+      args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
     mg_bthing_state_changing_handlers_invoke(&args, sens->state_changing);
     // trigger STATE_CHANGING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
@@ -205,12 +201,15 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
 
     // STATE_CHANGED: invoke handlers and trigger the event
     // invoke state-changed handlers
-    mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state_changed_arg *)&args, sens->state_changed);
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
+    if (is_init)
+      args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
+    mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state *)&args, sens->state_changed);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
   }
 
-  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state_updated_arg *)&args);
+  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 
   if (is_changed) {
     mgos_bvar_set_unchanged(sens->tmp_state);
@@ -219,10 +218,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
 
   sens->is_updating -= 1;
   return true;
-}
-
-bool mg_bthing_update_state(struct mg_bthing_sens *sens) {
-  return (mgos_bthing_get_state(MG_BTHING_SENS_CAST3(sens)) != NULL);
 }
 
 mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
@@ -309,9 +304,10 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
   }
 }
 
-bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
-  if (thing && state) {
-    struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(thing);
+bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
+  if (actu && state) {
+    struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(actu);
+    mgos_bthing_t thing = MG_BTHING_ACTU_CAST5(actu);
 
     // compare the requested state with the sensor's state
     enum mgos_bvar_cmp_res cmp = mgos_bvar_cmp(state, sens->state);
@@ -323,18 +319,17 @@ bool mg_bthing_set_state(struct mg_bthing_actu *thing, mgos_bvarc_t state) {
       return true;
     } 
 
-    enum MG_BTHING_STATE_RESULT res = (!thing->setting_state_cb ? 
-      MG_BTHING_STATE_RESULT_UNHANDLED : thing->setting_state_cb(thing, state, thing->set_state_ud));
+    enum MG_BTHING_STATE_RESULT res = (!actu->setting_state_cb ? 
+      MG_BTHING_STATE_RESULT_UNHANDLED : actu->setting_state_cb(actu, state, actu->set_state_ud));
     
     if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
       return mgos_bvar_merge(state, sens->state);
     else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
-      mg_bthing_update_state(sens);
+      mgos_bthing_update_state(thing);
       return true;
     }
   }
-  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'",
-    mgos_bthing_get_id(MG_BTHING_ACTU_CAST5(thing))));
+  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", mgos_bthing_get_id(thing)));
   return false;
 }
 

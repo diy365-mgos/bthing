@@ -149,7 +149,6 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
-  bool requesting_update_state;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();
@@ -163,8 +162,6 @@ void mg_bthing_reset(struct mg_bthing *thing);
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
-
-bool mg_bthing_update_state(struct mg_bthing_sens *sens);
 
 mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing);
 

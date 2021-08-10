@@ -67,7 +67,6 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED = MGOS_BTHING_EVENT_BASE,
   MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
-  MGOS_EV_BTHING_UPDATE_STATE,
   MGOS_EV_BTHING_STATE_UPDATED
 };
 
@@ -98,46 +97,32 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 #if MGOS_BTHING_HAVE_SENSORS
 
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,         // 0000
-  MGOS_BTHING_STATE_FLAG_CHANGING = 2,          // 0010
-  MGOS_BTHING_STATE_FLAG_CHANGED = 6,           // 0110
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 7,      // 0111
-  MGOS_BTHING_STATE_FLAG_REQUESTING_UPDATE = 8  // 1000
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 1,  // 0001
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 3    // 0011
+  MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 0100
+  MGOS_BTHING_STATE_FLAG_CHANGED = 14,      // 1100
+ 
 };
 
-struct mgos_bthing_state_updated_arg {
+struct mgos_bthing_state {
   mgos_bthing_t thing;
   enum mgos_bthing_state_flag state_flags;
   mgos_bvarc_t state;
   // --------------------------------------------------
   // NOTE: if you add new fields, you must update
-  // following structs as well:
-  //   - struct mgos_bthing_state_changed_arg
-  //   - struct mgos_bthing_state_changing_arg
+  // following struct as well:
+  //   - struct mgos_bthing_state_change
   // --------------------------------------------------
 };
 
-struct mgos_bthing_state_changed_arg {
-  mgos_bthing_t thing;
-  enum mgos_bthing_state_flag state_flags;
-  mgos_bvarc_t state;
-  // --------------------------------------------------
-  // NOTE 1: above fields must be the same of:
-  //   - struct mgos_bthing_state_updated_arg 
-  //
-  // NOTE 2: new fields must be added below, and
-  // following struct must be updated as well:
-  //   - struct mgos_bthing_state_changing_arg 
-  // --------------------------------------------------
-};
-
-struct mgos_bthing_state_changing_arg {
+struct mgos_bthing_state_change {
   mgos_bthing_t thing;
   enum mgos_bthing_state_flag state_flags;
   mgos_bvarc_t cur_state;
   // --------------------------------------------------
   // NOTE 1: above fields must be the same of:
-  //   - struct mgos_bthing_state_changed_arg 
+  //   - struct mgos_bthing_state 
   //
   // NOTE 2: New fields must be added below. 
   // --------------------------------------------------
@@ -150,14 +135,14 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata);
 
-typedef void (*mgos_bthing_state_changed_handler_t)(struct mgos_bthing_state_changed_arg *args,
+typedef void (*mgos_bthing_state_changed_handler_t)(struct mgos_bthing_state *args,
                                                     void *userdata);
 
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
                                   mgos_bthing_state_changed_handler_t handler,
                                   void *userdata);
 
-typedef void (*mgos_bthing_state_changing_handler_t)(struct mgos_bthing_state_changing_arg *args,
+typedef void (*mgos_bthing_state_changing_handler_t)(struct mgos_bthing_state_change *args,
                                                      void *userdata);
 
 void mgos_bthing_on_state_changing(mgos_bthing_t thing,
@@ -165,6 +150,10 @@ void mgos_bthing_on_state_changing(mgos_bthing_t thing,
                                    void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
+
+bool mgos_bthing_update_state(mgos_bthing_t thing);
+
+void mgos_bthing_update_states();
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 

@@ -74,29 +74,17 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
   return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
 }
 
-static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
-  if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
-  
-  // force to trigger MGOS_EV_BTHING_STATE_CHANGED event 
-  mg_bthing_context()->requesting_update_state = true;
-  
-  if (ev_data) {
-    // force the update of one specific bThing
-    mg_bthing_update_state(MG_BTHING_SENS_CAST1((mgos_bthing_t)ev_data));
-  } else {
-    // force the update of all registered bThings
-    mgos_bthing_t thing;
-    mgos_bthing_enum_t things = mgos_bthing_get_all();
+bool mgos_bthing_update_state(mgos_bthing_t thing) {
+  return (mgos_bthing_get_state(thing) != NULL);
+}
 
-    while(mgos_bthing_get_next(&things, &thing)) {
-      mg_bthing_update_state(MG_BTHING_SENS_CAST1(thing));
-    }
+void mgos_bthing_update_states() {
+  mgos_bthing_t thing;
+  mgos_bthing_enum_t things = mgos_bthing_get_all();
+
+  while(mgos_bthing_get_next(&things, &thing)) {
+    mgos_bthing_update_state(thing);
   }
-
-  // remove forced MGOS_EV_BTHING_STATE_CHANGED event trigger
-  mg_bthing_context()->requesting_update_state = false;
-
-  (void) userdata;
 }
 
 void mgos_bthing_on_state_changed(mgos_bthing_t thing,
@@ -168,10 +156,6 @@ bool mgos_bthing_set_state(mgos_bthing_t thing, mgos_bvarc_t state) {
 bool mgos_bthing_init() {
   if (!mgos_event_register_base(MGOS_BTHING_EVENT_BASE, "bThing events")) return false;
 
-  #if MGOS_BTHING_HAVE_SENSORS
-  if (!mgos_event_add_handler(MGOS_EV_BTHING_UPDATE_STATE, mg_bthing_update_state_cb, NULL)) return false;
-  #endif
-  
   LOG(LL_DEBUG, ("MGOS_BTHING_EVENT_BASE %d", MGOS_BTHING_EVENT_BASE));
     
   return true;

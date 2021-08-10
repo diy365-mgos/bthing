@@ -65,7 +65,7 @@ let bThing = {
     CREATED: 0,
     STATE_CHANGING: 0,
     STATE_CHANGED: 0,
-    UPDATE_STATE: 0,
+    STATE_UPDATED: 0,
   },
   
   _proto: {
