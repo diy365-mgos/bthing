@@ -184,7 +184,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   };
 
   bool is_init = mgos_bvar_is_null(sens->state);
-  if (is_changed || is_init)) {
+  if (is_changed || is_init) {
 
     // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
@@ -305,10 +305,10 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
 }
 
 bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
+  mgos_bthing_t thing = MG_BTHING_ACTU_CAST5(actu);
   if (actu && state) {
     struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(actu);
-    mgos_bthing_t thing = MG_BTHING_ACTU_CAST5(actu);
-
+    
     // compare the requested state with the sensor's state
     enum mgos_bvar_cmp_res cmp = mgos_bvar_cmp(state, sens->state);
     if ((cmp & MGOS_BVAR_CMP_RES_EQUAL) == MGOS_BVAR_CMP_RES_EQUAL && 
@@ -329,7 +329,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
       return true;
     }
   }
-  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", mgos_bthing_get_id(thing)));
+  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_id(thing) : "")));
   return false;
 }
 
