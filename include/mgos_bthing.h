@@ -99,10 +99,9 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 enum mgos_bthing_state_flag {
   MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
   MGOS_BTHING_STATE_FLAG_INITIALIZING = 1,  // 0001
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 3    // 0011
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 3,   // 0011
   MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 0100
-  MGOS_BTHING_STATE_FLAG_CHANGED = 14,      // 1100
- 
+  MGOS_BTHING_STATE_FLAG_CHANGED = 14       // 1100
 };
 
 struct mgos_bthing_state {
