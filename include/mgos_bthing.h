@@ -36,6 +36,7 @@ typedef struct mg_bthing *mgos_bthing_t;
 /* bThings enumerator returned by mgos_bthing_get_all() */
 typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 
+#define MGOS_BTHING_TYPE_ANY 0
 #define MGOS_BTHING_TYPE_SENSOR 1
 #define MGOS_BTHING_TYPE_ACTUATOR 3
 
@@ -152,7 +153,7 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
 bool mgos_bthing_update_state(mgos_bthing_t thing);
 
-void mgos_bthing_update_states();
+void mgos_bthing_update_states(int bthing_type);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 

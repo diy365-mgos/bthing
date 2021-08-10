@@ -165,6 +165,24 @@ typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t
 |thing|The bThing for whom to return the status.|
 |state|The state to return.|
 |userdata|The handler's *user-data*.|
+### mgos_bthing_update_state
+```c
+bool mgos_bthing_update_state(mgos_bthing_t thing);
+```
+Updates the state of a bThing sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHING_TYPE_SENSOR)`). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|thing|A bThing sensor/actuator.|
+### mgos_bthing_update_states
+```c
+void mgos_bthing_update_states(int bthing_type);
+```
+Updates the state of all bThings of type `bthing_type`. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|bthing_type|The type of bThings or `MGOS_BTHING_TYPE_ANY`.|
 ### mgos_bthing_on_get_state
 ```c
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,

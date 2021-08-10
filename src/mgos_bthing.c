@@ -78,12 +78,17 @@ bool mgos_bthing_update_state(mgos_bthing_t thing) {
   return (mgos_bthing_get_state(thing) != NULL);
 }
 
-void mgos_bthing_update_states() {
+void mgos_bthing_update_states(int bthing_type) {
   mgos_bthing_t thing;
   mgos_bthing_enum_t things = mgos_bthing_get_all();
-
-  while(mgos_bthing_get_next(&things, &thing)) {
-    mgos_bthing_update_state(thing);
+  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
+    while(mgos_bthing_get_next(&things, &thing)) {
+      mgos_bthing_update_state(thing);
+    }
+  } else {
+    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
+      mgos_bthing_update_state(thing);
+    }
   }
 }
 
