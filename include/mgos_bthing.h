@@ -67,7 +67,8 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED = MGOS_BTHING_EVENT_BASE,
   MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
-  MGOS_EV_BTHING_UPDATE_STATE
+  MGOS_EV_BTHING_UPDATE_STATE,
+  MGOS_EV_BTHING_STATE_UPDATED
 };
 
 /* Returns the ID of a *bThing*, or `NULL` if error. */
@@ -96,16 +97,50 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 
 #if MGOS_BTHING_HAVE_SENSORS
 
+enum mgos_bthing_state_flag {
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,         // 0000
+  MGOS_BTHING_STATE_FLAG_CHANGING = 2,          // 0010
+  MGOS_BTHING_STATE_FLAG_CHANGED = 6,           // 0110
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 7,      // 0111
+  MGOS_BTHING_STATE_FLAG_REQUESTING_UPDATE = 8  // 1000
+};
+
+struct mgos_bthing_state_updated_arg {
+  mgos_bthing_t thing;
+  enum mgos_bthing_state_flag state_flags;
+  mgos_bvarc_t state;
+  // --------------------------------------------------
+  // NOTE: if you add new fields, you must update
+  // following structs as well:
+  //   - struct mgos_bthing_state_changed_arg
+  //   - struct mgos_bthing_state_changing_arg
+  // --------------------------------------------------
+};
+
 struct mgos_bthing_state_changed_arg {
   mgos_bthing_t thing;
-  bool state_init;
+  enum mgos_bthing_state_flag state_flags;
   mgos_bvarc_t state;
+  // --------------------------------------------------
+  // NOTE 1: above fields must be the same of:
+  //   - struct mgos_bthing_state_updated_arg 
+  //
+  // NOTE 2: new fields must be added below, and
+  // following struct must be updated as well:
+  //   - struct mgos_bthing_state_changing_arg 
+  // --------------------------------------------------
 };
 
 struct mgos_bthing_state_changing_arg {
   mgos_bthing_t thing;
-  bool state_init;
+  enum mgos_bthing_state_flag state_flags;
   mgos_bvarc_t cur_state;
+  // --------------------------------------------------
+  // NOTE 1: above fields must be the same of:
+  //   - struct mgos_bthing_state_changed_arg 
+  //
+  // NOTE 2: New fields must be added below. 
+  // --------------------------------------------------
   mgos_bvarc_t new_state;
 };
 

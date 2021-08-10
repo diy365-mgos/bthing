@@ -78,7 +78,7 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   if (ev != MGOS_EV_BTHING_UPDATE_STATE) return;
   
   // force to trigger MGOS_EV_BTHING_STATE_CHANGED event 
-  mg_bthing_context()->force_state_changed = true;
+  mg_bthing_context()->requesting_update_state = true;
   
   if (ev_data) {
     // force the update of one specific bThing
@@ -94,7 +94,7 @@ static void mg_bthing_update_state_cb(int ev, void *ev_data, void *userdata) {
   }
 
   // remove forced MGOS_EV_BTHING_STATE_CHANGED event trigger
-  mg_bthing_context()->force_state_changed = false;
+  mg_bthing_context()->requesting_update_state = false;
 
   (void) userdata;
 }

@@ -149,7 +149,7 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
-  bool force_state_changed;
+  bool requesting_update_state;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();

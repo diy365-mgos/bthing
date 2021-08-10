@@ -27,7 +27,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
-    s_context->force_state_changed = false;
+    s_context->requesting_update_state = false;
   }
   return s_context; 
 }
@@ -176,17 +176,24 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   }
 
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
-  bool manage_state = (mg_bthing_context()->force_state_changed || is_changed);
 
-  if (manage_state) {
-      struct mgos_bthing_state_changing_arg args = { 
-        .thing = thing,
-        .state_init = mgos_bvar_is_null(sens->state),
-        .cur_state = sens->state, 
-        .new_state = sens->tmp_state
-      };
+   struct mgos_bthing_state_changing_arg args = { 
+    .thing = thing,
+    .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
+    .cur_state = sens->state, 
+    .new_state = sens->tmp_state
+  };
 
-     // STATE_CHANGING: invoke handlers and trigger the event
+  // initialize args.state_flags
+  if (mgos_bvar_is_null(sens->state))
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
+  if (mg_bthing_context()->requesting_update_state)
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_REQUESTING_UPDATE;
+  if (is_changed)
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
+
+  if ((args.state_flags & MGOS_BTHING_STATE_FLAG_CHANGED) == MGOS_BTHING_STATE_FLAG_CHANGED) {
+    // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
     mg_bthing_state_changing_handlers_invoke(&args, sens->state_changing);
     // trigger STATE_CHANGING event
@@ -201,11 +208,13 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state_changed_arg *)&args, sens->state_changed);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
+  }
 
-    if (is_changed) {
-      mgos_bvar_set_unchanged(sens->tmp_state);
-      mgos_bvar_set_unchanged(sens->state);
-    }
+  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state_updated_arg *)&args);
+
+  if (is_changed) {
+    mgos_bvar_set_unchanged(sens->tmp_state);
+    mgos_bvar_set_unchanged(sens->state);
   }
 
   sens->is_updating -= 1;
