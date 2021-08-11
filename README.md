@@ -71,7 +71,7 @@ struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 enum mgos_bthing_state_flag {
   MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
   MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 0001
-  MGOS_BTHING_STATE_FLAG_CHANGED = 3        // 0011
+  MGOS_BTHING_STATE_FLAG_CHANGED = 3,       // 0011
   MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 0101
   MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 1111
 };
