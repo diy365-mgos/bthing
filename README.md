@@ -32,7 +32,7 @@ struct mgos_bthing_state {
 ```
 Event-data passed to `MGOS_EV_BTHING_STATE_UPDATED` and `MGOS_EV_BTHING_STATE_CHANGED` event's handlers (see [mgos_event_handler_t](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_handler_t)).
 
-|Fields||
+|Field||
 |--|--|
 |thing|The bThing which state has been updated.|
 |state_flags|The combination of one or more state's flags (see `enum mgos_bthing_state_flag` below).|
@@ -49,7 +49,7 @@ struct mgos_bthing_state_change {
 ```
 Event-data passed to `MGOS_EV_BTHING_STATE_CHANGING` event's handler (see [mgos_event_handler_t](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_handler_t)).
 
-|Fields||
+|Field||
 |--|--|
 |thing|The bThing which state is going to change.|
 |state_flags|The combination of one or more state's flags (see `enum mgos_bthing_state_flag` below).|
@@ -69,13 +69,20 @@ struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 ### enum mgos_bthing_state_flag
 ```c
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED,
-  MGOS_BTHING_STATE_FLAG_INITIALIZING,
-  MGOS_BTHING_STATE_FLAG_INITIALIZED,
-  MGOS_BTHING_STATE_FLAG_CHANGING,
-  MGOS_BTHING_STATE_FLAG_CHANGED,
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
+  MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 0001
+  MGOS_BTHING_STATE_FLAG_CHANGED = 3        // 0011
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 0101
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 1111
 };
 ```
+|Flag||
+|--|--|
+|`MGOS_BTHING_STATE_FLAG_UNCHANGED`|The state was not changed.|
+|`MGOS_BTHING_STATE_FLAG_CHANGING`|The state is going to be changed.|
+|`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
+|`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
+|`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
 ### mgos_bthing_get_id
 ```c
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
@@ -239,53 +246,18 @@ Sets the state of a bThing actuator. Returns `true` on success, or `false` other
 |--|--|
 |thing|A bThing actuator.|
 |state|The state to set.|
-### (*mgos_bthing_state_changed_handler_t)
+### mgos_bthing_on_event
 ```c
-typedef void (*mgos_bthing_state_changed_handler_t)(struct mgos_bthing_state *args,
-                                                    void *userdata);
+void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
+                          mgos_event_handler_t handler, void *userdata);
 ```
-Signature of *state-changed* handlers. (see `mgos_bthing_on_state_changed()` below). The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
-
-|Parameter||
-|--|--|
-|args|The handler's parameters.|
-|userdata|The handler's *user-data*.|
-### mgos_bthing_on_state_changed
-```c
-void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_changed_handler_t handler,
-                                  void *userdata);
-```
-Adds a *state-changed* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Adds en event handler for the bThing. If the handler (*ev + handler + userdata*) is already registered nothing is done. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|handler|The [state-changed handler](#mgos_bthing_state_changed_handler_t) to add.|
-|userdata|The handler's *user-data* or `NULL`.|
-### (*mgos_bthing_state_changing_handler_t)
-```c
-typedef void (*mgos_bthing_state_changing_handler_t)(struct mgos_bthing_state_change *args,
-                                                     void *userdata);
-```
-Signature of *state-changing* handlers (see `mgos_bthing_on_state_changing()` below). The signature is available only `#if MGOS_BTHING_HAVE_SENSORS`.
-
-|Parameter||
-|--|--|
-|args|The handler's parameters.|
-|userdata|The handler's *user-data*.|
-### mgos_bthing_on_state_changing
-```c
-void mgos_bthing_on_state_changing(mgos_bthing_t thing,
-                                   mgos_bthing_state_changing_handler_t handler,
-                                   void *userdata);
-```
-Adds a *state-changing* handler, only if the *handler/userdata* pair is not yet registered. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
-
-|Parameter||
-|--|--|
-|thing|A bThing.|
-|handler|The [state-changing handler](#mgos_bthing_state_changing_handler_t) to add.|
+|ev|The event.|
+|handler|The event handler to add.|
 |userdata|The handler's *user-data* or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT

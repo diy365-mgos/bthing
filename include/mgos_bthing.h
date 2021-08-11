@@ -99,10 +99,10 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 
 enum mgos_bthing_state_flag {
   MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 1,  // 0001
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 3,   // 0011
-  MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 0100
-  MGOS_BTHING_STATE_FLAG_CHANGED = 14       // 1100
+  MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 0001
+  MGOS_BTHING_STATE_FLAG_CHANGED = 3        // 0011
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 0101
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 1111
 };
 
 struct mgos_bthing_state {
@@ -135,19 +135,8 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
                               mgos_bthing_get_state_handler_t get_state_cb,
                               void *userdata);
 
-typedef void (*mgos_bthing_state_changed_handler_t)(struct mgos_bthing_state *args,
-                                                    void *userdata);
-
-void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_changed_handler_t handler,
-                                  void *userdata);
-
-typedef void (*mgos_bthing_state_changing_handler_t)(struct mgos_bthing_state_change *args,
-                                                     void *userdata);
-
-void mgos_bthing_on_state_changing(mgos_bthing_t thing,
-                                   mgos_bthing_state_changing_handler_t handler,
-                                   void *userdata);
+void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
+                          mgos_event_handler_t handler, void *userdata);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 

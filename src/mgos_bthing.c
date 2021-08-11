@@ -92,43 +92,23 @@ void mgos_bthing_update_states(int bthing_type) {
   }
 }
 
-void mgos_bthing_on_state_changed(mgos_bthing_t thing,
-                                  mgos_bthing_state_changed_handler_t handler,
-                                  void *userdata) {
+void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
+                          mgos_event_handler_t handler, void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens) {
-    struct mg_bthing_state_changed_handlers *sc = sens->state_changed;
-    while (sc) {
-      if (sc->callback == handler && sc->base.userdata == userdata) return;
-      sc = (struct mg_bthing_state_changed_handlers *)sc->base.next;
+    struct mg_bthing_on_event_handler *stc = sens->on_event;
+    while (stc) {
+      if (stc->event == ev && sc->handler == handler && stc->userdata == userdata) return;
+      stc = stc->next;
     }
  
-    sc = calloc(1, sizeof(struct mg_bthing_state_changed_handlers));
-    sc->callback = handler;
-    sc->base.userdata = userdata;
+    stc = calloc(1, sizeof(struct mg_bthing_on_event_handler));
+    stc->event = ev;
+    stc->handler = handler;
+    stc->userdata = userdata;
 
-    if (sens->state_changed) sc->base.next = (struct mg_bthing_state_changex_handlers *)sens->state_changed;
-    sens->state_changed = sc;
-  }
-}
-
-void mgos_bthing_on_state_changing(mgos_bthing_t thing,
-                                   mgos_bthing_state_changing_handler_t handler,
-                                   void *userdata) {
-  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  if (sens) {
-    struct mg_bthing_state_changing_handlers *sc = sens->state_changing;
-    while (sc) {
-      if (sc->callback == handler && sc->base.userdata == userdata) return;
-      sc = (struct mg_bthing_state_changing_handlers *)sc->base.next;
-    }
- 
-    sc = calloc(1, sizeof(struct mg_bthing_state_changing_handlers));
-    sc->callback = handler;
-    sc->base.userdata = userdata;
-
-    if (sens->state_changing) sc->base.next = (struct mg_bthing_state_changex_handlers *)sens->state_changing;
-    sens->state_changing = sc;
+    if (sens->on_event) stc.next = sens->on_event;
+    sens->on_event = stc;
   }
 }
 

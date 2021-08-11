@@ -104,8 +104,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
     mg_bthing_on_getting_state(sens, mg_bthing_sens_getting_state_cb);
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
-    sens->state_changed = NULL;
-    sens->state_changing = NULL;
+    sens->on_event = NULL;
     sens->is_updating = 0;
     sens->state = mgos_bvar_new();
     sens->tmp_state = mgos_bvar_new();
@@ -115,8 +114,8 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
   return false;
 }
 
-static void mg_bthing_state_changex_handler_free(struct mg_bthing_state_changex_handlers *h) {
-  struct mg_bthing_state_changex_handlers *tmp;
+static void mg_bthing_on_event_handler_free(struct mg_bthing_on_event_handler *h) {
+  struct mg_bthing_on_event_handler *tmp;
   while (h) {
     tmp = h->next;
     free(h);
@@ -131,12 +130,9 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
 
-    // dispose state_changed handlers
-    mg_bthing_state_changex_handler_free((struct mg_bthing_state_changex_handlers *)sens->state_changed);
-    sens->state_changed = NULL;
-    // dispose state_changing handlers
-    mg_bthing_state_changex_handler_free((struct mg_bthing_state_changex_handlers *)sens->state_changing);
-    sens->state_changing = NULL;
+    // dispose on_event handlers
+    mg_bthing_on_event_handler_free(sens->on_event);
+    sens->on_event = NULL;
 
     sens->is_updating = 0;
     mgos_bvar_free(sens->state);
@@ -145,19 +141,13 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
   }
 }
 
-static void mg_bthing_state_changed_handlers_invoke(struct mgos_bthing_state *args,
-                                                    struct mg_bthing_state_changed_handlers *h) {
+static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bthing_event ev, void *args) {
+  struct mg_bthing_on_event_handler *h = sens->on_event;
   while (h) {
-    h->callback(args, h->base.userdata);
-    h = (struct mg_bthing_state_changed_handlers *)h->base.next;
-  }
-}
-
-static void mg_bthing_state_changing_handlers_invoke(struct mgos_bthing_state_change *args,
-                                                     struct mg_bthing_state_changing_handlers *h) {
-  while (h) {
-    h->callback(args, h->base.userdata);
-    h = (struct mg_bthing_state_changing_handlers *)h->base.next;
+    if (h->event == ev) {
+      h->handler(evm args, h->userdata);
+    }
+    h = h->next;
   }
 }
 
@@ -191,7 +181,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGING;
     if (is_init)
       args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
-    mg_bthing_state_changing_handlers_invoke(&args, sens->state_changing);
+    mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
     // trigger STATE_CHANGING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
 
@@ -204,11 +194,12 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
     if (is_init)
       args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
-    mg_bthing_state_changed_handlers_invoke((struct mgos_bthing_state *)&args, sens->state_changed);
+    mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
     // trigger STATE_CHANGED event
-    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, &args);
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
+  mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 
   if (is_changed) {
