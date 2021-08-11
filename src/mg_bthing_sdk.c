@@ -145,7 +145,7 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
   struct mg_bthing_on_event_handler *h = sens->on_event;
   while (h) {
     if (h->event == ev) {
-      h->handler(evm args, h->userdata);
+      h->handler(ev, args, h->userdata);
     }
     h = h->next;
   }
