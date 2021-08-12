@@ -35,9 +35,8 @@ Event-data passed to `MGOS_EV_BTHING_STATE_UPDATED` and `MGOS_EV_BTHING_STATE_CH
 |Field||
 |--|--|
 |thing|The bThing which state has been updated.|
-|state_flags|The combination of one or more state's flags (see `enum mgos_bthing_state_flag` below).|
+|state_flags|State's flags. It could be a combination of more flags (see `enum mgos_bthing_state_flag` below).|
 |state|The state.|
-```
 ### mgos_bthing_state_change
 ```c
 struct mgos_bthing_state_change {
@@ -52,7 +51,7 @@ Event-data passed to `MGOS_EV_BTHING_STATE_CHANGING` event's handler (see [mgos_
 |Field||
 |--|--|
 |thing|The bThing which state is going to change.|
-|state_flags|The combination of one or more state's flags (see `enum mgos_bthing_state_flag` below).|
+|state_flags|State's flags. It could be a combination of more flags (see `enum mgos_bthing_state_flag` below).|
 |cur_state|The current state.|
 |new_state|The new state.|
 
