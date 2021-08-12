@@ -75,11 +75,11 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_update_state(mgos_bthing_t thing) {
-  return mgos_bthing_update_state(thing, false);
+  return mg_bthing_update_state(thing, false);
 }
 
 int mgos_bthing_update_states(int bthing_type) {
-  return mgos_bthing_update_states(bthing_type, false);
+  return mg_bthing_update_states(bthing_type, false);
 }
 
 void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
