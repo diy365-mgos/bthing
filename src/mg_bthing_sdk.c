@@ -226,6 +226,32 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
   return prev_h;
 }
 
+bool mg_bthing_update_state(mgos_bthing_t thing, bool mark_as_requested) {
+  mg_bthing_context()->upd_state_requested = mark_as_requested;
+  bool ret = (mgos_bthing_get_state(thing) != NULL);
+  mg_bthing_context()->upd_state_requested = false;
+  return ret;
+}
+
+int mg_bthing_update_states(int bthing_type, bool mark_as_requested) {
+  int count = 0;
+  mgos_bthing_t thing;
+  
+  mg_bthing_context()->upd_state_requested = mark_as_requested;
+  mgos_bthing_enum_t things = mgos_bthing_get_all();
+  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
+    while(mgos_bthing_get_next(&things, &thing)) {
+      if (mgos_bthing_get_state(thing) != NULL) ++count;
+    }
+  } else {
+    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
+      if (mgos_bthing_get_state(thing) != NULL) ++count;
+    }
+  }
+  mg_bthing_context()->upd_state_requested = false;
+  return count;
+}
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS

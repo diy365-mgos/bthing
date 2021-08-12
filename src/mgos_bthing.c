@@ -75,29 +75,11 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_update_state(mgos_bthing_t thing) {
-  mg_bthing_context()->upd_state_requested = true;
-  bool ret = (mgos_bthing_get_state(thing) != NULL);
-  mg_bthing_context()->upd_state_requested = false;
-  return ret;
+  return mgos_bthing_update_state(thing, false);
 }
 
 int mgos_bthing_update_states(int bthing_type) {
-  int count = 0;
-  mgos_bthing_t thing;
-  
-  mg_bthing_context()->upd_state_requested = true;
-  mgos_bthing_enum_t things = mgos_bthing_get_all();
-  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
-    while(mgos_bthing_get_next(&things, &thing)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  } else {
-    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  }
-  mg_bthing_context()->upd_state_requested = false;
-  return count;
+  return mgos_bthing_update_states(bthing_type, false);
 }
 
 void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
