@@ -98,11 +98,12 @@ bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 #if MGOS_BTHING_HAVE_SENSORS
 
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
-  MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 0001
-  MGOS_BTHING_STATE_FLAG_CHANGED = 3,       // 0011
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 0101
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 1111
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,       // 00000
+  MGOS_BTHING_STATE_FLAG_CHANGING = 1,        // 00001
+  MGOS_BTHING_STATE_FLAG_CHANGED = 3,         // 00011
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,    // 00101
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,    // 01111
+  MGOS_BTHING_STATE_FLAG_UPD_REQUESTED = 16,  // 10000
 };
 
 struct mgos_bthing_state {
@@ -142,7 +143,7 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
 bool mgos_bthing_update_state(mgos_bthing_t thing);
 
-void mgos_bthing_update_states(int bthing_type);
+int mgos_bthing_update_states(int bthing_type);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 

@@ -140,6 +140,7 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
+  bool upd_state_requested;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();

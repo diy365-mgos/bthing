@@ -69,11 +69,12 @@ struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 ### enum mgos_bthing_state_flag
 ```c
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 0000
-  MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 0001
-  MGOS_BTHING_STATE_FLAG_CHANGED = 3,       // 0011
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 0101
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 1111
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,       // 00000
+  MGOS_BTHING_STATE_FLAG_CHANGING = 1,        // 00001
+  MGOS_BTHING_STATE_FLAG_CHANGED = 3,         // 00011
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,    // 00101
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,    // 01111
+  MGOS_BTHING_STATE_FLAG_UPD_REQUESTED = 16,  // 10000
 };
 ```
 |Flag||
@@ -83,6 +84,7 @@ enum mgos_bthing_state_flag {
 |`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
+|`MGOS_BTHING_STATE_FLAG_UPD_REQUESTED`|The state has been updated because `mgos_bthing_update_state()` or `mgos_bthing_update_states()` has been invoked.|
 ### mgos_bthing_get_id
 ```c
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
@@ -183,9 +185,9 @@ Updates the state of a bThing sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHIN
 |thing|A bThing sensor/actuator.|
 ### mgos_bthing_update_states
 ```c
-void mgos_bthing_update_states(int bthing_type);
+int mgos_bthing_update_states(int bthing_type);
 ```
-Updates the state of all bThings of type `bthing_type`. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+Updates the state of all bThings of type `bthing_type`. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`. Returns the count of successfully updated states.
 
 |Parameter||
 |--|--|

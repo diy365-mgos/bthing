@@ -27,6 +27,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
+    s_context->upd_state_requested = false;
   }
   return s_context; 
 }
@@ -164,8 +165,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     }
   }
 
-  bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
-
    struct mgos_bthing_state_change args = { 
     .thing = thing,
     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
@@ -173,6 +172,10 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     .new_state = sens->tmp_state
   };
 
+  if (mg_bthing_context()->upd_state_requested)
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_UPD_REQUESTED;
+
+  bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = mgos_bvar_is_null(sens->state);
   if (is_changed || is_init) {
 
