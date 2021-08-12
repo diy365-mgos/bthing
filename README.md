@@ -258,7 +258,7 @@ Adds en event handler for the bThing. If the handler (*ev + handler + userdata*)
 |--|--|
 |thing|A bThing.|
 |ev|The event.|
-|handler|The event handler to add.|
+|handler|The event handler to add (see [mgos_event_handler_t](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_handler_t)).|
 |userdata|The handler's *user-data* or `NULL`.|
 ## JS APIs Reference
 ### bThing.EVENT
