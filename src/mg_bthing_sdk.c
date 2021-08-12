@@ -202,6 +202,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
+  args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
   mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 

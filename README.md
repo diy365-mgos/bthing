@@ -72,7 +72,8 @@ enum mgos_bthing_state_flag {
   MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 00001
   MGOS_BTHING_STATE_FLAG_CHANGED = 3,       // 00011
   MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 00101
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15   // 01111
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 01111
+  MGOS_BTHING_STATE_FLAG_UPDATED = 16       // 10000
 };
 ```
 |Flag||
@@ -82,6 +83,7 @@ enum mgos_bthing_state_flag {
 |`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
+|`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed.|
 ### mgos_bthing_get_id
 ```c
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
