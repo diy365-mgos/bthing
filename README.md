@@ -21,7 +21,7 @@ Events triggered by a bThing. Use [mgos_event_add_handler()](https://mongoose-os
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created. The event-data passed to the handler is a `mgos_bthing_t`.|
 |MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
+|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
 ### mgos_bthing_state
 ```c
 struct mgos_bthing_state {
@@ -83,7 +83,7 @@ enum mgos_bthing_state_flag {
 |`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
-|`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed.|
+|`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed. This flag is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function.|
 ### mgos_bthing_get_id
 ```c
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
@@ -278,7 +278,7 @@ Events triggered by a bThing. Use [Event.addHandler()](https://mongoose-os.com/d
 |CREATED|Triggered when a new bThing is created. The event-data passed to the handler is a `mgos_bthing_t`.|
 |STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
 |STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|STATE_UPDATED|Triggered when the state of a bThing has been updated. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
+|STATE_UPDATED|Triggered when the state of a bThing has been updated after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
 
 Example:
 ```javascript

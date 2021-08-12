@@ -172,9 +172,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     .new_state = sens->tmp_state
   };
 
-  if (mg_bthing_context()->upd_state_requested)
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_UPD_REQUESTED;
-
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = mgos_bvar_is_null(sens->state);
   if (is_changed || is_init) {
@@ -202,9 +199,11 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
-  args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
-  mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
-  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+  if (mg_bthing_context()->upd_state_requested) {
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
+    mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+  }
 
   if (is_changed) {
     mgos_bvar_set_unchanged(sens->tmp_state);
@@ -225,32 +224,6 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
   mg_bthing_getting_state_handler_t prev_h = thing->getting_state_cb;
   thing->getting_state_cb = getting_state_cb;
   return prev_h;
-}
-
-bool mg_bthing_update_state(mgos_bthing_t thing, bool mark_as_requested) {
-  mg_bthing_context()->upd_state_requested = mark_as_requested;
-  bool ret = (mgos_bthing_get_state(thing) != NULL);
-  mg_bthing_context()->upd_state_requested = false;
-  return ret;
-}
-
-int mg_bthing_update_states(int bthing_type, bool mark_as_requested) {
-  int count = 0;
-  mgos_bthing_t thing;
-  
-  mg_bthing_context()->upd_state_requested = mark_as_requested;
-  mgos_bthing_enum_t things = mgos_bthing_get_all();
-  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
-    while(mgos_bthing_get_next(&things, &thing)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  } else {
-    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  }
-  mg_bthing_context()->upd_state_requested = false;
-  return count;
 }
 
 #endif // MGOS_BTHING_HAVE_SENSORS

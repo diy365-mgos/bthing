@@ -49,8 +49,6 @@ struct mg_bthing *MG_BTHING_CAST1(mgos_bthing_t thing);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
-#define MGOS_BTHING_STATE_FLAG_UPD_REQUESTED 256 // 100000000 (this must be the last value of enum mgos_bthing_state_flag).
-
 struct mg_bthing_sens;
 typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
                                                                          mgos_bvar_t state,
@@ -161,9 +159,6 @@ mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
-
-bool mg_bthing_update_state(mgos_bthing_t thing, bool mark_as_requested);
-int mg_bthing_update_states(int bthing_type, bool mark_as_requested);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
