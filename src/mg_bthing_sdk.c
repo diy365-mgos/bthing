@@ -27,7 +27,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
-    s_context->upd_state_requested = false;
+    s_context->raise_state_updated = false;
   }
   return s_context; 
 }
@@ -199,7 +199,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
-  if (mg_bthing_context()->upd_state_requested) {
+  if (mg_bthing_context()->raise_state_updated) {
     args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
     mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
@@ -225,6 +225,33 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
   thing->getting_state_cb = getting_state_cb;
   return prev_h;
 }
+
+bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
+  if (raise_event) mg_bthing_context()->raise_state_updated = true;
+  bool ret = (mgos_bthing_get_state(thing) != NULL);
+  if (raise_event) mg_bthing_context()->raise_state_updated = false;
+  return ret;
+}
+
+int mg_bthing_update_states(int bthing_type, bool raise_event) {
+  int count = 0;
+  mgos_bthing_t thing;
+  
+  if (raise_event) mg_bthing_context()->raise_state_updated = true;
+  mgos_bthing_enum_t things = mgos_bthing_get_all();
+  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
+    while(mgos_bthing_get_next(&things, &thing)) {
+      if (mgos_bthing_get_state(thing) != NULL) ++count;
+    }
+  } else {
+    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
+      if (mgos_bthing_get_state(thing) != NULL) ++count;
+    }
+  }
+  if (raise_event) mg_bthing_context()->raise_state_updated = false;
+  return count;
+}
+
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
@@ -319,7 +346,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
     if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
       return mgos_bvar_merge(state, sens->state);
     else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
-      mgos_bthing_update_state(thing);
+      mg_bthing_update_state(thing, false);
       return true;
     }
   }

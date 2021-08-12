@@ -140,7 +140,7 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
-  bool upd_state_requested;
+  bool raise_state_updated;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();
@@ -159,6 +159,9 @@ mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
+
+bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event);
+int mg_bthing_update_states(int bthing_type, bool raise_event);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
