@@ -193,6 +193,11 @@ bool mg_bthing_sreplaces(const char *src, char **out, int count, ...);
 
 int64_t mg_bthing_duration_micro(int64_t t1, int64_t t2);
 
+int mg_bthing_path_indexof(const char *path, int path_len, char sep, const char *str);
+
+int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
+                               int seg_idx, const char **seg_val);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

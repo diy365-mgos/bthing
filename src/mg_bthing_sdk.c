@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
+#include <stdint.h> 
 #include "mgos.h"
 #include "mg_bthing_sdk.h"
 
@@ -463,4 +463,48 @@ int64_t mg_bthing_duration_micro(int64_t t1, int64_t t2) {
     return ((INT64_MAX - t1) + t2);
   }
   return (t2 - t1);
+}
+
+int mg_bthing_path_indexof(const char *path, int path_len, char sep, const char *str) {
+  if (path && str && (path_len > 0) && (strlen(str) > 0)) {
+    char *p1 = (char *)path;
+    char *p2 = p1;
+    int c = 0;
+    for (int i = 0; i < path_len; ++i, ++p2) {
+      if (path[i] == sep) {
+        if (p2 > p1 && strncmp(p1, str, (p2-p1)) == 0)
+          return c;
+        p1 = (p2 + 1);
+        ++c;
+      }
+    }
+    if (p2 > p1 && strncmp(p1, str, (p2-p1)) == 0)
+      return c;
+  }
+  return -1;
+}
+
+int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
+                               int seg_idx, const char **seg_val) {
+  if (path && (seg_idx >= 0)) {
+    char *p1 = (char *)path;
+    char *p2 = p1;
+    int c = 0;
+    for (int i = 0; i < path_len; ++i, ++p2) {
+      if (path[i] == sep) {
+        if (c == seg_idx) {
+          if (seg_val) *seg_val = p1;
+          return (p2 - p1);
+        }
+        p1 = (p2 + 1);
+        ++c;
+      }
+    }
+    if (c == seg_idx) {
+      if (seg_val) *seg_val = p1;
+      return (p2 - p1);
+    }
+  }
+  if (seg_val) *seg_val = NULL;
+  return 0;
 }
