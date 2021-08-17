@@ -21,17 +21,19 @@ const char *mgos_bthing_get_domain(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain) {
+  struct mg_bthing *t = MG_BTHING_CAST1(thing);
+  if (!t) return false;
+
   if (domain && (mgos_bthing_get_by_id(domain, NULL) != NULL)) {
     LOG(LL_ERROR, ("Invalid '%s' domain name for '%s'. The value is already used as ID.",
       domain, mgos_bthing_get_uid(thing)));
     return false;
   }
-  struct mg_bthing *t = MG_BTHING_CAST1(thing);
-  if (t) {
-    free(t->domain);
-    t->domain = domain ? strdup(domain) : NULL;
-    mg_bthing_rebuild_uid(t);
-  }
+  
+  free(t->domain);
+  t->domain = (domain ? strdup(domain) : NULL);
+   mg_bthing_rebuild_uid(t);
+  return true;
 }
 
 int mgos_bthing_get_type(mgos_bthing_t thing) {
@@ -89,6 +91,7 @@ bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
   bool ret = mgos_bthing_get_next(things_enum, thing);
   if (ret) {
     va_list ap;
+    va_start(ap, filter); 
     switch (filter)
     {
       case MGOS_BTHING_FILTER_BY_NOTHING:
