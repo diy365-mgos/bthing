@@ -32,7 +32,7 @@ bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain) {
   
   free(t->domain);
   t->domain = (domain ? strdup(domain) : NULL);
-   mg_bthing_rebuild_uid(t);
+  mg_bthing_rebuild_uid(t);
   return true;
 }
 
