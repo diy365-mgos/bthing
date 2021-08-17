@@ -111,16 +111,6 @@ Returns the bThing's domain name, or `NULL` if the bThing doesn't belong to any 
 |Parameter||
 |--|--|
 |thing|A bThing.|
-### mgos_bthing_set_domain
-```c
-bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain);
-```
-Set's the bThing's domain. Returns `true` on success, or `false` otherwise.
-
-|Parameter||
-|--|--|
-|thing|A bThing.|
-|domain|The domain name.|
 ### mgos_bthing_get_type
 ```c
 int mgos_bthing_get_type(mgos_bthing_t thing);

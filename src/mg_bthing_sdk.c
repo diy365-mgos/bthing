@@ -32,18 +32,25 @@ struct mg_bthing_ctx *mg_bthing_context() {
   return s_context; 
 }
 
-bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type) {
+bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type, const char *domain) {
   if (thing && id && (strlen(id) > 0)) {
-    mgos_bthing_enum_t things = mgos_bthing_get_all();
-    if (mgos_bthing_get_by_id(id, NULL) == NULL &&
-        !mgos_bthing_filter_get_next(&things, NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
-      thing->id = strdup(id);
-      thing->uid = NULL; 
-      thing->domain = NULL;
-      thing->type = type;
-      return true;
+
+    if (domain && (mgos_bthing_get_by_id(domain, NULL) != NULL)) {
+      LOG(LL_ERROR, ("Invalid '%s' domain name creating '%s'. The value is already used as ID.", domain, id));
+      return false;
     }
-    LOG(LL_ERROR, ("The '%s' ID has been already assigned or it is alredy in use as domain name.", id));
+
+    mgos_bthing_enum_t things = mgos_bthing_get_all();
+    if (mgos_bthing_get_by_id(id, NULL) != NULL ||
+        mgos_bthing_filter_get_next(&things, NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
+      LOG(LL_ERROR, ("The '%s' ID has been already assigned or it is alredy in use as domain name.", id));
+    }
+
+    thing->id = strdup(id);
+    thing->uid = NULL; 
+    thing->domain = (domain ? strdup(domain) : NULL);
+    thing->type = type;
+    return true;
   }
   LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
   return false;
@@ -59,18 +66,6 @@ void mg_bthing_reset(struct mg_bthing *thing) {
     thing->domain = NULL;
     thing->type = 0;
   }
-}
-
-void mg_bthing_rebuild_uid(struct mg_bthing *thing) {
-  // rebuild a new UID
-  free(thing->uid);
-  const char *dev_id = mgos_sys_config_get_device_id();
-  thing->uid = calloc(strlen(thing->id) + (thing->domain ? strlen(thing->domain) : 0) + strlen(dev_id) + 3, sizeof(char));
-  strcat(thing->uid, dev_id); strcat(thing->uid, ".");
-  if (thing->domain) {
-    strcat(thing->uid, thing->domain); strcat(thing->uid, ".");
-  }
-  strcat(thing->uid, thing->id);
 }
 
 #if MGOS_BTHING_HAVE_SENSORS

@@ -85,7 +85,6 @@ const char *mgos_bthing_get_uid(mgos_bthing_t thing);
 const char *mgos_bthing_get_id(mgos_bthing_t thing);
 
 const char *mgos_bthing_get_domain(mgos_bthing_t thing);
-bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain);
 
 /* Returns the type of a *bThing*, or `0` if error. */
 int mgos_bthing_get_type(mgos_bthing_t thing);

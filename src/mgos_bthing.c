@@ -6,9 +6,17 @@
 #endif
 
 const char *mgos_bthing_get_uid(mgos_bthing_t thing) {
-  if (!thing) return NULL;
   struct mg_bthing *t = MG_BTHING_CAST1(thing);
-  if (!t->uid) mg_bthing_rebuild_uid(t);
+  if (!t) return NULL;
+  if (!t->uid) {
+    const char *dev_id = mgos_sys_config_get_device_id();
+    t->uid = calloc(strlen(t->id) + (t->domain ? strlen(t->domain) : 0) + strlen(dev_id) + 3, sizeof(char));
+    strcat(t->uid, dev_id); strcat(t->uid, ".");
+    if (t->domain) {
+      strcat(t->uid, t->domain); strcat(t->uid, ".");
+    }
+    strcat(t->uid, t->id);
+  }
   return t->uid;
 }
 
@@ -18,22 +26,6 @@ const char *mgos_bthing_get_id(mgos_bthing_t thing) {
 
 const char *mgos_bthing_get_domain(mgos_bthing_t thing) {
   return (thing ? MG_BTHING_CAST1(thing)->domain : NULL);
-}
-
-bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain) {
-  struct mg_bthing *t = MG_BTHING_CAST1(thing);
-  if (!t) return false;
-
-  if (domain && (mgos_bthing_get_by_id(domain, NULL) != NULL)) {
-    LOG(LL_ERROR, ("Invalid '%s' domain name for '%s'. The value is already used as ID.",
-      domain, mgos_bthing_get_uid(thing)));
-    return false;
-  }
-  
-  free(t->domain);
-  t->domain = (domain ? strdup(domain) : NULL);
-  mg_bthing_rebuild_uid(t);
-  return true;
 }
 
 int mgos_bthing_get_type(mgos_bthing_t thing) {
