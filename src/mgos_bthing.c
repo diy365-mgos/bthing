@@ -101,8 +101,8 @@ bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
       }
       case MGOS_BTHING_FILTER_BY_DOMAIN: {
         const char *dom = va_arg(ap, const char *);
-        const char *my_dom = mgos_bthing_get_domain(*thing)
-        if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0)) ) 
+        const char *my_dom = mgos_bthing_get_domain(*thing);
+        if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0))) 
           ret =  mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
         break;
       }
