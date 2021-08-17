@@ -82,7 +82,7 @@ enum mgos_bthing_filter_by {
 /* Returns the unique ID of a *bThing*, or `NULL` if error. */
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);
 /* Returns the ID of a *bThing*, or `NULL` if error. */
-const char *mgos_bthing_get_id(mgos_bthing_t thing)
+const char *mgos_bthing_get_id(mgos_bthing_t thing);
 
 const char *mgos_bthing_get_domain(mgos_bthing_t thing);
 bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain);
