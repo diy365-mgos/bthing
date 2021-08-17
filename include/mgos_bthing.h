@@ -77,7 +77,7 @@ enum mgos_bthing_filter_by {
   MGOS_BTHING_FILTER_BY_NOTHING = 0,
   MGOS_BTHING_FILTER_BY_TYPE = 1,
   MGOS_BTHING_FILTER_BY_DOMAIN = 2
-}
+};
 
 /* Returns the unique ID of a *bThing*, or `NULL` if error. */
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);
