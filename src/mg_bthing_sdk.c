@@ -34,8 +34,9 @@ struct mg_bthing_ctx *mg_bthing_context() {
 
 bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type) {
   if (thing && id && (strlen(id) > 0)) {
+    mgos_bthing_enum_t things = mgos_bthing_get_all();
     if (mgos_bthing_get_by_id(id, NULL) == NULL &&
-        !mgos_bthing_filter_get_next(&(mgos_bthing_get_all()), NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
+        !mgos_bthing_filter_get_next(&things, NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
       thing->id = strdup(id);
       thing->uid = NULL; 
       thing->domain = NULL;
