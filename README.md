@@ -95,7 +95,7 @@ Returns the uniue ID of a bThing, or `NULL` if error.
 |thing|A bThing.|
 ### mgos_bthing_get_id
 ```c
-const char *mgos_bthing_get_uid(mgos_bthing_t thing);
+const char *mgos_bthing_get_id(mgos_bthing_t thing);
 ```
 Returns the ID of a bThing, or `NULL` if error.
 
