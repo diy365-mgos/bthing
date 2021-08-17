@@ -81,8 +81,7 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
 bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
                                  enum mgos_bthing_filter_by filter, ...) {
   mgos_bthing_t my_t = NULL;
-  bool ret = mgos_bthing_get_next(things_enum, &my_t);
-  if (ret) {
+  if (mgos_bthing_get_next(things_enum, &my_t)) {
     va_list ap;
     va_start(ap, filter); 
     switch (filter)
@@ -90,25 +89,29 @@ bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
       case MGOS_BTHING_FILTER_BY_NOTHING:
         break;
       case MGOS_BTHING_FILTER_BY_TYPE: {
-        int type = va_arg(ap, int);
-        if (!mgos_bthing_is_typeof(my_t, type))
-          ret = mgos_bthing_filter_get_next(things_enum, thing, filter, type);
+          int type = va_arg(ap, int);
+          if (!mgos_bthing_is_typeof(my_t, type))
+            return mgos_bthing_filter_get_next(things_enum, thing, filter, type);
+        }
         break;
-      }
-      case MGOS_BTHING_FILTER_BY_DOMAIN: {
-        const char *dom = va_arg(ap, const char *);
-        const char *my_dom = mgos_bthing_get_domain(my_t);
-        if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0))) 
-          ret =  mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
+        case MGOS_BTHING_FILTER_BY_DOMAIN: {
+          const char *dom = va_arg(ap, const char *);
+          const char *my_dom = mgos_bthing_get_domain(my_t);
+          if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0))) 
+            return mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
+        }
         break;
-      }
       default:
-        ret = false;
+        return false;
     };
+
     va_end(ap);
+    if (thing) *thing = my_t;
+    return true;
   }
-  if (thing) *thing = my_t;
-  return ret;
+
+  if (thing) *thing = NULL;
+  return false;
 }
 
 #if MGOS_BTHING_HAVE_SENSORS
