@@ -46,7 +46,7 @@ mgos_bthing_t mgos_bthing_get_by_uid(const char* uid) {
   if (uid) {
     struct mg_bthing_enum *things = &(mg_bthing_context()->things);
     while (things && things->thing) {
-      if (0 == strcasecmp(id, mgos_bthing_get_uid(things->thing))) return things->thing;
+      if (0 == strcasecmp(uid, mgos_bthing_get_uid(things->thing))) return things->thing;
       things = things->next_item;
     }
   }
@@ -86,28 +86,32 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
 
 bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
                                  enum mgos_bthing_filter_by filter, ...) {
-  if (!mgos_bthing_get_next(things_enum, thing)) return false;
-  switch (filter)
-  {
-    case MGOS_BTHING_FILTER_BY_NOTHING:
-      break;
-    case MGOS_BTHING_FILTER_BY_TYPE: {
-      int type = va_arg(ap, int);
-      if (!mgos_bthing_is_typeof(*thing, type))
-        return mgos_bthing_filter_get_next(things_enum, thing, filter, type);
-      break;
-    }
-    case MGOS_BTHING_FILTER_BY_DOMAIN: {
-      const char *dom = va_arg(ap, const char *);
-      const char *my_dom = mgos_bthing_get_domain(*thing)
-      if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0)) ) 
-        return mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
-      break;
-    }
-    default:
-      return false;
-  };
-  return true;
+  bool ret = mgos_bthing_get_next(things_enum, thing);
+  if (ret) {
+    va_list ap;
+    switch (filter)
+    {
+      case MGOS_BTHING_FILTER_BY_NOTHING:
+        break;
+      case MGOS_BTHING_FILTER_BY_TYPE: {
+        int type = va_arg(ap, int);
+        if (!mgos_bthing_is_typeof(*thing, type))
+          ret = mgos_bthing_filter_get_next(things_enum, thing, filter, type);
+        break;
+      }
+      case MGOS_BTHING_FILTER_BY_DOMAIN: {
+        const char *dom = va_arg(ap, const char *);
+        const char *my_dom = mgos_bthing_get_domain(*thing)
+        if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0)) ) 
+          ret =  mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
+        break;
+      }
+      default:
+        ret = false;
+    };
+    va_end(ap);
+  }
+  return ret;
 }
 
 #if MGOS_BTHING_HAVE_SENSORS

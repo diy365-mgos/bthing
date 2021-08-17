@@ -35,7 +35,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
 bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type) {
   if (thing && id && (strlen(id) > 0)) {
     if (mgos_bthing_get_by_id(id, NULL) == NULL &&
-        !mgos_bthing_filter_get_next(&mgos_bthing_get_all(), NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
+        !mgos_bthing_filter_get_next(&(mgos_bthing_get_all()), NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
       thing->id = strdup(id);
       thing->uid = NULL; 
       thing->domain = NULL;
@@ -63,7 +63,7 @@ void mg_bthing_reset(struct mg_bthing *thing) {
 void mg_bthing_rebuild_uid(struct mg_bthing *thing) {
   // rebuild a new UID
   free(thing->uid);
-  const char dev_id = mgos_sys_config_get_device_id();
+  const char *dev_id = mgos_sys_config_get_device_id();
   thing->uid = calloc(strlen(thing->id) + (thing->domain ? strlen(thing->domain) : 0) + strlen(dev_id) + 3, sizeof(char));
   strcat(thing->uid, dev_id); strcat(thing->uid, ".");
   if (thing->domain) {
