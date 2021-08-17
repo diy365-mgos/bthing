@@ -19,6 +19,7 @@
 #define MGOS_BTHING_H_
 
 #include <stdbool.h>
+#include <stdarg.h>
 #include "mgos_event.h"
 #include "mgos_bvar.h"
 
@@ -55,6 +56,7 @@ typedef struct mg_bthing_enum *mgos_bthing_enum_t;
 
 #define MGOS_BTHING_ENV_DEVICEID "${device_id}"
 #define MGOS_BTHING_ENV_THINGID "${bthing_id}"
+#define MGOS_BTHING_ENV_THINGUID "${bthing_uid}"
 
 #define MGOS_BTHING_STR_ON "ON"
 #define MGOS_BTHING_STR_OFF "OFF"
@@ -71,8 +73,19 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_STATE_UPDATED
 };
 
+enum mgos_bthing_filter_by {
+  MGOS_BTHING_FILTER_BY_NOTHING = 0,
+  MGOS_BTHING_FILTER_BY_TYPE = 1,
+  MGOS_BTHING_FILTER_BY_DOMAIN = 2
+}
+
+/* Returns the unique ID of a *bThing*, or `NULL` if error. */
+const char *mgos_bthing_get_uid(mgos_bthing_t thing);
 /* Returns the ID of a *bThing*, or `NULL` if error. */
-const char *mgos_bthing_get_id(mgos_bthing_t thing);
+const char *mgos_bthing_get_id(mgos_bthing_t thing)
+
+const char *mgos_bthing_get_domain(mgos_bthing_t thing);
+bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain);
 
 /* Returns the type of a *bThing*, or `0` if error. */
 int mgos_bthing_get_type(mgos_bthing_t thing);
@@ -80,8 +93,11 @@ int mgos_bthing_get_type(mgos_bthing_t thing);
 /* Returns `true` if the *bThing* type is `type`. */
 bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type);
 
-/* Returns the *bThing* having the specified ID, or `NULL` otherwise. */
-mgos_bthing_t mgos_bthing_get(const char* id);
+/* Returns the *bThing* having the specified unique ID, or `NULL` otherwise. */
+mgos_bthing_t mgos_bthing_get_by_uid(const char* uid);
+
+/* Returns the *bThing* having the specified ID and domain (optional). */
+mgos_bthing_t mgos_bthing_get_by_id(const char* id, const char *domain);
 
 /* Returns the enumerator for iterating all registered *bThings*, or `NULL` if error. */
 mgos_bthing_enum_t mgos_bthing_get_all();
@@ -90,11 +106,11 @@ mgos_bthing_enum_t mgos_bthing_get_all();
  * Returns `false` if the end of the enumerator is reached, or `true` otherwise.
  */
 bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing);
-/* Gets the next *bThing* of given type, iterating registered ones. 
+/* Gets the next filtered *bThing*, iterating registered ones. 
  * Returns `false` if the end of the enumerator is reached, or `true` otherwise.
  */
-bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type);
-
+bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
+                                 enum mgos_bthing_filter_by filter, ...);
 #if MGOS_BTHING_HAVE_SENSORS
 
 enum mgos_bthing_state_flag {

@@ -32,7 +32,9 @@ enum MG_BTHING_STATE_RESULT {
 };
 
 struct mg_bthing {
+  char *uid;
   char *id;
+  char *domain;
   int type;
 };
 
@@ -148,6 +150,8 @@ struct mg_bthing_ctx *mg_bthing_context();
 bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type);
 
 void mg_bthing_reset(struct mg_bthing *thing);
+
+void mg_bthing_rebuild_uid(struct mg_bthing *thing);
 
 #if MGOS_BTHING_HAVE_SENSORS
 

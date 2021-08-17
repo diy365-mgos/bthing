@@ -84,15 +84,43 @@ enum mgos_bthing_state_flag {
 |`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
 |`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed. This flag is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function.|
+### mgos_bthing_get_uid
+```c
+const char *mgos_bthing_get_uid(mgos_bthing_t thing);
+```
+Returns the uniue ID of a bThing, or `NULL` if error.
+
+|Parameter||
+|--|--|
+|thing|A bThing.|
 ### mgos_bthing_get_id
 ```c
-const char *mgos_bthing_get_id(mgos_bthing_t thing);
+const char *mgos_bthing_get_uid(mgos_bthing_t thing);
 ```
 Returns the ID of a bThing, or `NULL` if error.
 
 |Parameter||
 |--|--|
 |thing|A bThing.|
+### mgos_bthing_get_domain
+```c
+const char *mgos_bthing_get_domain(mgos_bthing_t thing);
+```
+Returns the bThing's domain name, or `NULL` if the bThing doesn't belong to any domain (see `mgos_bthing_set_domain()`).
+
+|Parameter||
+|--|--|
+|thing|A bThing.|
+### mgos_bthing_set_domain
+```c
+bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain);
+```
+Set's the bThing's domain. Returns `true` on success, or `false` otherwise.
+
+|Parameter||
+|--|--|
+|thing|A bThing.|
+|domain|The domain name.|
 ### mgos_bthing_get_type
 ```c
 int mgos_bthing_get_type(mgos_bthing_t thing);
@@ -127,15 +155,25 @@ else if (mgos_bthing_is_typeof(thing, MGOS_BTHING_TYPE_ACTUATOR))
 else
   LOG(LL_INFO, ("Unknown bThing type."));
 ```
-### mgos_bthing_get
+### mgos_bthing_get_by_uid
 ```c
-mgos_bthing_t mgos_bthing_get(const char* id);
+mgos_bthing_t mgos_bthing_get_by_uid(const char* uid);
 ```
-Returns the bThing having the specified ID, or `NULL` if not found.
+Returns the bThing having the specified unique ID, or `NULL` if not found.
+
+|Parameter||
+|--|--|
+|uid|A bThing unique ID.|
+### mgos_bthing_get_by_id
+```c
+mgos_bthing_t mgos_bthing_get_by_id(const char* id, const char *domain);
+```
+Returns the bThing having the specified ID and domain, or `NULL` if not found.
 
 |Parameter||
 |--|--|
 |id|A bThing ID.|
+|domain|The domain name.|
 ### mgos_bthing_get_all
 ```c
 mgos_bthing_enum_t mgos_bthing_get_all();
@@ -151,17 +189,28 @@ Gets the next bThing iterating registered ones. Returns `false` if the end of th
 |--|--|
 |things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
-### mgos_bthing_typeof_get_next
+### mgos_bthing_filter_get_next
 ```c
-bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type) ;
+bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
+                                 enum mgos_bthing_filter_by filter, ...);
 ```
-Gets the next bThing of given type, iterating registered ones. Returns `false` if the end of the enumerator is reached, or `true` otherwise.
+Gets the next filtered bThing, iterating registered ones. Returns `false` if the end of the enumerator is reached, or `true` otherwise.
 
 |Parameter||
 |--|--|
 |things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
-|type|The bThing type to take into account enumerating.|
+|filter|The filter type to use.|
+|<...>|The filter value.|
+### enum mgos_bthing_filter_by
+```c
+enum mgos_bthing_filter_by {
+  MGOS_BTHING_FILTER_BY_NOTHING = 0,
+  MGOS_BTHING_FILTER_BY_TYPE = 1,
+  MGOS_BTHING_FILTER_BY_DOMAIN = 2
+}
+```
+Filters used by `mgos_bthing_filter_get_next()` itherating registered bThings.
 ### (*mgos_bthing_get_state_handler_t)
 ```c
 typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t state, void *userdata);

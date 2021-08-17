@@ -34,9 +34,15 @@ struct mg_bthing_ctx *mg_bthing_context() {
 
 bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type) {
   if (thing && id && (strlen(id) > 0)) {
-    thing->id = strdup(id);
-    thing->type = type;
-    return true;
+    if (mgos_bthing_get_by_id(id, NULL) == NULL &&
+        !mgos_bthing_filter_get_next(&mgos_bthing_get_all(), NULL, MGOS_BTHING_FILTER_BY_DOMAIN, id)) {
+      thing->id = strdup(id);
+      thing->uid = NULL; 
+      thing->domain = NULL;
+      thing->type = type;
+      return true;
+    }
+    LOG(LL_ERROR, ("The '%s' ID has been already assigned or it is alredy in use as domain name.", id));
   }
   LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
   return false;
@@ -46,8 +52,24 @@ void mg_bthing_reset(struct mg_bthing *thing) {
   if (thing) {
     free(thing->id);
     thing->id = NULL;
+    free(thing->uid);
+    thing->uid = NULL;
+    free(thing->domain);
+    thing->domain = NULL;
     thing->type = 0;
   }
+}
+
+void mg_bthing_rebuild_uid(struct mg_bthing *thing) {
+  // rebuild a new UID
+  free(thing->uid);
+  const char dev_id = mgos_sys_config_get_device_id();
+  thing->uid = calloc(strlen(thing->id) + (thing->domain ? strlen(thing->domain) : 0) + strlen(dev_id) + 3, sizeof(char));
+  strcat(thing->uid, dev_id); strcat(thing->uid, ".");
+  if (thing->domain) {
+    strcat(thing->uid, thing->domain); strcat(thing->uid, ".");
+  }
+  strcat(thing->uid, thing->id);
 }
 
 #if MGOS_BTHING_HAVE_SENSORS
@@ -87,14 +109,14 @@ enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sen
       return MG_BTHING_STATE_RESULT_SUCCESS;
   }
   LOG(LL_ERROR, ("Error getting bThing '%s' state. The get-state handler returned 'false'.",
-    mgos_bthing_get_id(MG_BTHING_SENS_CAST4(thing))));
+    mgos_bthing_get_uid(MG_BTHING_SENS_CAST4(thing))));
   return MG_BTHING_STATE_RESULT_ERROR;
 }
 
 bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
   if (sens) {
     struct mg_bthing *t = MG_BTHING_SENS_CAST3(sens);
-    if (!t->id) {
+    if (!mgos_bthing_get_id(MG_BTHING_SENS_CAST4(sens))) {
       LOG(LL_ERROR, ("bSensor init failed. Invoke 'mg_bthing_init()' function first."));
       return false;
     }
@@ -160,7 +182,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   if (sens->getting_state_cb) {
     if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
       sens->is_updating -= 1;
-      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_id(thing)));
+      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
       return false;
     }
   }
@@ -244,7 +266,7 @@ int mg_bthing_update_states(int bthing_type, bool raise_event) {
       if (mgos_bthing_get_state(thing) != NULL) ++count;
     }
   } else {
-    while (mgos_bthing_typeof_get_next(&things, &thing, bthing_type)) {
+    while (mgos_bthing_filter_get_next(&things, &thing, MGOS_BTHING_FILTER_BY_TYPE, bthing_type)) {
       if (mgos_bthing_get_state(thing) != NULL) ++count;
     }
   }
@@ -300,7 +322,7 @@ enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_act
 bool mg_bthing_actu_init(struct mg_bthing_actu *actu, void *cfg) {
   if (actu) {
     struct mg_bthing *t = MG_BTHING_ACTU_CAST4(actu);
-    if (!t->id) {
+    if (!mgos_bthing_get_id(MG_BTHING_ACTU_CAST5(actu))) {
       LOG(LL_ERROR, ("bActuator init failed. Invoke 'mg_bthing_init()' function first."));
       return false;
     }
@@ -350,7 +372,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
       return true;
     }
   }
-  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_id(thing) : "")));
+  LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));
   return false;
 }
 

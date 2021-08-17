@@ -5,8 +5,33 @@
 #include "mjs.h"
 #endif
 
+const char *mgos_bthing_get_uid(mgos_bthing_t thing) {
+  if (!thing) return NULL;
+  struct mg_bthing *t = MG_BTHING_CAST1(thing);
+  if (!t->uid) mg_bthing_rebuild_uid(t);
+  return t->uid;
+}
+
 const char *mgos_bthing_get_id(mgos_bthing_t thing) {
   return (thing ? MG_BTHING_CAST1(thing)->id : NULL);
+}
+
+const char *mgos_bthing_get_domain(mgos_bthing_t thing) {
+  return (thing ? MG_BTHING_CAST1(thing)->domain : NULL);
+}
+
+bool mgos_bthing_set_domain(mgos_bthing_t thing, const char *domain) {
+  if (domain && (mgos_bthing_get_by_id(domain, NULL) != NULL)) {
+    LOG(LL_ERROR, ("Invalid '%s' domain name for '%s'. The value is already used as ID.",
+      domain, mgos_bthing_get_uid(thing)));
+    return false;
+  }
+  struct mg_bthing *t = MG_BTHING_CAST1(thing);
+  if (t) {
+    free(t->domain);
+    t->domain = domain ? strdup(domain) : NULL;
+    mg_bthing_rebuild_uid(t);
+  }
 }
 
 int mgos_bthing_get_type(mgos_bthing_t thing) {
@@ -17,11 +42,27 @@ bool mgos_bthing_is_typeof(mgos_bthing_t thing, int type) {
   return ((mgos_bthing_get_type(thing) & type) == type);
 }
 
-mgos_bthing_t mgos_bthing_get(const char* id) {
+mgos_bthing_t mgos_bthing_get_by_uid(const char* uid) {
+  if (uid) {
+    struct mg_bthing_enum *things = &(mg_bthing_context()->things);
+    while (things && things->thing) {
+      if (0 == strcasecmp(id, mgos_bthing_get_uid(things->thing))) return things->thing;
+      things = things->next_item;
+    }
+  }
+  return NULL;
+}
+
+mgos_bthing_t mgos_bthing_get_by_id(const char* id, const char *domain) {
   if (id) {
     struct mg_bthing_enum *things = &(mg_bthing_context()->things);
     while (things && things->thing) {
-      if (0 == strcasecmp(id, MG_BTHING_CAST1(things->thing)->id)) return things->thing;
+      if (0 == strcasecmp(id, mgos_bthing_get_id(things->thing))) {
+        const char *dom = mgos_bthing_get_domain(things->thing);
+        if ((dom && domain && (strcasecmp(dom, domain) == 0)) ||(!dom && !domain)) {
+          return things->thing;
+        }
+      } 
       things = things->next_item;
     }
   }
@@ -43,10 +84,30 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
   }
 }
 
-bool mgos_bthing_typeof_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing, int type) {
+bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
+                                 enum mgos_bthing_filter_by filter, ...) {
   if (!mgos_bthing_get_next(things_enum, thing)) return false;
-  if (mgos_bthing_is_typeof(*thing, type)) return true;
-  return mgos_bthing_typeof_get_next(things_enum, thing, type);
+  switch (filter)
+  {
+    case MGOS_BTHING_FILTER_BY_NOTHING:
+      break;
+    case MGOS_BTHING_FILTER_BY_TYPE: {
+      int type = va_arg(ap, int);
+      if (!mgos_bthing_is_typeof(*thing, type))
+        return mgos_bthing_filter_get_next(things_enum, thing, filter, type);
+      break;
+    }
+    case MGOS_BTHING_FILTER_BY_DOMAIN: {
+      const char *dom = va_arg(ap, const char *);
+      const char *my_dom = mgos_bthing_get_domain(*thing)
+      if ((!dom && my_dom) || (dom && !my_dom) || (dom && my_dom && (strcasecmp(dom, my_dom) != 0)) ) 
+        return mgos_bthing_filter_get_next(things_enum, thing, filter, dom);
+      break;
+    }
+    default:
+      return false;
+  };
+  return true;
 }
 
 #if MGOS_BTHING_HAVE_SENSORS
@@ -61,7 +122,7 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
       sens->get_state_ud = (get_state_cb ? userdata : NULL);
       return true;
     }
-    LOG(LL_ERROR, ("The get-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
+    LOG(LL_ERROR, ("The get-state handler of bThing '%s' is already configured.", mgos_bthing_get_uid(thing)));
   }
   return false;
 }
@@ -116,7 +177,7 @@ bool mgos_bthing_on_set_state(mgos_bthing_t thing,
       actu->set_state_ud = (set_state_cb ? userdata : NULL);
       return true;
     }
-    LOG(LL_ERROR, ("The set-state handler of bThing '%s' is already configured.", mgos_bthing_get_id(thing)));
+    LOG(LL_ERROR, ("The set-state handler of bThing '%s' is already configured.", mgos_bthing_get_uid(thing)));
   }
   return false;
 }

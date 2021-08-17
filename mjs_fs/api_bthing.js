@@ -2,7 +2,7 @@ let bThing = {
   _free: ffi('void free(void *)'),
   _gty: ffi('int mgos_bthing_get_type(void *)'),
   _tof: ffi('bool mgos_bthing_is_typeof(void *, int)'),
-  _gid: ffi('char *mgos_bthing_get_id(void *)'),
+  _gid: ffi('char *mgos_bthing_get_uid(void *)'),
 
   _getSafe: function(obj, val) {
   	return ((obj === null || obj === undefined) ? val : obj);
