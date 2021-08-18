@@ -19,6 +19,7 @@
 #define MG_BTHING_SDK_H_
 
 #include <stdbool.h>
+#include <stdarg.h>
 #include "mgos_bthing.h"
 
 #ifdef __cplusplus
@@ -199,6 +200,8 @@ int mg_bthing_path_indexof(const char *path, int path_len, char sep, const char 
 
 int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
                                int seg_idx, const char **seg_val);
+
+char *mgos_bthing_sjoin(const char *sep, int count, ...);
 
 #ifdef __cplusplus
 }

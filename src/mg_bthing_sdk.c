@@ -526,3 +526,25 @@ int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
   if (seg_val) *seg_val = NULL;
   return 0;
 }
+
+char *mgos_bthing_sjoin(const char *sep, int count, ...) {
+  if (count <= 0) return NULL;
+  
+  const char *list[count];
+  int size = (sep ? count : 1);
+  
+  va_list ap;
+  va_start(ap, count);
+  for (int i = 0; i < count; ++i) {
+    list[i] = va_arg(ap, const char*);
+    size += strlen(list[i] );
+  }
+  va_end(ap);
+  
+  char *buf = calloc(size, sizeof(char));
+  for (int i = 0; i < count; ++i) {
+    if ((i > 0) && sep) strcat(buf, sep);
+    strcat(buf, list[i]);
+  }
+  return buf;
+}
