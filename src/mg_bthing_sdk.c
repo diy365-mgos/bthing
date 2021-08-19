@@ -502,8 +502,8 @@ int mg_bthing_path_indexof(const char *path, int path_len, char sep, const char 
   return -1;
 }
 
-int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
-                               int seg_idx, const char **seg_val) {
+bool mg_bthing_path_get_segment(const char *path, int path_len, char sep,
+                               int seg_idx, const char **seg_val, int *seg_len) {
   if (path && (seg_idx >= 0)) {
     char *p1 = (char *)path;
     char *p2 = p1;
@@ -512,7 +512,8 @@ int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
       if (path[i] == sep) {
         if (c == seg_idx) {
           if (seg_val) *seg_val = p1;
-          return (p2 - p1);
+          if (seg_len) *seg_len = (p2 - p1);
+          return true;
         }
         p1 = (p2 + 1);
         ++c;
@@ -520,11 +521,13 @@ int mg_bthing_path_get_segment(const char *path, int path_len, char sep,
     }
     if (c == seg_idx) {
       if (seg_val) *seg_val = p1;
-      return (p2 - p1);
+      if (seg_len) *seg_len = (p2 - p1);
+      return true;
     }
   }
   if (seg_val) *seg_val = NULL;
-  return 0;
+  if (seg_len) *seg_len = 0;
+  return false;
 }
 
 char *mgos_bthing_sjoin(const char *sep, int count, ...) {
