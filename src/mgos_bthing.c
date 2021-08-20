@@ -144,14 +144,14 @@ bool mgos_bthing_update_state(mgos_bthing_t thing) {
 }
 
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
-  int count = 0;
   int thing_type;
   const char *thing_dom;
 
   va_list ap;
   va_start(ap, filter);
-  switch (filter)
-  {
+  switch (filter) {
+    case MGOS_BTHING_FILTER_BY_NOTHING:
+      break;
     case MGOS_BTHING_FILTER_BY_TYPE:
       thing_type = va_arg(ap, int);
       break;
@@ -161,18 +161,18 @@ int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
   };
   va_end(ap);
 
+  int count = 0;
   mgos_bthing_t thing;
   mgos_bthing_enum_t things = mgos_bthing_get_all();
   while(1) {
-    switch (filter)
-    {
+    switch (filter) {
       case MGOS_BTHING_FILTER_BY_NOTHING:
         if (!mgos_bthing_get_next(&things, &thing)) return count;
         break;
-      case MGOS_BTHING_FILTER_BY_TYPE: {
+      case MGOS_BTHING_FILTER_BY_TYPE:
         if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_type)) return count;
         break;
-      case MGOS_BTHING_FILTER_BY_DOMAIN: {
+      case MGOS_BTHING_FILTER_BY_DOMAIN:
         if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_dom)) return count;
         break;
       default:
