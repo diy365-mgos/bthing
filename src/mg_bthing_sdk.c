@@ -251,6 +251,51 @@ bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
   return ret;
 }
 
+int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {
+  int thing_type;
+  const char *thing_dom;
+
+  switch (filter) {
+    case MGOS_BTHING_FILTER_BY_NOTHING:
+      break;
+    case MGOS_BTHING_FILTER_BY_TYPE:
+      thing_type = va_arg(ap, int);
+      break;
+    case MGOS_BTHING_FILTER_BY_DOMAIN:
+      thing_dom = va_arg(ap, const char *);
+      break;
+  };
+
+  int count = 0;
+  mgos_bthing_t thing;
+  mgos_bthing_enum_t things = mgos_bthing_get_all();
+  while(1) {
+    switch (filter) {
+      case MGOS_BTHING_FILTER_BY_NOTHING:
+        if (!mgos_bthing_get_next(&things, &thing)) return count;
+        break;
+      case MGOS_BTHING_FILTER_BY_TYPE:
+        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_type)) return count;
+        break;
+      case MGOS_BTHING_FILTER_BY_DOMAIN:
+        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_dom)) return count;
+        break;
+      default:
+        return 0;
+    };
+    if (mg_bthing_update_state(thing, raise_event)) ++count;
+  }
+  return 0;
+}
+
+int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...) {
+  va_list ap;
+  va_start(ap, filter);
+  int count = mg_bthing_update_states_ap(raise_event, filter, ap);
+  va_end(ap);
+  return count;
+}
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS

@@ -144,63 +144,11 @@ bool mgos_bthing_update_state(mgos_bthing_t thing) {
 }
 
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
-  int thing_type;
-  const char *thing_dom;
-
   va_list ap;
   va_start(ap, filter);
-  switch (filter) {
-    case MGOS_BTHING_FILTER_BY_NOTHING:
-      break;
-    case MGOS_BTHING_FILTER_BY_TYPE:
-      thing_type = va_arg(ap, int);
-      break;
-    case MGOS_BTHING_FILTER_BY_DOMAIN:
-      thing_dom = va_arg(ap, const char *);
-      break;
-  };
+  int count = mg_bthing_update_states_ap(true, filter, ap);
   va_end(ap);
-
-  int count = 0;
-  mgos_bthing_t thing;
-  mgos_bthing_enum_t things = mgos_bthing_get_all();
-  while(1) {
-    switch (filter) {
-      case MGOS_BTHING_FILTER_BY_NOTHING:
-        if (!mgos_bthing_get_next(&things, &thing)) return count;
-        break;
-      case MGOS_BTHING_FILTER_BY_TYPE:
-        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_type)) return count;
-        break;
-      case MGOS_BTHING_FILTER_BY_DOMAIN:
-        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_dom)) return count;
-        break;
-      default:
-        return 0;
-    };
-    if (mg_bthing_update_state(thing, true)) ++count;
-  }
-  return 0;
-}
-
-void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
-                          mgos_event_handler_t handler, void *userdata) {
-  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  if (sens) {
-    struct mg_bthing_on_event_handler *stc = sens->on_event;
-    while (stc) {
-      if (stc->event == ev && stc->handler == handler && stc->userdata == userdata) return;
-      stc = stc->next;
-    }
- 
-    stc = calloc(1, sizeof(struct mg_bthing_on_event_handler));
-    stc->event = ev;
-    stc->handler = handler;
-    stc->userdata = userdata;
-
-    if (sens->on_event) stc->next = sens->on_event;
-    sens->on_event = stc;
-  }
+  return count;
 }
 
 #endif // MGOS_BTHING_HAVE_SENSORS
