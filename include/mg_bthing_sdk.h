@@ -164,7 +164,6 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
 
 bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event);
-int mg_bthing_update_states(int bthing_type, bool raise_event);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 

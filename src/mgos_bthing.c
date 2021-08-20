@@ -143,8 +143,44 @@ bool mgos_bthing_update_state(mgos_bthing_t thing) {
   return mg_bthing_update_state(thing, true);
 }
 
-int mgos_bthing_update_states(int bthing_type) {
-  return mg_bthing_update_states(bthing_type, true);
+int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
+  int count = 0;
+  int thing_type;
+  const char *thing_dom;
+
+  va_list ap;
+  va_start(ap, filter);
+  switch (filter)
+  {
+    case MGOS_BTHING_FILTER_BY_TYPE:
+      thing_type = va_arg(ap, int);
+      break;
+    case MGOS_BTHING_FILTER_BY_DOMAIN:
+      thing_dom = va_arg(ap, const char *);
+      break;
+  };
+  va_end(ap);
+
+  mgos_bthing_t thing;
+  mgos_bthing_enum_t things = mgos_bthing_get_all();
+  while(1) {
+    switch (filter)
+    {
+      case MGOS_BTHING_FILTER_BY_NOTHING:
+        if (!mgos_bthing_get_next(&things, &thing)) return count;
+        break;
+      case MGOS_BTHING_FILTER_BY_TYPE: {
+        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_type)) return count;
+        break;
+      case MGOS_BTHING_FILTER_BY_DOMAIN: {
+        if (!mgos_bthing_filter_get_next(&things, &thing, filter, thing_dom)) return count;
+        break;
+      default:
+        return 0;
+    };
+    if (mg_bthing_update_state(thing, true)) ++count;
+  }
+  return 0;
 }
 
 void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,

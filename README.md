@@ -190,7 +190,7 @@ Gets the next filtered bThing, iterating registered ones. Returns `false` if the
 |--|--|
 |things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
-|filter|The filter type to use.|
+|filter|The filter type to apply.|
 |<...>|The filter value.|
 ### enum mgos_bthing_filter_by
 ```c
@@ -223,13 +223,14 @@ Updates the state of a bThing sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHIN
 |thing|A bThing sensor/actuator.|
 ### mgos_bthing_update_states
 ```c
-int mgos_bthing_update_states(int bthing_type);
+int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
 ```
-Updates the state of all bThings of type `bthing_type`. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`. Returns the count of successfully updated states.
+Updates the state of all bThings matching the provided filter. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`. Returns the count of successfully updated states.
 
 |Parameter||
 |--|--|
-|bthing_type|The type of bThings or `MGOS_BTHING_TYPE_ANY`.|
+|filter|The filter type to apply.|
+|<...>|The filter value.|
 ### mgos_bthing_on_get_state
 ```c
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,

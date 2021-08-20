@@ -251,26 +251,6 @@ bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
   return ret;
 }
 
-int mg_bthing_update_states(int bthing_type, bool raise_event) {
-  int count = 0;
-  mgos_bthing_t thing;
-  
-  if (raise_event) mg_bthing_context()->raise_state_updated = true;
-  mgos_bthing_enum_t things = mgos_bthing_get_all();
-  if (bthing_type == MGOS_BTHING_TYPE_ANY) {
-    while(mgos_bthing_get_next(&things, &thing)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  } else {
-    while (mgos_bthing_filter_get_next(&things, &thing, MGOS_BTHING_FILTER_BY_TYPE, bthing_type)) {
-      if (mgos_bthing_get_state(thing) != NULL) ++count;
-    }
-  }
-  if (raise_event) mg_bthing_context()->raise_state_updated = false;
-  return count;
-}
-
-
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
