@@ -151,6 +151,26 @@ int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
   return count;
 }
 
+void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
+                          mgos_event_handler_t handler, void *userdata) {
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
+  if (sens) {
+    struct mg_bthing_on_event_handler *stc = sens->on_event;
+    while (stc) {
+      if (stc->event == ev && stc->handler == handler && stc->userdata == userdata) return;
+      stc = stc->next;
+    }
+ 
+    stc = calloc(1, sizeof(struct mg_bthing_on_event_handler));
+    stc->event = ev;
+    stc->handler = handler;
+    stc->userdata = userdata;
+
+    if (sens->on_event) stc->next = sens->on_event;
+    sens->on_event = stc;
+  }
+}
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
