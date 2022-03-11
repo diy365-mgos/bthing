@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "mgos_event.h"
 #include "mgos_bvar.h"
+#include "mgos_bthing_types.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,10 +37,6 @@ typedef struct mg_bthing *mgos_bthing_t;
 
 /* bThings enumerator returned by mgos_bthing_get_all() */
 typedef struct mg_bthing_enum *mgos_bthing_enum_t;
-
-#define MGOS_BTHING_TYPE_ANY 0
-#define MGOS_BTHING_TYPE_SENSOR 1
-#define MGOS_BTHING_TYPE_ACTUATOR 3
 
 #ifdef MGOS_BTHING_HAVE_ACTUATOR 
 #define MGOS_BTHING_HAVE_SENSORS 1
