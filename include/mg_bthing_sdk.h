@@ -158,7 +158,13 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
+// Returns the readonly raw instance of the bThing's state
 mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing);
+
+// Returns the updatable instance of the bThing's state.
+// Use this API to change the state and ensure
+// update/change events are triggered.
+mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing);
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);

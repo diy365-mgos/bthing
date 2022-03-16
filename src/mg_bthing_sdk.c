@@ -232,8 +232,16 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   return true;
 }
 
+// Returns the readonly raw instance of the bThing's state
 mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
   return (mgos_bvarc_t)(thing ? MG_BTHING_SENS_CAST1(thing)->state : NULL);
+}
+
+// Returns the updatable instance of the bThing's state.
+// Use this API to change the state and ensure
+// update/change events are triggered.
+mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing) {
+  return (mgos_bvarc_t)(thing ? MG_BTHING_SENS_CAST1(thing)->tmp_state : NULL);
 }
 
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *thing, 
