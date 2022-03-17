@@ -119,7 +119,7 @@ void mgos_bthing_make_private(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_is_private(mgos_bthing_t thing) {
-  return mg_bthing_has_flag(mgos_bthing_t thing, MG_BTHING_FLAG_ISPRIVATE);
+  return mg_bthing_has_flag(thing, MG_BTHING_FLAG_ISPRIVATE);
 }
 
 #if MGOS_BTHING_HAVE_SENSORS
