@@ -107,6 +107,10 @@ bool mgos_bthing_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing)
  */
 bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t *thing,
                                  enum mgos_bthing_filter_by filter, ...);
+
+void mgos_bthing_make_private(mgos_bthing_t thing);
+bool mgos_bthing_is_private(mgos_bthing_t thing);
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 enum mgos_bthing_state_flag {

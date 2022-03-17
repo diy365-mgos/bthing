@@ -114,6 +114,14 @@ bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
   return false;
 }
 
+void mgos_bthing_make_private(mgos_bthing_t thing) {
+  mg_bthing_set_flag(thing, MG_BTHING_FLAG_ISPRIVATE);
+}
+
+bool mgos_bthing_is_private(mgos_bthing_t thing) {
+  return mg_bthing_has_flag(mgos_bthing_t thing, MG_BTHING_FLAG_ISPRIVATE);
+}
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,

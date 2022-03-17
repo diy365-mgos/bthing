@@ -50,6 +50,7 @@ bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type, const cha
     thing->uid = NULL; 
     thing->domain = (domain ? strdup(domain) : NULL);
     thing->type = type;
+    thing->flags = MG_BTHING_FLAG_NONE;
     return true;
   }
   LOG(LL_ERROR, ("Error initializing the bThing '%s'. Invalid 'thing' or 'id' parameters.", (id ? id : "")));
@@ -65,7 +66,16 @@ void mg_bthing_reset(struct mg_bthing *thing) {
     free(thing->domain);
     thing->domain = NULL;
     thing->type = 0;
+    thing->flags = MG_BTHING_FLAG_NONE;
   }
+}
+
+void mg_bthing_set_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag) {
+  if (thing) { MG_BTHING_CAST1(thing)->flags |= flag; }
+}
+
+bool mg_bthing_has_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag) {
+  return (thing ? ((MG_BTHING_CAST1(thing)->flags & flag) == flag) : false);
 }
 
 #if MGOS_BTHING_HAVE_SENSORS

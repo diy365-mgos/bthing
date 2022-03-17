@@ -32,11 +32,17 @@ enum MG_BTHING_STATE_RESULT {
   MG_BTHING_STATE_RESULT_UNHANDLED
 };
 
+enum MG_BTHING_FLAG {
+  MG_BTHING_FLAG_NONE = 0,        // 0000-0000
+  MG_BTHING_FLAG_ISPRIVATE = 1    // 0000-0001
+};
+
 struct mg_bthing {
   char *uid;
   char *id;
   char *domain;
   int type;
+  char flags;
 };
 
 /*****************************************
@@ -151,6 +157,9 @@ struct mg_bthing_ctx *mg_bthing_context();
 bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type, const char *domain);
 
 void mg_bthing_reset(struct mg_bthing *thing);
+
+void mg_bthing_set_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag);
+bool mg_bthing_has_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
