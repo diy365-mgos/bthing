@@ -70,11 +70,11 @@ void mg_bthing_reset(struct mg_bthing *thing) {
   }
 }
 
-void mg_bthing_set_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag) {
+void mg_bthing_set_flag(mgos_bthing_t thing, enum mg_bthing_flag flag) {
   if (thing) { MG_BTHING_CAST1(thing)->flags |= flag; }
 }
 
-bool mg_bthing_has_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag) {
+bool mg_bthing_has_flag(mgos_bthing_t thing, enum mg_bthing_flag flag) {
   return (thing ? ((MG_BTHING_CAST1(thing)->flags & flag) == flag) : false);
 }
 
@@ -105,7 +105,7 @@ mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing) {
 }
 /*****************************************/
 
-enum MG_BTHING_STATE_RESULT mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
+enum mg_bthing_state_result mg_bthing_sens_getting_state_cb(struct mg_bthing_sens *thing,
                                                             mgos_bvar_t state,
                                                             void *userdata) {
   if (thing) {
@@ -346,7 +346,7 @@ struct mg_bthing *MG_BTHING_ACTU_CAST4(struct mg_bthing_actu *thing) {
 mgos_bthing_t MG_BTHING_ACTU_CAST5(struct mg_bthing_actu *thing) { return MG_BTHING_CAST1(MG_BTHING_ACTU_CAST4(thing)); }
 /*****************************************/
 
-enum MG_BTHING_STATE_RESULT mg_bthing_actu_setting_state_cb(struct mg_bthing_actu *thing,
+enum mg_bthing_state_result mg_bthing_actu_setting_state_cb(struct mg_bthing_actu *thing,
                                                             mgos_bvarc_t state,
                                                             void *userdata) {
   if (thing) {
@@ -401,7 +401,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
       return true;
     } 
 
-    enum MG_BTHING_STATE_RESULT res = (!actu->setting_state_cb ? 
+    enum mg_bthing_state_result res = (!actu->setting_state_cb ? 
       MG_BTHING_STATE_RESULT_UNHANDLED : actu->setting_state_cb(actu, state, actu->set_state_ud));
     
     if (res == MG_BTHING_STATE_RESULT_UNHANDLED)

@@ -26,13 +26,13 @@
 extern "C" {
 #endif
 
-enum MG_BTHING_STATE_RESULT {
+enum mg_bthing_state_result {
   MG_BTHING_STATE_RESULT_ERROR,
   MG_BTHING_STATE_RESULT_SUCCESS,
   MG_BTHING_STATE_RESULT_UNHANDLED
 };
 
-enum MG_BTHING_FLAG {
+enum mg_bthing_flag {
   MG_BTHING_FLAG_NONE = 0,        // 0000-0000
   MG_BTHING_FLAG_ISPRIVATE = 1    // 0000-0001
 };
@@ -59,7 +59,7 @@ struct mg_bthing *MG_BTHING_CAST1(mgos_bthing_t thing);
 #if MGOS_BTHING_HAVE_SENSORS
 
 struct mg_bthing_sens;
-typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
+typedef enum mg_bthing_state_result (*mg_bthing_getting_state_handler_t)(struct mg_bthing_sens *thing,
                                                                          mgos_bvar_t state,
                                                                          void *userdata);
 
@@ -106,7 +106,7 @@ mgos_bthing_t MG_BTHING_SENS_CAST4(struct mg_bthing_sens *thing);
 #if MGOS_BTHING_HAVE_ACTUATORS
 
 struct mg_bthing_actu;
-typedef enum MG_BTHING_STATE_RESULT (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing,
+typedef enum mg_bthing_state_result (*mg_bthing_setting_state_handler_t)(struct mg_bthing_actu *thing,
                                                                          mgos_bvarc_t state,
                                                                          void *userdata);
 
@@ -158,8 +158,8 @@ bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type, const cha
 
 void mg_bthing_reset(struct mg_bthing *thing);
 
-void mg_bthing_set_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag);
-bool mg_bthing_has_flag(mgos_bthing_t thing, enum MG_BTHING_FLAG flag);
+void mg_bthing_set_flag(mgos_bthing_t thing, enum mg_bthing_flag flag);
+bool mg_bthing_has_flag(mgos_bthing_t thing, enum mg_bthing_flag flag);
 
 #if MGOS_BTHING_HAVE_SENSORS
 
