@@ -5,7 +5,7 @@ Mongoose OS core library for the bThings ecosystem.
 |--|--|--|
 |[bSensors](https://github.com/diy365-mgos/bsensor), [bBinarySensors](https://github.com/diy365-mgos/bbinsensor), [bButtons](https://github.com/diy365-mgos/bbutton)|[bActuators](https://github.com/diy365-mgos/bactuator), [bBinaryActuators](https://github.com/diy365-mgos/bbinactuator), [bSwitches](https://github.com/diy365-mgos/bswitch)|[MQTT support](https://github.com/diy365-mgos/bthing-mqtt), [State-shadow suport](https://github.com/diy365-mgos/bthing-shadow), [GPIO support](https://github.com/diy365-mgos/bthing-gpio)|
 ## C/C++ APIs Reference
-### enum mgos_bthing_event
+### mgos_bthing_event
 ```c
 enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED,
@@ -65,7 +65,7 @@ This struct inherits from `struct mgos_bthing_state`, so it can be casted to it.
 struct mgos_bthing_state_change arg;
 struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 ```
-### enum mgos_bthing_state_flag
+### mgos_bthing_state_flag
 ```c
 enum mgos_bthing_state_flag {
   MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 00000
@@ -192,7 +192,7 @@ Gets the next filtered bThing, iterating registered ones. Returns `false` if the
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
 |filter|The filter type to apply.|
 |<...>|The filter value.|
-### enum mgos_bthing_filter_by
+### mgos_bthing_filter_by
 ```c
 enum mgos_bthing_filter_by {
   MGOS_BTHING_FILTER_BY_NOTHING = 0,
@@ -297,7 +297,7 @@ Adds en event handler for the bThing. If the handler (*ev + handler + userdata*)
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|ev|The [event](#mgos_bthing_event).|
+|ev|The [event](/#mgos_bthing_event).|
 |handler|The event handler to add (see [mgos_event_handler_t](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_handler_t)).|
 |userdata|The handler's *user-data* or `NULL`.|
 ### mgos_bthing_make_private
