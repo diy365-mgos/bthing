@@ -14,7 +14,10 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_STATE_UPDATED
 };
 ```
-Events triggered by a bThing. Use [mgos_event_add_handler()](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_handler) or [mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, ...)](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_group_handler) for subscribing to them.
+Events triggered by a bThing. Use following functions to subscribe to these events:
+* [mgos_event_add_handler()](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_handler)
+* [mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, ...)](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_group_handler)
+* [mgos_bthing_on_event()](https://github.com/diy365-mgos/bthing#mgos_bthing_on_event)
 
 |Event||
 |--|--|
@@ -297,7 +300,7 @@ Adds en event handler for the bThing. If the handler (*ev + handler + userdata*)
 |Parameter||
 |--|--|
 |thing|A bThing.|
-|ev|The [event](/#mgos_bthing_event).|
+|ev|The [event](#mgos_bthing_event).|
 |handler|The event handler to add (see [mgos_event_handler_t](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_handler_t)).|
 |userdata|The handler's *user-data* or `NULL`.|
 ### mgos_bthing_make_private
