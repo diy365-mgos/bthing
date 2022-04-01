@@ -165,7 +165,7 @@ void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
   if (sens) {
     struct mg_bthing_on_event_handler *stc = sens->on_event;
     while (stc) {
-      if (stc->event == ev && stc->handler == handler && stc->userdata == userdata) return;
+      if (((stc->event & ev) == ev) && (stc->handler == handler) && (stc->userdata == userdata)) return;
       stc = stc->next;
     }
  

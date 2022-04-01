@@ -173,7 +173,7 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
 static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bthing_event ev, void *args) {
   struct mg_bthing_on_event_handler *h = sens->on_event;
   while (h) {
-    if (h->event == ev) {
+    if ((h->event & ev) == ev) {
       h->handler(ev, args, h->userdata);
     }
     h = h->next;
@@ -203,6 +203,9 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = mgos_bvar_is_null(sens->state);
   if (is_changed || is_init) {
+
+    LOG(LL_INFO, ("%s is%sCHANGED",mgos_bthing_get_id(thing), is_changed?" ":" NOT "));
+    LOG(LL_INFO, ("%s is%sINIT",mgos_bthing_get_id(thing), is_changed?" ":" NOT "));
 
     // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
