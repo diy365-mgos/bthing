@@ -255,9 +255,7 @@ mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
   return (mgos_bvarc_t)(sens ? sens->state : NULL);
 }
 
-// Returns the updatable instance of the bThing's state.
-// Use this API to change the state and ensure
-// update/change events are triggered.
+// Returns the updatable in-memory state of the bThing
 mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (sens && !mgos_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
@@ -400,6 +398,35 @@ void mg_bthing_actu_reset(struct mg_bthing_actu *actu) {
   }
 }
 
+// bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
+//   mgos_bthing_t thing = MG_BTHING_ACTU_CAST5(actu);
+//   if (actu && state) {
+//     struct mg_bthing_sens *sens = MG_BTHING_ACTU_CAST3(actu);
+    
+//     // compare the requested state with the sensor's state
+//     enum mgos_bvar_cmp_res cmp = mgos_bvar_cmp(state, sens->state);
+//     if ((cmp & MGOS_BVAR_CMP_RES_EQUAL) == MGOS_BVAR_CMP_RES_EQUAL && 
+//         (cmp == MGOS_BVAR_CMP_RES_EQUAL || (cmp & MGOS_BVAR_CMP_RES_MINOR) == MGOS_BVAR_CMP_RES_MINOR)) {
+//       // The requested and the sensor's state are equal, or
+//       // the requested state is contained (as exact copy) into the sensor's state.
+//       // So, nothing to do.
+//       return true;
+//     } 
+
+//     enum mg_bthing_state_result res = (!actu->setting_state_cb ? 
+//       MG_BTHING_STATE_RESULT_UNHANDLED : actu->setting_state_cb(actu, state, actu->set_state_ud));
+    
+//     if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
+//       return mgos_bvar_merge(state, sens->state);
+//     else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
+//       mg_bthing_update_state(thing, false);
+//       return true;
+//     }
+//   }
+//   LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));
+//   return false;
+// }
+
 bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
   mgos_bthing_t thing = MG_BTHING_ACTU_CAST5(actu);
   if (actu && state) {
@@ -418,9 +445,14 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
     enum mg_bthing_state_result res = (!actu->setting_state_cb ? 
       MG_BTHING_STATE_RESULT_UNHANDLED : actu->setting_state_cb(actu, state, actu->set_state_ud));
     
-    if (res == MG_BTHING_STATE_RESULT_UNHANDLED)
-      return mgos_bvar_merge(state, sens->state);
-    else if (res == MG_BTHING_STATE_RESULT_SUCCESS) {
+    if (res != MG_BTHING_STATE_RESULT_ERROR) {
+      if (res == MG_BTHING_STATE_RESULT_UNHANDLED) {
+        if (!mgos_bvar_merge(state, sens->state)) {
+          LOG(LL_ERROR, ("Error mergin the state value of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));
+          return false;
+        }
+      }
+
       mg_bthing_update_state(thing, false);
       return true;
     }
