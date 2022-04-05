@@ -234,6 +234,51 @@ Updates the state of all bThings matching the provided filter. This function is 
 |--|--|
 |filter|The filter type to apply.|
 |<...>|The filter value.|
+### mgos_bthing_updatable_state
+```c
+struct mgos_bthing_updatable_state {
+  mgos_bthing_t owner;
+  mgos_bvar_t value;
+};
+```
+Updatable in-memory state value of a bThing. It is used by [mgos_bthing_start_update_state()](#mgos_bthing_start_update_state) and [mgos_bthing_end_update_state()](#mgos_bthing_end_update_state) functions.
+
+|Field||
+|--|--|
+|owner|The bThing owner of the state.|
+|value|The updatable state value.|
+### mgos_bthing_start_update_state
+```c
+bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_updatable_state *state);
+```
+Gets the updatable in-memory state value of a bThing. Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|thing|A bThing sensor/actuator.|
+|state|Output in-memory [updatable state](#mgos_bthing_updatable_state).|
+
+**Remarks**
+
+The provided updatable in-memory state value can be updated using [bVar functions](https://github.com/diy365-mgos/bvar). The [mgos_bthing_end_update_state()](#mgos_bthing_end_update_state) function must be invoked to complete the state modification process.
+
+Example:
+```c
+struct mgos_bthing_updatable_state state;
+if (mgos_bthing_start_update_state(<thing_instance>, &state)) {
+  mgos_bvar_set_decimal(state.value, 36.72);
+  mgos_bthing_end_update_state(state);
+}
+```
+### mgos_bthing_end_update_state
+```c
+bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state);
+```
+Completes and closes the state update process initiated by the [mgos_bthing_start_update_state()](#mgos_bthing_start_update_state) function. Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
+
+|Parameter||
+|--|--|
+|state|The updated in-memory [updatable state](#mgos_bthing_updatable_state).|
 ### mgos_bthing_on_get_state
 ```c
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,

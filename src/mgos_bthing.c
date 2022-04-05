@@ -159,6 +159,26 @@ int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
   return count;
 }
 
+bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_updatable_state *state) {
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
+  if (thing && state && sens) {
+    state->owner = thing;
+    state->value = sens->tmp_state;
+    sens->tmp_state = NULL; // detach the state until mgos_bthing_end_update_state()
+    return true;
+  }
+  return false;
+}
+
+bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state) {
+  struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(state.owner);
+  if (sens && state.value) {
+    sens->tmp_state = state.value; // re-attach the state
+    return mg_bthing_update_state(state.owner, false);
+  }
+  return false;
+}
+
 void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
                           mgos_event_handler_t handler, void *userdata) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);

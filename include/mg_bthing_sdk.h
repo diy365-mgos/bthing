@@ -167,7 +167,7 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg);
 
 void mg_bthing_sens_reset(struct mg_bthing_sens *sens);
 
-// Returns the readonly raw instance of the bThing's state
+// Returns the readonly in-memory state of the bThing
 mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing);
 
 // Returns the updatable instance of the bThing's state.

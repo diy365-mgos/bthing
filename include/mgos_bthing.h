@@ -160,6 +160,15 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 bool mgos_bthing_update_state(mgos_bthing_t thing);
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
 
+struct mgos_bthing_updatable_state {
+  mgos_bthing_t owner;
+  mgos_bvar_t value;
+};
+
+bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_updatable_state *state);
+
+bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state);
+
 #endif // MGOS_BTHING_HAVE_SENSORS
 
 #if MGOS_BTHING_HAVE_ACTUATORS
