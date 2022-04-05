@@ -233,7 +233,13 @@ Updates the state of all bThings matching the provided filter. This function is 
 |Parameter||
 |--|--|
 |filter|The filter type to apply.|
-|<...>|The filter value.|
+|...|Dynamic filter value.|
+```c
+// Example 1: update all states
+mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_NOTHING);
+// Example 1: update all in "lights" domain states
+mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_DOMAIN, "lights");
+```
 ### mgos_bthing_updatable_state
 ```c
 struct mgos_bthing_updatable_state {
