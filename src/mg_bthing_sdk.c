@@ -266,10 +266,12 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 }
 
 bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
-  if (raise_event) mg_bthing_context()->raise_state_updated = true;
-  bool ret = (mgos_bthing_get_state(thing) != NULL);
-  if (raise_event) mg_bthing_context()->raise_state_updated = false;
-  return ret;
+  struct mg_bthing_ctx *ctx = mg_bthing_context();
+  bool prev_raise = ctx->raise_state_updated;
+  ctx->raise_state_updated = raise_event;
+  bool success = (mgos_bthing_get_state(thing) != NULL);
+  ctx->raise_state_updated = prev_raise;
+  return success;
 }
 
 int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {

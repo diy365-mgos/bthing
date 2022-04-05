@@ -194,7 +194,7 @@ Gets the next filtered bThing, iterating registered ones. Returns `false` if the
 |things_enum|A reference to a bThing enumerator returned by `mgos_bthing_get_all()`.|
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
 |filter|The filter type to apply.|
-|<...>|The filter value.|
+|...|Dynamic filter value.|
 ### mgos_bthing_filter_by
 ```c
 enum mgos_bthing_filter_by {
