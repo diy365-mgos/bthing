@@ -74,6 +74,10 @@ void mg_bthing_set_flag(mgos_bthing_t thing, enum mg_bthing_flag flag) {
   if (thing) { MG_BTHING_CAST1(thing)->flags |= flag; }
 }
 
+void mg_bthing_reset_flag(mgos_bthing_t thing, enum mg_bthing_flag flag) {
+  if (thing) { MG_BTHING_CAST1(thing)->flags &= ~flag; }
+}
+
 bool mg_bthing_has_flag(mgos_bthing_t thing, enum mg_bthing_flag flag) {
   return (thing ? ((MG_BTHING_CAST1(thing)->flags & flag) == flag) : false);
 }
@@ -134,7 +138,6 @@ bool mg_bthing_sens_init(struct mg_bthing_sens *sens, void *cfg) {
     sens->get_state_cb = NULL;
     sens->get_state_ud = NULL;
     sens->on_event = NULL;
-    sens->is_updating = 0;
     sens->state = mgos_bvar_new();
     sens->tmp_state = mgos_bvar_new();
     sens->cfg = cfg;
@@ -163,7 +166,6 @@ void mg_bthing_sens_reset(struct mg_bthing_sens *sens) {
     mg_bthing_on_event_handler_free(sens->on_event);
     sens->on_event = NULL;
 
-    sens->is_updating = 0;
     mgos_bvar_free(sens->state);
     mgos_bvar_free(sens->tmp_state);
     sens->state = NULL;
@@ -183,11 +185,13 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
 bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
   if (!thing) return false;
+  if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED)) return false;
+  if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) return false;
 
-  sens->is_updating += 1;
+  mg_bthing_set_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
   if (sens->getting_state_cb) {
     if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
-      sens->is_updating -= 1;
+      mg_bthing_reset_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
       return false;
     }
@@ -241,7 +245,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     mgos_bvar_set_unchanged(sens->state);
   }
 
-  sens->is_updating -= 1;
+  mg_bthing_reset_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
   return true;
 }
 
@@ -440,6 +444,7 @@ bool mg_bthing_register(mgos_bthing_t thing) {
     things->next_item = new_item;
   }
   things->thing = thing;
+  mg_bthing_set_flag(thing, MG_BTHING_FLAG_REGISTERED);
   mgos_event_trigger(MGOS_EV_BTHING_CREATED, thing);
   return true;
 }

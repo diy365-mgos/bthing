@@ -138,8 +138,15 @@ bool mgos_bthing_on_get_state(mgos_bthing_t thing,
 bool mg_bthing_get_state(struct mg_bthing_sens *);
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
+  bool get_ok = false;
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  bool get_ok = (!sens ? false : (sens->is_updating == 0 ? mg_bthing_get_state(sens) : true));
+  if (thing && sens) {
+    if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
+      get_ok = true;
+    } else {
+      get_ok = mg_bthing_get_state(sens);
+    }
+  }
   return (get_ok ? MGOS_BVAR_CONST(sens->state) : NULL);
 }
 

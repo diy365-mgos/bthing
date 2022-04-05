@@ -33,8 +33,10 @@ enum mg_bthing_state_result {
 };
 
 enum mg_bthing_flag {
-  MG_BTHING_FLAG_NONE = 0,        // 0000-0000
-  MG_BTHING_FLAG_ISPRIVATE = 1    // 0000-0001
+  MG_BTHING_FLAG_NONE = 0,            // 0000-0000
+  MG_BTHING_FLAG_ISPRIVATE = 1,       // 0000-0001
+  MG_BTHING_FLAG_REGISTERED = 2,      // 0000-0010
+  MG_BTHING_FLAG_STATE_UPDATING = 4   // 0000-0100
 };
 
 struct mg_bthing {
@@ -77,7 +79,6 @@ struct mg_bthing_sens {
   mgos_bthing_get_state_handler_t get_state_cb;
   void *get_state_ud;
   struct mg_bthing_on_event_handler *on_event;
-  unsigned char is_updating;
   mgos_bvar_t state;
   mgos_bvar_t tmp_state;
 };
@@ -159,6 +160,7 @@ bool mg_bthing_init(struct mg_bthing *thing, const char *id, int type, const cha
 void mg_bthing_reset(struct mg_bthing *thing);
 
 void mg_bthing_set_flag(mgos_bthing_t thing, enum mg_bthing_flag flag);
+void mg_bthing_reset_flag(mgos_bthing_t thing, enum mg_bthing_flag flag);
 bool mg_bthing_has_flag(mgos_bthing_t thing, enum mg_bthing_flag flag);
 
 #if MGOS_BTHING_HAVE_SENSORS
