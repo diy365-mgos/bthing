@@ -195,6 +195,16 @@ Gets the next filtered bThing, iterating registered ones. Returns `false` if the
 |thing|The output bThing. Optional, if `NULL` no bThing is returned as output.|
 |filter|The filter type to apply.|
 |...|Dynamic filter value.|
+
+Examples:
+```c
+// Example #1 - Loop on all instances
+mgos_bthing_filter_get_next(things_enum, thing, MGOS_BTHING_FILTER_BY_NOTHING);
+// Example #2 - Loop on all in "lights" domain instances
+mgos_bthing_filter_get_next(things_enum, thing, MGOS_BTHING_FILTER_BY_DOMAIN, "lights");
+// Example #3 - Loop on all bSwitches
+mgos_bthing_filter_get_next(things_enum, thing, MGOS_BTHING_FILTER_BY_TYPE, MGOS_BSWITCH_TYPE);
+```
 ### mgos_bthing_filter_by
 ```c
 enum mgos_bthing_filter_by {
@@ -234,11 +244,15 @@ Updates the state of all bThings matching the provided filter. This function is 
 |--|--|
 |filter|The filter type to apply.|
 |...|Dynamic filter value.|
+
+Examples:
 ```c
-// Example 1: update all states
+// Example #1 - Update all states
 mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_NOTHING);
-// Example 1: update all in "lights" domain states
+// Example #2 - Update all in "lights" domain states
 mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_DOMAIN, "lights");
+// Example #3 - Update the state of all bSwitches
+mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_TYPE, MGOS_BSWITCH_TYPE);
 ```
 ### mgos_bthing_updatable_state
 ```c
@@ -271,7 +285,7 @@ The provided updatable in-memory state value can be updated using [bVar function
 Example:
 ```c
 struct mgos_bthing_updatable_state state;
-if (mgos_bthing_start_update_state(<thing_instance>, &state)) {
+if (mgos_bthing_start_update_state(thing, &state)) {
   mgos_bvar_set_decimal(state.value, 36.72);
   mgos_bthing_end_update_state(state);
 }
