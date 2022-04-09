@@ -258,7 +258,7 @@ mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
 // Returns the updatable in-memory state of the bThing
 mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  if (sens && !mgos_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
+  if (sens && !mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
     return sens->tmp_state;
   }
   return NULL;
