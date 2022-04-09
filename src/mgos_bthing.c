@@ -167,7 +167,7 @@ bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_upda
     state->value = mg_bthing_get_state_4update(thing);
     if (state->value != NULL) {
       state->owner = thing;
-      mg_bthing_set_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING);
+      mg_bthing_set_flag(state->owner, MG_BTHING_FLAG_STATE_UPDATING);
       return true;
     }
   }
