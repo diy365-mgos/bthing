@@ -177,7 +177,7 @@ bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_upda
 bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state) {
   if (state.owner && state.value) {
     if (mgos_bthing_has_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING)) {
-      mgos_bthing_reset_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING);
+      mg_bthing_reset_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING);
       return mg_bthing_update_state(state.owner, false);
     }
   }
