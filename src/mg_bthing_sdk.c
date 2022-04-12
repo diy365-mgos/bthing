@@ -185,7 +185,7 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
 bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
   if (!thing) return false;
-  if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED)) return false;
+  if (!mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED)) return false;
   if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) return false;
 
   mg_bthing_set_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
