@@ -231,7 +231,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   }
 
   if (mg_bthing_context()->raise_state_updated) {
-    LOG(LL_INFO, ("MUST TRIGGER MGOS_EV_BTHING_STATE_UPDATED...")); // TO REMOVE
     args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
     mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
@@ -273,10 +272,8 @@ bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
   struct mg_bthing_ctx *ctx = mg_bthing_context();
   bool prev_raise = ctx->raise_state_updated;
   ctx->raise_state_updated = raise_event;
-  LOG(LL_INFO, ("SET ctx->raise_state_updated = %d", (int)raise_event)); // TO REMOVE
   bool success = (mgos_bthing_get_state(thing) != NULL);
   ctx->raise_state_updated = prev_raise;
-  LOG(LL_INFO, ("RESET ctx->raise_state_updated = %d", (int)raise_event)); // TO REMOVE
   return success;
 }
 
