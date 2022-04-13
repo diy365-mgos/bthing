@@ -207,9 +207,6 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = mgos_bvar_is_null(sens->state);
   if (is_changed || is_init) {
-
-    LOG(LL_INFO, ("%s is%sCHANGED",mgos_bthing_get_uid(thing), is_changed?" ":" NOT "));
-
     // STATE_CHANGING: invoke handlers and trigger the event
     // invoke state-changing handlers
     args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGING;
