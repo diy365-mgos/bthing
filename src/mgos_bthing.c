@@ -158,7 +158,8 @@ bool mgos_bthing_update_state(mgos_bthing_t thing) {
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
   va_list ap;
   va_start(ap, filter);
-  int count = mg_bthing_update_states_ap(true, filter, ap);
+  //int count = mg_bthing_update_states_ap(true, filter, ap);
+  int count = mg_bthing_update_states_ap(filter, ap);
   va_end(ap);
   return count;
 }
