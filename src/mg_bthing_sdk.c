@@ -27,7 +27,7 @@ struct mg_bthing_ctx *mg_bthing_context() {
     s_context = calloc(1, sizeof(struct mg_bthing_ctx));
     s_context->things.thing = NULL;
     s_context->things.next_item = NULL;
-    s_context->raise_state_updated = false;
+    //s_context->raise_state_updated = false;
   }
   return s_context; 
 }
@@ -182,67 +182,137 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
   }
 }
 
-bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
-  mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
-  if (!thing) return false;
-  if (!mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED)) return false;
-  if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) return false;
+// bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
+//   mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
+//   if (!thing) return false;
+//   if (!mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED)) return false;
+//   if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_UPDATING_STATE)) return false;
 
-  mg_bthing_set_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
-  if (sens->getting_state_cb) {
-    if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
-      mg_bthing_reset_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
-      LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
-      return false;
-    }
-  }
+//   mg_bthing_set_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+//   if (sens->getting_state_cb) {
+//     if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
+//       mg_bthing_reset_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+//       LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
+//       return false;
+//     }
+//   }
 
-  struct mgos_bthing_state_change args = { 
-    .thing = thing,
+//   struct mgos_bthing_state_change args = { 
+//     .thing = thing,
+//     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
+//     .cur_state = sens->state, 
+//     .new_state = sens->tmp_state
+//   };
+
+//   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
+//   bool is_init = mgos_bvar_is_null(sens->state);
+//   if (is_changed || is_init) {
+//     // STATE_CHANGING: invoke handlers and trigger the event
+//     // invoke state-changing handlers
+//     args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGING;
+//     if (is_init)
+//       args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
+//     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
+//     // trigger STATE_CHANGING event
+//     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
+
+//     if (is_changed) {
+//       mgos_bvar_copy(sens->tmp_state, sens->state);
+//     }
+
+//     // STATE_CHANGED: invoke handlers and trigger the event
+//     // invoke state-changed handlers
+//     args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
+//     if (is_init)
+//       args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
+//     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
+//     // trigger STATE_CHANGED event
+//     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
+//   }
+
+//   if (mg_bthing_context()->raise_state_updated) {
+//     args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
+//     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+//     mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+//   }
+
+//   if (is_changed) {
+//     mgos_bvar_set_unchanged(sens->tmp_state);
+//     mgos_bvar_set_unchanged(sens->state);
+//   }
+
+//   mg_bthing_reset_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+//   return true;
+// }
+
+void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
+   struct mgos_bthing_state_change args = { 
+    .thing = MG_BTHING_SENS_CAST4(sens),
     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
     .cur_state = sens->state, 
     .new_state = sens->tmp_state
   };
 
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
-  bool is_init = mgos_bvar_is_null(sens->state);
+  bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
+
   if (is_changed || is_init) {
     // STATE_CHANGING: invoke handlers and trigger the event
+    args.state_flags = MGOS_BTHING_STATE_FLAG_CHANGING;
+    if (is_init) args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
     // invoke state-changing handlers
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGING;
-    if (is_init)
-      args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
     // trigger STATE_CHANGING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
 
-    if (is_changed) {
-      mgos_bvar_copy(sens->tmp_state, sens->state);
-    }
+    if (is_changed) mgos_bvar_copy(sens->tmp_state, sens->state);
+    if (is_init) mg_bthing_set_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
 
     // STATE_CHANGED: invoke handlers and trigger the event
+    args.state_flags = MGOS_BTHING_STATE_FLAG_CHANGED;
+    if (is_init) args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
     // invoke state-changed handlers
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_CHANGED;
-    if (is_init)
-      args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
-  if (mg_bthing_context()->raise_state_updated) {
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
-    mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
-    mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
-  }
+  // STATE_UPDATED: invoke handlers and trigger the event
+  args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
+  // invoke state-updated handlers
+  mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+  // trigger STATE_UPDATED event
+  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 
-  if (is_changed) {
-    mgos_bvar_set_unchanged(sens->tmp_state);
-    mgos_bvar_set_unchanged(sens->state);
-  }
+  mgos_bvar_set_unchanged(sens->tmp_state);
+  mgos_bvar_set_unchanged(sens->state);
+}
 
-  mg_bthing_reset_flag(thing, MG_BTHING_FLAG_STATE_UPDATING);
-  return true;
+bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
+  mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
+
+  bool success = (thing != NULL);
+  if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED) && !mg_bthing_has_flag(thing, MG_BTHING_FLAG_UPDATING_STATE)) {
+
+    mg_bthing_set_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+
+    if (sens->getting_state_cb) {
+      if (mgos_bvar_is_changed(sens->tmp_state)) {
+        mg_bthing_trig_get_state_events(sens); // trigger pending events
+      }
+      if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
+        LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
+        success = false;
+      }
+    }
+
+    if (success) {
+      mg_bthing_trig_get_state_events(sens);
+    }
+
+    mg_bthing_reset_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+  }
+  return success;
 }
 
 // Returns the readonly raw instance of the bThing's state
@@ -254,7 +324,7 @@ mgos_bvarc_t mg_bthing_get_raw_state(mgos_bthing_t thing) {
 // Returns the updatable in-memory state of the bThing
 mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing) {
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
-  if (sens && !mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
+  if (sens && !mg_bthing_has_flag(thing, MG_BTHING_FLAG_UPDATING_STATE)) {
     return sens->tmp_state;
   }
   return NULL;
@@ -268,16 +338,21 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
   return prev_h;
 }
 
-bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
-  struct mg_bthing_ctx *ctx = mg_bthing_context();
-  bool prev_raise = ctx->raise_state_updated;
-  ctx->raise_state_updated = raise_event;
-  bool success = (mgos_bthing_get_state(thing) != NULL);
-  ctx->raise_state_updated = prev_raise;
-  return success;
+// bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event) {
+//   struct mg_bthing_ctx *ctx = mg_bthing_context();
+//   bool prev_raise = ctx->raise_state_updated;
+//   ctx->raise_state_updated = raise_event;
+//   bool success = (mgos_bthing_get_state(thing) != NULL);
+//   ctx->raise_state_updated = prev_raise;
+//   return success;
+// }
+
+bool mg_bthing_update_state(mgos_bthing_t thing) {
+  return (mgos_bthing_get_state(thing) != NULL);
 }
 
-int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {
+//int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {
+int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap) {
   int thing_type;
   const char *thing_dom;
 
@@ -309,15 +384,18 @@ int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filt
       default:
         return 0;
     };
-    if (mg_bthing_update_state(thing, raise_event)) ++count;
+    //if (mg_bthing_update_state(thing, raise_event)) ++count;
+    if (mg_bthing_update_state(thing)) ++count;
   }
   return 0;
 }
 
-int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...) {
+//int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...) {
+int mg_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
   va_list ap;
   va_start(ap, filter);
-  int count = mg_bthing_update_states_ap(raise_event, filter, ap);
+  //int count = mg_bthing_update_states_ap(raise_event, filter, ap);
+  int count = mg_bthing_update_states_ap(filter, ap);
   va_end(ap);
   return count;
 }
@@ -449,8 +527,8 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
         }
       }
 
-      mg_bthing_update_state(thing, false);
-      return true;
+      //return mg_bthing_update_state(thing, false);
+      return mg_bthing_update_state(thing);
     }
   }
   LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));

@@ -141,7 +141,7 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
   bool get_ok = false;
   struct mg_bthing_sens *sens = MG_BTHING_SENS_CAST1(thing);
   if (thing && sens) {
-    if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_STATE_UPDATING)) {
+    if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_UPDATING_STATE)) {
       get_ok = true;
     } else {
       get_ok = mg_bthing_get_state(sens);
@@ -151,7 +151,8 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_update_state(mgos_bthing_t thing) {
-  return mg_bthing_update_state(thing, true);
+  //return mg_bthing_update_state(thing, true);
+  return mg_bthing_update_state(thing);
 }
 
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
@@ -167,7 +168,7 @@ bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_upda
     state->value = mg_bthing_get_state_4update(thing);
     if (state->value != NULL) {
       state->owner = thing;
-      mg_bthing_set_flag(state->owner, MG_BTHING_FLAG_STATE_UPDATING);
+      mg_bthing_set_flag(state->owner, MG_BTHING_FLAG_UPDATING_STATE);
       return true;
     }
   }
@@ -176,9 +177,10 @@ bool mgos_bthing_start_update_state(mgos_bthing_t thing, struct mgos_bthing_upda
 
 bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state) {
   if (state.owner && state.value) {
-    if (mg_bthing_has_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING)) {
-      mg_bthing_reset_flag(state.owner, MG_BTHING_FLAG_STATE_UPDATING);
-      return mg_bthing_update_state(state.owner, false);
+    if (mg_bthing_has_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE)) {
+      mg_bthing_reset_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE);
+      //return mg_bthing_update_state(state.owner, false);
+      return mg_bthing_update_state(state.owner);
     }
   }
   return false;

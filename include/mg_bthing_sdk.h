@@ -33,10 +33,11 @@ enum mg_bthing_state_result {
 };
 
 enum mg_bthing_flag {
-  MG_BTHING_FLAG_NONE = 0,            // 0000-0000
-  MG_BTHING_FLAG_ISPRIVATE = 1,       // 0000-0001
-  MG_BTHING_FLAG_REGISTERED = 2,      // 0000-0010
-  MG_BTHING_FLAG_STATE_UPDATING = 4   // 0000-0100
+  MG_BTHING_FLAG_NONE = 0,              // 0000-0000
+  MG_BTHING_FLAG_ISPRIVATE = 1,         // 0000-0001
+  MG_BTHING_FLAG_REGISTERED = 2,        // 0000-0010
+  MG_BTHING_FLAG_UPDATING_STATE = 4,    // 0000-0100
+  MG_BTHING_FLAG_STATE_INITIALIZED = 8  // 0000-1000
 };
 
 struct mg_bthing {
@@ -150,7 +151,7 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
-  bool raise_state_updated;
+  //bool raise_state_updated;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();
@@ -178,9 +179,12 @@ mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing);
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
 
-bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event);
-int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...);
-int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap);
+//bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event);
+bool mg_bthing_update_state(mgos_bthing_t thing);
+//int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...);
+int mg_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
+//int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap);
+int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap);
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
