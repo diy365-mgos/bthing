@@ -158,8 +158,10 @@ void mgos_bthing_on_event(mgos_bthing_t thing, enum mgos_bthing_event ev,
 
 mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing);
 
-bool mgos_bthing_update_state(mgos_bthing_t thing);
-int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
+bool mgos_bthing_update_state(mgos_bthing_t thing, bool force_pub);
+int mgos_bthing_update_states(bool force_pub, enum mgos_bthing_filter_by filter, ...);
+
+bool mgos_bthing_publish_state(mgos_bthing_t thing);
 
 struct mgos_bthing_updatable_state {
   mgos_bthing_t owner;

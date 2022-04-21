@@ -359,7 +359,7 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 // }
 
 //int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {
-int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap) {
+int mg_bthing_update_states_ap(bool force_pub, enum mgos_bthing_filter_by filter, va_list ap) {
   int thing_type;
   const char *thing_dom;
 
@@ -393,7 +393,7 @@ int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap) {
     };
     //if (mg_bthing_update_state(thing, raise_event)) ++count;
     //if (mg_bthing_update_state(thing)) ++count;
-    if (mgos_bthing_update_state(thing)) ++count;
+    if (mgos_bthing_update_state(thing, force_pub)) ++count;
   }
   return 0;
 }
@@ -537,7 +537,7 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
 
       //return mg_bthing_update_state(thing, false);
       //return mg_bthing_update_state(thing);
-      return mgos_bthing_update_state(thing);
+      return mgos_bthing_update_state(thing, false);
     }
   }
   LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));
