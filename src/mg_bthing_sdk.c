@@ -354,9 +354,9 @@ mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_se
 //   return success;
 // }
 
-bool mg_bthing_update_state(mgos_bthing_t thing) {
-  return (mgos_bthing_get_state(thing) != NULL);
-}
+// bool mg_bthing_update_state(mgos_bthing_t thing) {
+//   return (mgos_bthing_get_state(thing) != NULL);
+// }
 
 //int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap) {
 int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap) {
@@ -392,20 +392,21 @@ int mg_bthing_update_states_ap(enum mgos_bthing_filter_by filter, va_list ap) {
         return 0;
     };
     //if (mg_bthing_update_state(thing, raise_event)) ++count;
-    if (mg_bthing_update_state(thing)) ++count;
+    //if (mg_bthing_update_state(thing)) ++count;
+    if (mgos_bthing_update_state(thing)) ++count;
   }
   return 0;
 }
 
 //int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...) {
-int mg_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
-  va_list ap;
-  va_start(ap, filter);
-  //int count = mg_bthing_update_states_ap(raise_event, filter, ap);
-  int count = mg_bthing_update_states_ap(filter, ap);
-  va_end(ap);
-  return count;
-}
+// int mg_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
+//   va_list ap;
+//   va_start(ap, filter);
+//   //int count = mg_bthing_update_states_ap(raise_event, filter, ap);
+//   int count = mg_bthing_update_states_ap(filter, ap);
+//   va_end(ap);
+//   return count;
+// }
 
 #endif // MGOS_BTHING_HAVE_SENSORS
 
@@ -535,7 +536,8 @@ bool mg_bthing_set_state(struct mg_bthing_actu *actu, mgos_bvarc_t state) {
       }
 
       //return mg_bthing_update_state(thing, false);
-      return mg_bthing_update_state(thing);
+      //return mg_bthing_update_state(thing);
+      return mgos_bthing_update_state(thing);
     }
   }
   LOG(LL_ERROR, ("Error setting the state of bActuator '%s'", (thing ? mgos_bthing_get_uid(thing) : "")));

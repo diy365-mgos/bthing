@@ -152,7 +152,8 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 
 bool mgos_bthing_update_state(mgos_bthing_t thing) {
   //return mg_bthing_update_state(thing, true);
-  return mg_bthing_update_state(thing);
+  //return mg_bthing_update_state(thing);
+  return (mgos_bthing_get_state(thing) != NULL);
 }
 
 int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...) {
@@ -181,7 +182,8 @@ bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state) {
     if (mg_bthing_has_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE)) {
       mg_bthing_reset_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE);
       //return mg_bthing_update_state(state.owner, false);
-      return mg_bthing_update_state(state.owner);
+      //return mg_bthing_update_state(state.owner);
+      return mgos_bthing_update_state(state.owner);
     }
   }
   return false;
