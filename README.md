@@ -73,22 +73,24 @@ struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 ### mgos_bthing_state_flag
 ```c
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED = 1,     // 000001
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 6,  // 000110
-  MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 000100
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 24,  // 011000
-  MGOS_BTHING_STATE_FLAG_CHANGED = 16,      // 010000
-  MGOS_BTHING_STATE_FLAG_UPDATED = 32       // 100000
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 1,     // 0000001
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 6,  // 0000110
+  MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 0000100
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 24,  // 0011000
+  MGOS_BTHING_STATE_FLAG_CHANGED = 16,      // 0010000
+  MGOS_BTHING_STATE_FLAG_UPDATED = 32       // 0100000
+  MGOS_BTHING_STATE_FLAG_FORCED_PUB = 64    // 1000000
 };
 ```
 |Flag||
 |--|--|
 |`MGOS_BTHING_STATE_FLAG_UNCHANGED`|The state was not changed.|
-|`MGOS_BTHING_STATE_FLAG_CHANGING`|The state is going to be changed.|
-|`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
 |`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
-|`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes `MGOS_BTHING_STATE_FLAG_INITIALIZING` and `MGOS_BTHING_STATE_FLAG_CHANGED`.|
+|`MGOS_BTHING_STATE_FLAG_CHANGING`|The state is going to be changed.|
+|`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`.|
+|`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed.|
 |`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed. This flag is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function.|
+|`MGOS_BTHING_STATE_FLAG_FORCED_PUB`|...|
 ### mgos_bthing_get_uid
 ```c
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);

@@ -282,10 +282,13 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   // trigger STATE_UPDATED event
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 
-  if (is_changed || mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_PUB_STATE)) {
+  // STATE_PUBLISHING: trigger the event
+  bool force_pub = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
+  if (is_changed || force_pub) {
     // trigger STATE_PUBLISHING event
+    if (force_pub) args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUB;
     mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
-    mg_bthing_reset_flag(args.thing, MG_BTHING_FLAG_FORCE_PUB_STATE);
+    if (force_pub) mg_bthing_reset_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
   }
 
   mgos_bvar_set_unchanged(sens->tmp_state);
