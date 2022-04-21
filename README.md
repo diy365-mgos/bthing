@@ -11,7 +11,8 @@ enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED,
   MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
-  MGOS_EV_BTHING_STATE_UPDATED
+  MGOS_EV_BTHING_STATE_UPDATED,
+  MGOS_EV_BTHING_STATE_PUBLISHING
 };
 ```
 Events triggered by a bThing. Use following functions to subscribe to these events:
@@ -25,6 +26,7 @@ Events triggered by a bThing. Use following functions to subscribe to these even
 |MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
 |MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
+|MGOS_EV_BTHING_STATE_PUBLISHING|...|
 ### mgos_bthing_state
 ```c
 struct mgos_bthing_state {
@@ -71,12 +73,12 @@ struct mgos_bthing_state *upd_arg = (struct mgos_bthing_state *)&arg;
 ### mgos_bthing_state_flag
 ```c
 enum mgos_bthing_state_flag {
-  MGOS_BTHING_STATE_FLAG_UNCHANGED = 0,     // 00000
-  MGOS_BTHING_STATE_FLAG_CHANGING = 1,      // 00001
-  MGOS_BTHING_STATE_FLAG_CHANGED = 3,       // 00011
-  MGOS_BTHING_STATE_FLAG_INITIALIZING = 5,  // 00101
-  MGOS_BTHING_STATE_FLAG_INITIALIZED = 15,  // 01111
-  MGOS_BTHING_STATE_FLAG_UPDATED = 16       // 10000
+  MGOS_BTHING_STATE_FLAG_UNCHANGED = 1,     // 000001
+  MGOS_BTHING_STATE_FLAG_INITIALIZING = 6,  // 000110
+  MGOS_BTHING_STATE_FLAG_CHANGING = 4,      // 000100
+  MGOS_BTHING_STATE_FLAG_INITIALIZED = 24,  // 011000
+  MGOS_BTHING_STATE_FLAG_CHANGED = 16,      // 010000
+  MGOS_BTHING_STATE_FLAG_UPDATED = 32       // 100000
 };
 ```
 |Flag||

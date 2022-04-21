@@ -258,8 +258,7 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
 
   if (is_changed || is_init) {
     // STATE_CHANGING: invoke handlers and trigger the event
-    args.state_flags = MGOS_BTHING_STATE_FLAG_CHANGING;
-    if (is_init) args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZING;
+    args.state_flags = (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
     // invoke state-changing handlers
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
     // trigger STATE_CHANGING event
@@ -269,8 +268,7 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
     if (is_init) mg_bthing_set_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
 
     // STATE_CHANGED: invoke handlers and trigger the event
-    args.state_flags = MGOS_BTHING_STATE_FLAG_CHANGED;
-    if (is_init) args.state_flags |= MGOS_BTHING_STATE_FLAG_INITIALIZED;
+    args.state_flags = (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZED : MGOS_BTHING_STATE_FLAG_CHANGED);
     // invoke state-changed handlers
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
     // trigger STATE_CHANGED event
@@ -283,6 +281,12 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
   // trigger STATE_UPDATED event
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+
+  if (is_changed || mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_PUB_STATE)) {
+    // trigger STATE_PUBLISHING event
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
+    mg_bthing_reset_flag(args.thing, MG_BTHING_FLAG_FORCE_PUB_STATE);
+  }
 
   mgos_bvar_set_unchanged(sens->tmp_state);
   mgos_bvar_set_unchanged(sens->state);
