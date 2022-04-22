@@ -115,7 +115,10 @@ bool mgos_bthing_filter_get_next(mgos_bthing_enum_t *things_enum, mgos_bthing_t 
 }
 
 void mgos_bthing_make_private(mgos_bthing_t thing) {
-  mg_bthing_set_flag(thing, MG_BTHING_FLAG_ISPRIVATE);
+  if (thing) {
+    mg_bthing_set_flag(thing, MG_BTHING_FLAG_ISPRIVATE);
+    mgos_event_trigger(MGOS_EV_BTHING_MADE_PRIVATE, thing);
+  }
 }
 
 #if MGOS_BTHING_HAVE_SENSORS

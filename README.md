@@ -9,6 +9,7 @@ Mongoose OS core library for the bThings ecosystem.
 ```c
 enum mgos_bthing_event {
   MGOS_EV_BTHING_CREATED,
+  MGOS_EV_BTHING_MADE_PRIVATE,
   MGOS_EV_BTHING_STATE_CHANGING,
   MGOS_EV_BTHING_STATE_CHANGED,
   MGOS_EV_BTHING_STATE_UPDATED,
@@ -23,6 +24,7 @@ Events triggered by a bThing. Use following functions to subscribe to these even
 |Event||
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created. The event-data passed to the handler is a `mgos_bthing_t`.|
+|MGOS_EV_BTHING_MADE_PRIVATE|...|
 |MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
 |MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
