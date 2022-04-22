@@ -86,13 +86,13 @@ enum mgos_bthing_state_flag {
 ```
 |Flag||
 |--|--|
-|`MGOS_BTHING_STATE_FLAG_UNCHANGED`|The state was not changed.|
-|`MGOS_BTHING_STATE_FLAG_INITIALIZING`|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
-|`MGOS_BTHING_STATE_FLAG_CHANGING`|The state is going to be changed.|
-|`MGOS_BTHING_STATE_FLAG_INITIALIZED`|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`.|
-|`MGOS_BTHING_STATE_FLAG_CHANGED`|The state has been changed.|
-|`MGOS_BTHING_STATE_FLAG_UPDATED`|The state has been updated, but not necessary changed. This flag is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function.|
-|`MGOS_BTHING_STATE_FLAG_FORCED_PUB`|...|
+|MGOS_BTHING_STATE_FLAG_UNCHANGED|The state was not changed.|
+|MGOS_BTHING_STATE_FLAG_INITIALIZING|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`. It could be set when `MGOS_EV_BTHING_STATE_CHANGING` event is triggered.|
+|MGOS_BTHING_STATE_FLAG_CHANGING|The state is going to be changed. It is set when `MGOS_EV_BTHING_STATE_CHANGING` event is triggered.|
+|MGOS_BTHING_STATE_FLAG_INITIALIZED|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`. It could be set when `MGOS_EV_BTHING_STATE_CHANGED`, `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
+|MGOS_BTHING_STATE_FLAG_CHANGED|The state has been changed. It is set when `MGOS_EV_BTHING_STATE_CHANGED` event is triggered. It could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
+|MGOS_BTHING_STATE_FLAG_UPDATED|The state has been updated. It is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered.|
+|MGOS_BTHING_STATE_FLAG_FORCED_PUB|The publish of the state has been forcibly requested by [mgos_bthing_update_state()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_state) or [mgos_bthing_update_states()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_states). This falg could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
 ### mgos_bthing_get_uid
 ```c
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);
