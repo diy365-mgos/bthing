@@ -275,6 +275,12 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
+  // set the MG_BTHING_FLAG_FORCE_STATE_PUB before invoking 
+  // STATE_UPDATED and STATE_PUBLISHING handlers/events
+  if (mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUB;
+  }
+
   // STATE_UPDATED: invoke handlers and trigger the event
   args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
   // invoke state-updated handlers
@@ -283,12 +289,9 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
 
   // STATE_PUBLISHING: trigger the event
-  bool force_pub = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
-  if (is_changed || force_pub) {
+  if (is_changed || ((args.state_flags & MGOS_BTHING_STATE_FLAG_FORCED_PUB) == MGOS_BTHING_STATE_FLAG_FORCED_PUB)) {
     // trigger STATE_PUBLISHING event
-    if (force_pub) args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUB;
     mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
-    if (force_pub) mg_bthing_reset_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
   }
 
   mgos_bvar_set_unchanged(sens->tmp_state);
