@@ -257,6 +257,8 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
   bool is_private = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE);
 
+  LOG(LL_INFO, ("is_changed=%d, is_init=%d, is_private=%d", (int)is_changed, (int)is_init, (int)is_private));
+
   if (is_changed || is_init) {
     // STATE_CHANGING: invoke handlers and trigger the event
     args.state_flags = (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
@@ -312,6 +314,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
 
     if (sens->getting_state_cb) {
       if (mgos_bvar_is_changed(sens->tmp_state)) {
+        LOG(LL_INFO, ("AAAAA1"));
         mg_bthing_trig_get_state_events(sens); // trigger pending events
       }
       if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
@@ -321,6 +324,7 @@ bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
     }
 
     if (success) {
+      LOG(LL_INFO, ("AAAAA2"));
       mg_bthing_trig_get_state_events(sens);
     }
 
