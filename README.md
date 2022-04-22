@@ -385,7 +385,8 @@ Makes the bThing private. A private instance is not included into the shadow sta
 |Parameter||
 |--|--|
 |thing|A bThing.|
-## JS APIs Reference
+
+<!-- ## JS APIs Reference
 ### bThing.EVENT
 ```javascript
 bThing.EVENT: {
@@ -485,6 +486,6 @@ else if (<obj>.isTypeOf(bThing.TYPE.ACTUATOR))
   print("The bThing is an actuator.");
 else
   print("Unknown bThing type.");
-```
+``` -->
 ## To Do
-- Complete javascript APIs for [Mongoose OS MJS](https://github.com/mongoose-os-libs/mjs).
+- Implement javascript APIs for [Mongoose OS MJS](https://github.com/mongoose-os-libs/mjs).
