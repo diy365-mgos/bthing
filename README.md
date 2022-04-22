@@ -380,7 +380,7 @@ Adds en event handler for the bThing. If the handler (*ev + handler + userdata*)
 ```c
 void mgos_bthing_make_private(mgos_bthing_t thing);
 ```
-Makes the bThing private. A private instance is not included into the shadow state (see [bThings Shadow library](https://github.com/diy365-mgos/bthing-shadow)) and it is not published via MQTT (see [bThings MQTT Library](https://github.com/diy365-mgos/bthing-mqtt)) or HTTP. When invocked an `MGOS_EV_BTHING_MADE_PRIVATE` event is triggered.
+Makes the bThing private. A private instance is not included into the shadow state (see [bThings Shadow library](https://github.com/diy365-mgos/bthing-shadow)) and it is not published via MQTT (see [bThings MQTT Library](https://github.com/diy365-mgos/bthing-mqtt)) or HTTP. When invoked an `MGOS_EV_BTHING_MADE_PRIVATE` event is triggered.
 
 |Parameter||
 |--|--|
