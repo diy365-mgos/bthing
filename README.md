@@ -24,11 +24,11 @@ Events triggered by a bThing. Use following functions to subscribe to these even
 |Event||
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created. The event-data passed to the handler is a `mgos_bthing_t`.|
-|MGOS_EV_BTHING_MADE_PRIVATE|...|
+|MGOS_EV_BTHING_MADE_PRIVATE|Triggered when a new bThing is marked as private using [mgos_bthing_make_private()](https://github.com/diy365-mgos/bthing#mgos_bthing_make_private). The event-data passed to the handler is a `mgos_bthing_t`.|
 |MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
 |MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated after invoking `mgos_bthing_update_state()` or '`mgos_bthing_update_states()`' function. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|MGOS_EV_BTHING_STATE_PUBLISHING|...|
+|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
+|MGOS_EV_BTHING_STATE_PUBLISHING|Triggered when the state of a bThing is going to be published. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
 ### mgos_bthing_state
 ```c
 struct mgos_bthing_state {
