@@ -245,7 +245,7 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
 //   return true;
 // }
 
-void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
+bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
    struct mgos_bthing_state_change args = { 
     .thing = MG_BTHING_SENS_CAST4(sens),
     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
@@ -257,13 +257,10 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
   bool is_private = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE);
 
-  LOG(LL_INFO, ("is_changed=%d, is_init=%d, is_private=%d", (int)is_changed, (int)is_init, (int)is_private));
-
   if (is_changed || is_init) {
     // STATE_CHANGING: invoke handlers and trigger the event
     args.state_flags = (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
     // invoke state-changing handlers
-    LOG(LL_INFO, ("TRIGGER MGOS_EV_BTHING_STATE_CHANGING (flags=%d)", args.state_flags));
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
     // trigger STATE_CHANGING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
@@ -274,7 +271,6 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
     // STATE_CHANGED: invoke handlers and trigger the event
     args.state_flags = (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZED : MGOS_BTHING_STATE_FLAG_CHANGED);
     // invoke state-changed handlers
-    LOG(LL_INFO, ("TRIGGER MGOS_EV_BTHING_STATE_CHANGED (flags=%d)", args.state_flags));
     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
     // trigger STATE_CHANGED event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
@@ -289,7 +285,6 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   // STATE_UPDATED: invoke handlers and trigger the event
   args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
   // invoke state-updated handlers
-  LOG(LL_INFO, ("TRIGGER MGOS_EV_BTHING_STATE_UPDATED (flags=%d)", args.state_flags));
   mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
   // trigger STATE_UPDATED event
   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
@@ -305,35 +300,43 @@ void mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
 
   mgos_bvar_set_unchanged(sens->tmp_state);
   mgos_bvar_set_unchanged(sens->state);
+
+  return true;
 }
 
 bool mg_bthing_get_state(struct mg_bthing_sens *sens) {
   mgos_bthing_t thing = MG_BTHING_SENS_CAST4(sens);
 
-  bool success = (thing != NULL);
   if (mg_bthing_has_flag(thing, MG_BTHING_FLAG_REGISTERED) && !mg_bthing_has_flag(thing, MG_BTHING_FLAG_UPDATING_STATE)) {
-
     mg_bthing_set_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
 
+    bool must_trig = true;
+    if (mgos_bvar_is_changed(sens->tmp_state)) {
+      must_trig = !mg_bthing_trig_get_state_events(sens);
+    }
+
     if (sens->getting_state_cb) {
-      if (mgos_bvar_is_changed(sens->tmp_state)) {
-        LOG(LL_INFO, ("AAAAA1"));
-        mg_bthing_trig_get_state_events(sens); // trigger pending events
-      }
-      if (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud) == MG_BTHING_STATE_RESULT_ERROR) {
-        LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
-        success = false;
+      switch (sens->getting_state_cb(sens, sens->tmp_state, sens->get_state_ud))
+      {
+        case MG_BTHING_STATE_RESULT_ERROR:
+          mg_bthing_reset_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
+          LOG(LL_ERROR, ("Error getting bThing '%s' state.", mgos_bthing_get_uid(thing)));
+          return false;
+        case MG_BTHING_STATE_RESULT_SUCCESS:
+          must_trig = true; // force to invoke mg_bthing_trig_get_state_events() below
+          break;
+        default:
+          break;
       }
     }
 
-    if (success) {
-      LOG(LL_INFO, ("AAAAA2"));
+    if (must_trig) {
       mg_bthing_trig_get_state_events(sens);
     }
 
     mg_bthing_reset_flag(thing, MG_BTHING_FLAG_UPDATING_STATE);
   }
-  return success;
+  return true;
 }
 
 // Returns the readonly raw instance of the bThing's state
