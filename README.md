@@ -92,7 +92,7 @@ enum mgos_bthing_state_flag {
 |MGOS_BTHING_STATE_FLAG_INITIALIZED|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`. It could be set when `MGOS_EV_BTHING_STATE_CHANGED`, `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
 |MGOS_BTHING_STATE_FLAG_CHANGED|The state has been changed. It is set when `MGOS_EV_BTHING_STATE_CHANGED` event is triggered. It could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
 |MGOS_BTHING_STATE_FLAG_UPDATED|The state has been updated. It is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered.|
-|MGOS_BTHING_STATE_FLAG_FORCED_PUB|The publish of the state has been forcibly requested by [mgos_bthing_update_state()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_state) or [mgos_bthing_update_states()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_states). This falg could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
+|MGOS_BTHING_STATE_FLAG_FORCED_PUB|The publish of the state has been forcibly requested by [mgos_bthing_update_state()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_state) or [mgos_bthing_update_states()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_states). This flag could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
 ### mgos_bthing_get_uid
 ```c
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);
@@ -233,32 +233,34 @@ typedef bool (*mgos_bthing_get_state_handler_t)(mgos_bthing_t thing, mgos_bvar_t
 |userdata|The handler's *user-data*.|
 ### mgos_bthing_update_state
 ```c
-bool mgos_bthing_update_state(mgos_bthing_t thing);
+bool mgos_bthing_update_state(mgos_bthing_t thing, bool force_pub);
 ```
 Updates the state of a bThing sensor/actuator (`mgos_bthing_is_typeof(MGOS_BTHING_TYPE_SENSOR)`). Returns `true` on success, or `false` otherwise. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`.
 
 |Parameter||
 |--|--|
 |thing|A bThing sensor/actuator.|
+|force_pub|Force the bThing's state to be published (see `MGOS_EV_BTHING_STATE_PUBLISHING` event).|
 ### mgos_bthing_update_states
 ```c
-int mgos_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
+int mgos_bthing_update_states(bool force_pub, enum mgos_bthing_filter_by filter, ...);
 ```
 Updates the state of all bThings matching the provided filter. This function is available only `#if MGOS_BTHING_HAVE_SENSORS`. Returns the count of successfully updated states.
 
 |Parameter||
 |--|--|
+|force_pub|Force the bThing's state to be published (see `MGOS_EV_BTHING_STATE_PUBLISHING` event).| 
 |filter|The filter type to apply.|
 |...|Dynamic filter value.|
 
 Examples:
 ```c
-// Example #1 - Update all states
-mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_NOTHING);
+// Example #1 - Update and forcibly publish all states
+mgos_bthing_update_states(true, MGOS_BTHING_FILTER_BY_NOTHING);
 // Example #2 - Update all in "lights" domain states
-mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_DOMAIN, "lights");
+mgos_bthing_update_states(false, MGOS_BTHING_FILTER_BY_DOMAIN, "lights");
 // Example #3 - Update the state of all bSwitches
-mgos_bthing_update_states(MGOS_BTHING_FILTER_BY_TYPE, MGOS_BSWITCH_TYPE);
+mgos_bthing_update_states(false, MGOS_BTHING_FILTER_BY_TYPE, MGOS_BSWITCH_TYPE);
 ```
 ### mgos_bthing_updatable_state
 ```c
@@ -378,7 +380,7 @@ Adds en event handler for the bThing. If the handler (*ev + handler + userdata*)
 ```c
 void mgos_bthing_make_private(mgos_bthing_t thing);
 ```
-Makes the bThing private. A private instance is not included into the shadow state (see [bThings Shadow library](https://github.com/diy365-mgos/bthing-shadow)) and it is not published via MQTT (see [bThings MQTT Library](https://github.com/diy365-mgos/bthing-mqtt)) or HTTP.
+Makes the bThing private. A private instance is not included into the shadow state (see [bThings Shadow library](https://github.com/diy365-mgos/bthing-shadow)) and it is not published via MQTT (see [bThings MQTT Library](https://github.com/diy365-mgos/bthing-mqtt)) or HTTP. When invocked an `MGOS_EV_BTHING_MADE_PRIVATE` event is triggered.
 
 |Parameter||
 |--|--|
