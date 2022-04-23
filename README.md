@@ -19,16 +19,16 @@ enum mgos_bthing_event {
 Events triggered by a bThing. Use following functions to subscribe to these events:
 * [mgos_event_add_handler()](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_handler)
 * [mgos_event_add_group_handler(MGOS_EV_BTHING_ANY, ...)](https://mongoose-os.com/docs/mongoose-os/api/core/mgos_event.h.md#mgos_event_add_group_handler)
-* [mgos_bthing_on_event()](https://github.com/diy365-mgos/bthing#mgos_bthing_on_event)
+* [mgos_bthing_on_event()](#mgos_bthing_on_event)
 
 |Event||
 |--|--|
 |MGOS_EV_BTHING_CREATED|Triggered when a new bThing is created. The event-data passed to the handler is a `mgos_bthing_t`.|
-|MGOS_EV_BTHING_MADE_PRIVATE|Triggered when a new bThing is marked as private using [mgos_bthing_make_private()](https://github.com/diy365-mgos/bthing#mgos_bthing_make_private). The event-data passed to the handler is a `mgos_bthing_t`.|
-|MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.|
-|MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
-|MGOS_EV_BTHING_STATE_PUBLISHING|Triggered when the state of a bThing is going to be published. The event-data passed to the handler is a `struct mgos_bthing_state*`.|
+|MGOS_EV_BTHING_MADE_PRIVATE|Triggered when a new bThing is marked as private using [mgos_bthing_make_private()](#mgos_bthing_make_private). The event-data passed to the handler is a `mgos_bthing_t`.|
+|MGOS_EV_BTHING_STATE_CHANGING|Triggered when the state of a bThing is going to change. The event-data passed to the handler is a `struct mgos_bthing_state_change*`.<br><br>Allowed `state_flags` are: `MGOS_BTHING_STATE_FLAG_CHANGING` and optionally `MGOS_BTHING_STATE_FLAG_INITIALIZING`, `MGOS_BTHING_STATE_FLAG_FORCED_PUB`.|
+|MGOS_EV_BTHING_STATE_CHANGED|Triggered when the state of a bThing is changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.<br><br>Allowed `state_flags` are: `MGOS_BTHING_STATE_FLAG_CHANGED` and optionally `MGOS_BTHING_STATE_FLAG_INITIALIZED`, `MGOS_BTHING_STATE_FLAG_FORCED_PUB`.|
+|MGOS_EV_BTHING_STATE_UPDATED|Triggered when the state of a bThing has been updated. It is triggered also if the state is not changed. The event-data passed to the handler is a `struct mgos_bthing_state*`.<br><br>Allowed `state_flags` are: `MGOS_BTHING_STATE_FLAG_UPDATED` and optionally `MGOS_BTHING_STATE_FLAG_UNCHANGED`, `MGOS_BTHING_STATE_FLAG_CHANGED`, `MGOS_BTHING_STATE_FLAG_INITIALIZED`, `MGOS_BTHING_STATE_FLAG_FORCED_PUB`.|
+|MGOS_EV_BTHING_STATE_PUBLISHING|Triggered when the state of a bThing is going to be published. The event-data passed to the handler is a `struct mgos_bthing_state*`.<br><br>Allowed `state_flags` are: `MGOS_BTHING_STATE_FLAG_UPDATED` and optionally `MGOS_BTHING_STATE_FLAG_UNCHANGED`, `MGOS_BTHING_STATE_FLAG_CHANGED`, `MGOS_BTHING_STATE_FLAG_INITIALIZED`, `MGOS_BTHING_STATE_FLAG_FORCED_PUB`.|
 ### mgos_bthing_state
 ```c
 struct mgos_bthing_state {
@@ -42,7 +42,7 @@ Event-data passed to `MGOS_EV_BTHING_STATE_UPDATED` and `MGOS_EV_BTHING_STATE_CH
 |Field||
 |--|--|
 |thing|The bThing which state has been updated.|
-|state_flags|State's flags. It could be a combination of more flags (see `enum mgos_bthing_state_flag` below).|
+|state_flags|State's flags. It could be a combination of one or more [mgos_bthing_state_flag](#mgos_bthing_state_flag) flags depending on the triggered [event](#mgos_bthing_event).|
 |state|The state.|
 ### mgos_bthing_state_change
 ```c
@@ -87,12 +87,12 @@ enum mgos_bthing_state_flag {
 |Flag||
 |--|--|
 |MGOS_BTHING_STATE_FLAG_UNCHANGED|The state was not changed.|
-|MGOS_BTHING_STATE_FLAG_INITIALIZING|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`. It could be set when `MGOS_EV_BTHING_STATE_CHANGING` event is triggered.|
-|MGOS_BTHING_STATE_FLAG_CHANGING|The state is going to be changed. It is set when `MGOS_EV_BTHING_STATE_CHANGING` event is triggered.|
-|MGOS_BTHING_STATE_FLAG_INITIALIZED|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`. It could be set when `MGOS_EV_BTHING_STATE_CHANGED`, `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
-|MGOS_BTHING_STATE_FLAG_CHANGED|The state has been changed. It is set when `MGOS_EV_BTHING_STATE_CHANGED` event is triggered. It could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
-|MGOS_BTHING_STATE_FLAG_UPDATED|The state has been updated. It is set when the `MGOS_EV_BTHING_STATE_UPDATED` event is triggered.|
-|MGOS_BTHING_STATE_FLAG_FORCED_PUB|The publish of the state has been forcibly requested by [mgos_bthing_update_state()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_state) or [mgos_bthing_update_states()](https://github.com/diy365-mgos/bthing#mgos_bthing_update_states). This flag could be set when `MGOS_EV_BTHING_STATE_UPDATED` or `MGOS_EV_BTHING_STATE_PUBLISHING` events are triggered.|
+|MGOS_BTHING_STATE_FLAG_INITIALIZING|The state is going to be initialized. This flag includes `MGOS_BTHING_STATE_FLAG_CHANGING`.|
+|MGOS_BTHING_STATE_FLAG_CHANGING|The state is going to be changed.|
+|MGOS_BTHING_STATE_FLAG_INITIALIZED|The state has been initialized. This flag includes  `MGOS_BTHING_STATE_FLAG_CHANGED`.|
+|MGOS_BTHING_STATE_FLAG_CHANGED|The state has been changed.|
+|MGOS_BTHING_STATE_FLAG_UPDATED|The state has been updated.|
+|MGOS_BTHING_STATE_FLAG_FORCED_PUB|The publish of the state has been forcibly requested invoking [mgos_bthing_update_state()](#mgos_bthing_update_state) or [mgos_bthing_update_states()](#mgos_bthing_update_states).|
 ### mgos_bthing_get_uid
 ```c
 const char *mgos_bthing_get_uid(mgos_bthing_t thing);
