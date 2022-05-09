@@ -319,13 +319,17 @@ bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
 
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
+  bool is_private = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE);
 
-  // set the MG_BTHING_FLAG_FORCE_STATE_PUB before invoking any event/handler
-  if (!mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE) && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_PUBLISHING;
+  // set the MGOS_BTHING_STATE_FLAG_FORCED_PUBLISH before 
+  // invoking any event/handler (it includes MGOS_BTHING_STATE_FLAG_PUBLISHING)
+  if (!is_private && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUBLISH;
   }
 
   if (is_changed || is_init) {
+     if (!is_private) args.state_flags |= MGOS_BTHING_STATE_FLAG_PUBLISHING;
+
     // STATE_CHANGING: invoke handlers and trigger the event
     args.state_flags |= (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
     // invoke state-changing handlers
