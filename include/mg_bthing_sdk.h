@@ -152,7 +152,6 @@ struct mg_bthing_enum {
 
 struct mg_bthing_ctx {
   struct mg_bthing_enum things;
-  //bool raise_state_updated;
 };
 
 struct mg_bthing_ctx *mg_bthing_context();
@@ -180,11 +179,6 @@ mgos_bvar_t mg_bthing_get_state_4update(mgos_bthing_t thing);
 mg_bthing_getting_state_handler_t mg_bthing_on_getting_state(struct mg_bthing_sens *sens, 
                                                              mg_bthing_getting_state_handler_t getting_state_cb);
 
-//bool mg_bthing_update_state(mgos_bthing_t thing, bool raise_event);
-//bool mg_bthing_update_state(mgos_bthing_t thing);
-//int mg_bthing_update_states(bool raise_event, enum mgos_bthing_filter_by filter, ...);
-//int mg_bthing_update_states(enum mgos_bthing_filter_by filter, ...);
-//int mg_bthing_update_states_ap(bool raise_event, enum mgos_bthing_filter_by filter, va_list ap);
 int mg_bthing_update_states_ap(bool force_pub, enum mgos_bthing_filter_by filter, va_list ap);
 
 #endif // MGOS_BTHING_HAVE_SENSORS

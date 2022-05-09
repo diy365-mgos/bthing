@@ -154,8 +154,6 @@ mgos_bvarc_t mgos_bthing_get_state(mgos_bthing_t thing) {
 }
 
 bool mgos_bthing_update_state(mgos_bthing_t thing, bool force_pub) {
-  //return mg_bthing_update_state(thing, true);
-  //return mg_bthing_update_state(thing);
   bool prev_force_pub = mg_bthing_has_flag(thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
   if (force_pub) {
     mg_bthing_set_flag(thing, MG_BTHING_FLAG_FORCE_STATE_PUB);
@@ -176,7 +174,6 @@ bool mgos_bthing_update_state(mgos_bthing_t thing, bool force_pub) {
 int mgos_bthing_update_states(bool force_pub, enum mgos_bthing_filter_by filter, ...) {
   va_list ap;
   va_start(ap, filter);
-  //int count = mg_bthing_update_states_ap(true, filter, ap);
   int count = mg_bthing_update_states_ap(force_pub, filter, ap);
   va_end(ap);
   return count;
@@ -198,8 +195,6 @@ bool mgos_bthing_end_update_state(struct mgos_bthing_updatable_state state) {
   if (state.owner && state.value) {
     if (mg_bthing_has_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE)) {
       mg_bthing_reset_flag(state.owner, MG_BTHING_FLAG_UPDATING_STATE);
-      //return mg_bthing_update_state(state.owner, false);
-      //return mg_bthing_update_state(state.owner);
       return mgos_bthing_update_state(state.owner, false);
     }
   }
