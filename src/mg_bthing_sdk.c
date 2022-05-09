@@ -245,6 +245,70 @@ static void mg_bthing_on_event_invoke(struct mg_bthing_sens *sens, enum mgos_bth
 //   return true;
 // }
 
+// bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
+//    struct mgos_bthing_state_change args = { 
+//     .thing = MG_BTHING_SENS_CAST4(sens),
+//     .state_flags = MGOS_BTHING_STATE_FLAG_UNCHANGED,
+//     .cur_state = sens->state, 
+//     .new_state = sens->tmp_state
+//   };
+
+//   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
+//   bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
+//   bool is_private = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE);
+
+//   // set the MG_BTHING_FLAG_FORCE_STATE_PUB before invoking any event/handler
+//   if (!is_private && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
+//     args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUB;
+//   }
+
+//   if (is_changed || is_init) {
+//     // remove the MGOS_BTHING_STATE_FLAG_UNCHANGED
+//     args.state_flags &= ~MGOS_BTHING_STATE_FLAG_UNCHANGED;
+
+//     // STATE_CHANGING: invoke handlers and trigger the event
+//     args.state_flags |= (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
+//     // invoke state-changing handlers
+//     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGING, &args);
+//     // trigger STATE_CHANGING event
+//     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGING, &args);
+
+//     if (is_changed) mgos_bvar_copy(sens->tmp_state, sens->state);
+//     if (is_init) mg_bthing_set_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
+
+//     // remove the MGOS_BTHING_STATE_FLAG_INITIALIZING (and MGOS_BTHING_STATE_FLAG_CHANGING)
+//     args.state_flags &= ~MGOS_BTHING_STATE_FLAG_INITIALIZING;
+
+//     // STATE_CHANGED: invoke handlers and trigger the event
+//     args.state_flags |= (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZED : MGOS_BTHING_STATE_FLAG_CHANGED);
+//     // invoke state-changed handlers
+//     mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
+//     // trigger STATE_CHANGED event
+//     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
+//   }
+
+//   // STATE_UPDATED: invoke handlers and trigger the event
+//   args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
+//   // invoke state-updated handlers
+//   mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+//   // trigger STATE_UPDATED event
+//   mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
+
+//   // STATE_PUBLISHING: trigger the event
+//   if (!is_private) {
+//     // the thing is not private, so I can publish it 
+//     if (is_changed || ((args.state_flags & MGOS_BTHING_STATE_FLAG_FORCED_PUB) == MGOS_BTHING_STATE_FLAG_FORCED_PUB)) {
+//       // trigger STATE_PUBLISHING event
+//       mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
+//     }
+//   }
+
+//   mgos_bvar_set_unchanged(sens->tmp_state);
+//   mgos_bvar_set_unchanged(sens->state);
+
+//   return true;
+// }
+
 bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
    struct mgos_bthing_state_change args = { 
     .thing = MG_BTHING_SENS_CAST4(sens),
@@ -255,17 +319,13 @@ bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
 
   bool is_changed = mgos_bvar_is_changed(sens->tmp_state);
   bool is_init = !mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_STATE_INITIALIZED);
-  bool is_private = mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE);
 
   // set the MG_BTHING_FLAG_FORCE_STATE_PUB before invoking any event/handler
-  if (!is_private && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_FORCED_PUB;
+  if (!mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE) && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_PUBLISHNG;
   }
 
   if (is_changed || is_init) {
-    // remove the MGOS_BTHING_STATE_FLAG_UNCHANGED
-    args.state_flags &= ~MGOS_BTHING_STATE_FLAG_UNCHANGED;
-
     // STATE_CHANGING: invoke handlers and trigger the event
     args.state_flags |= (is_init ? MGOS_BTHING_STATE_FLAG_INITIALIZING : MGOS_BTHING_STATE_FLAG_CHANGING);
     // invoke state-changing handlers
@@ -287,20 +347,10 @@ bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
     mgos_event_trigger(MGOS_EV_BTHING_STATE_CHANGED, (struct mgos_bthing_state *)&args);
   }
 
-  // STATE_UPDATED: invoke handlers and trigger the event
-  args.state_flags |= MGOS_BTHING_STATE_FLAG_UPDATED;
-  // invoke state-updated handlers
-  mg_bthing_on_event_invoke(sens, MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
-  // trigger STATE_UPDATED event
-  mgos_event_trigger(MGOS_EV_BTHING_STATE_UPDATED, (struct mgos_bthing_state *)&args);
-
   // STATE_PUBLISHING: trigger the event
-  if (!is_private) {
-    // the thing is not private, so I can publish it 
-    if (is_changed || ((args.state_flags & MGOS_BTHING_STATE_FLAG_FORCED_PUB) == MGOS_BTHING_STATE_FLAG_FORCED_PUB)) {
-      // trigger STATE_PUBLISHING event
-      mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
-    }
+  if ((args.state_flags & MGOS_BTHING_STATE_FLAG_PUBLISHNG) == MGOS_BTHING_STATE_FLAG_PUBLISHNG) {
+    // trigger STATE_PUBLISHING event
+    mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
   }
 
   mgos_bvar_set_unchanged(sens->tmp_state);
