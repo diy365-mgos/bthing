@@ -322,7 +322,7 @@ bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
 
   // set the MG_BTHING_FLAG_FORCE_STATE_PUB before invoking any event/handler
   if (!mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_ISPRIVATE) && mg_bthing_has_flag(args.thing, MG_BTHING_FLAG_FORCE_STATE_PUB)) {
-    args.state_flags |= MGOS_BTHING_STATE_FLAG_PUBLISHNG;
+    args.state_flags |= MGOS_BTHING_STATE_FLAG_PUBLISHING;
   }
 
   if (is_changed || is_init) {
@@ -348,7 +348,7 @@ bool mg_bthing_trig_get_state_events(struct mg_bthing_sens *sens) {
   }
 
   // STATE_PUBLISHING: trigger the event
-  if ((args.state_flags & MGOS_BTHING_STATE_FLAG_PUBLISHNG) == MGOS_BTHING_STATE_FLAG_PUBLISHNG) {
+  if ((args.state_flags & MGOS_BTHING_STATE_FLAG_PUBLISHING) == MGOS_BTHING_STATE_FLAG_PUBLISHING) {
     // trigger STATE_PUBLISHING event
     mgos_event_trigger(MGOS_EV_BTHING_STATE_PUBLISHING, (struct mgos_bthing_state *)&args);
   }
