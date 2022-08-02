@@ -381,6 +381,15 @@ Makes the bThing private. A private instance is not included into the shadow sta
 |Parameter||
 |--|--|
 |thing|A bThing.|
+### mgos_bthing_is_private
+```c
+bool mgos_bthing_is_private(mgos_bthing_t thing);
+```
+Returns `true` if the bThing has been marked as private using [mgos_bthing_make_private()](#mgos_bthing_make_private) function.
+
+|Parameter||
+|--|--|
+|thing|A bThing.|
 
 <!-- ## JS APIs Reference
 ### bThing.EVENT

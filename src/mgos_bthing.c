@@ -121,6 +121,13 @@ void mgos_bthing_make_private(mgos_bthing_t thing) {
   }
 }
 
+bool mgos_bthing_is_private(mgos_bthing_t thing) {
+  if (thing) {
+    return mg_bthing_has_flag(thing, MG_BTHING_FLAG_ISPRIVATE);
+  }
+  return false;
+}
+
 #if MGOS_BTHING_HAVE_SENSORS
 
 bool mgos_bthing_on_get_state(mgos_bthing_t thing,
